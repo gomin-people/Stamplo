@@ -10,6 +10,7 @@ type FloatingActionButtonProps = {
   isPreview?: boolean;
   isRewardClaimed?: boolean;
   isLoading?: boolean;
+  className?: string;
 };
 
 export default function FloatingActionButton({
@@ -19,10 +20,11 @@ export default function FloatingActionButton({
   isPreview = false,
   isRewardClaimed = false,
   isLoading = false,
+  className,
 }: FloatingActionButtonProps) {
   return (
     <div
-      className={`${isPreview ? "absolute" : "fixed"} bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-50`}
+      className={`${isPreview ? "absolute" : "fixed"} bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-50 ${className ?? ""}`}
     >
       <ThemedButton
         onClick={onClick}
