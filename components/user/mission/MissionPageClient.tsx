@@ -39,6 +39,7 @@ type MissionPageClientProps = {
   initialMissions: InitialMission[];
   initialParticipant?: ParticipantModel;
   isPreview?: boolean;
+  newlyStampedId?: number | null;
 };
 
 type ViewMode = "list" | "grid";
@@ -56,6 +57,7 @@ const MissionPageClient = ({
   initialMissions,
   initialParticipant,
   isPreview = false,
+  newlyStampedId,
 }: MissionPageClientProps) => {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -212,6 +214,7 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
+                  isNewStamped={mission.id === newlyStampedId}
                 />
               ))}
             </div>
@@ -223,6 +226,7 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
+                  isNewStamped={mission.id === newlyStampedId}
                 />
               ))}
             </div>
