@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { useRouter } from "next/navigation";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
@@ -60,6 +60,8 @@ const MissionPageClient = ({
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
+  const prevStampedIds = useRef<Set<number>>(new Set());
+  const newlyStampedIds = useRef<Set<number>>(new Set());
 
   const initialData: ParticipantMissions | undefined =
     !isPreview && initialMissions.length > 0
@@ -88,6 +90,16 @@ const MissionPageClient = ({
           description: m.description ?? "",
           isStamped: !!m.isCompleted,
         }));
+
+  // 이번 세션에 새로 찍힌 미션 ID 추적
+  missions.forEach((m) => {
+    if (m.isStamped && !prevStampedIds.current.has(m.id)) {
+      if (prevStampedIds.current.size > 0) {
+        newlyStampedIds.current.add(m.id);
+      }
+      prevStampedIds.current.add(m.id);
+    }
+  });
 
   // 미완료된 미션 수 계산
   const incompleteCount = missions.filter((m) => !m.isStamped).length;
@@ -212,6 +224,7 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
+                  isNewlyStamped={newlyStampedIds.current.has(mission.id)}
                 />
               ))}
             </div>
@@ -223,6 +236,7 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
+                  isNewlyStamped={newlyStampedIds.current.has(mission.id)}
                 />
               ))}
             </div>
