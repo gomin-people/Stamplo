@@ -16,6 +16,7 @@ import {
 import { cn } from "@/utils";
 import { buildInitialData } from "@/utils/participant-mission";
 import { type ParticipantModel } from "@/types/models";
+import { useCelebration } from "@/hooks/useCelebration";
 
 // Supabase의 event 테이블 타입 인터페이스 정의
 type EventData = {
@@ -115,28 +116,7 @@ const MissionPageClient = ({
   const isRewardClaimed =
     data && !isPreview ? data.participant.isRewardClaimed : false;
 
-  const hasConfettiFired = useRef(false);
-
-  useEffect(() => {
-    if (!isAllCompleted || hasConfettiFired.current) return;
-    hasConfettiFired.current = true;
-    import("canvas-confetti").then(({ default: confetti }) => {
-      confetti({
-        particleCount: 60,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.7 },
-        colors: ["#4CAF50", "#FF9800", "#2196F3", "#E91E63", "#9C27B0"],
-      });
-      confetti({
-        particleCount: 60,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1, y: 0.7 },
-        colors: ["#4CAF50", "#FF9800", "#2196F3", "#E91E63", "#9C27B0"],
-      });
-    });
-  }, [isAllCompleted]);
+  const { showCelebration, handleStampReady } = useCelebration();
 
   const hasError = isError && !isPreview;
   const isMissionsEmpty = missions.length === 0 && !isPreview;
@@ -202,7 +182,12 @@ const MissionPageClient = ({
                 리워드를 받으세요
               </h2>
             ) : (
-              <h2 className="text-2xl font-nanum font-extrabold text-gomin-black leading-tight tracking-tight select-none animate-bounce-in">
+              <h2
+                className={cn(
+                  "text-2xl font-nanum font-extrabold text-gomin-black leading-tight tracking-tight select-none",
+                  showCelebration && "animate-shake-in"
+                )}
+              >
                 🎉 축하합니다!
                 <br />
                 모든 스탬프를 수집했어요!
@@ -238,6 +223,9 @@ const MissionPageClient = ({
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
                   isNewStamped={mission.id === newlyStampedId}
+                  onStampReady={
+                    mission.id === newlyStampedId ? handleStampReady : undefined
+                  }
                 />
               ))}
             </div>
