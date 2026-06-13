@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
@@ -269,4 +269,4 @@ const MissionPageClient = ({
   );
 };
 
-export default memo(MissionPageClient);
+export default MissionPageClient;
