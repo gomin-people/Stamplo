@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import Button from "@/components/sample/Button";
+import { Button } from "@/components/ui/button";
 import { useModalHistoryBack } from "@/hooks/useModalHistoryBack";
 
 type Mission = {
