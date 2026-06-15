@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import EventPoster from "@/components/user/common/EventPoster";
 import ThemedButton from "@/components/user/common/ThemedButton";
