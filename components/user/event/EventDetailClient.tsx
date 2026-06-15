@@ -13,7 +13,7 @@ type Props = {
 const EventDetailClient = ({ event }: Props) => {
   return (
     <div className="bg-white min-h-screen flex flex-col w-full max-w-md mx-auto relative select-none pt-14">
-      <div className="px-6 mt-6">
+      <div className="px-6 mt-6 animate-fade-up">
         {event.posterImageUrl && (
           <div className="relative w-full aspect-3/4 rounded-[24px] overflow-hidden shadow-md border border-gomin-neutral-100">
             <Image
@@ -29,7 +29,7 @@ const EventDetailClient = ({ event }: Props) => {
         )}
       </div>
 
-      <div className="bg-gomin-primary-100 rounded-t-[32px] p-6 flex flex-col gap-4.5 mt-6 flex-1">
+      <div className="bg-gomin-primary-100 rounded-t-[32px] p-6 flex flex-col gap-4.5 mt-6 flex-1 animate-fade-up-delay-1">
         <InfoCard label="행사명">
           <h2 className="text-[17px] font-nanum font-extrabold text-gomin-primary-700">
             {event.title}
