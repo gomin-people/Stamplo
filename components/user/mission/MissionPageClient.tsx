@@ -165,7 +165,10 @@ const MissionPageClient = ({
           </h1>
           {/* 우측 별도 컴포넌트로 보여지는 브로슈어 버튼 */}
           {showBrochureButton && (
-            <BrochureButton eventId={eventId} className="animate-bounce-once" />
+            <BrochureButton
+              eventId={eventId}
+              className={cn(!newlyStampedId && "animate-bounce-once")}
+            />
           )}
         </div>
 

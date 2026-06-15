@@ -13,7 +13,7 @@ type PageProps = {
 export default async function MissionPage({ params, searchParams }: PageProps) {
   const { eventId: eventIdParam } = await params;
   const { newMission } = await searchParams;
-  const newStampedId = newMission ? Number(newMission) : null;
+  const newlyStampedId = newMission ? Number(newMission) : null;
 
   // 1. 세션 검증 및 이벤트 정보, 참여자 정보를 단일 쿼리로 획득
   const { event, participant } =
@@ -44,7 +44,7 @@ export default async function MissionPage({ params, searchParams }: PageProps) {
       eventId={eventIdParam}
       initialMissions={initialMissions}
       initialParticipant={initialParticipant}
-      newlyStampedId={newStampedId}
+      newlyStampedId={newlyStampedId}
     />
   );
 }
