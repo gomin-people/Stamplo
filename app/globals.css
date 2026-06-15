@@ -1,3 +1,13 @@
+@import "@fontsource/noto-sans-kr/korean-400.css";
+@import "@fontsource/noto-sans-kr/korean-700.css";
+@import "@fontsource/noto-sans-kr/korean-800.css";
+@import "@fontsource/noto-sans-kr/latin-400.css";
+@import "@fontsource/noto-sans-kr/latin-700.css";
+@import "@fontsource/noto-sans-kr/latin-800.css";
+@import "@fontsource/nanum-gothic/korean-700.css";
+@import "@fontsource/nanum-gothic/korean-800.css";
+@import "@fontsource/nanum-gothic/latin-700.css";
+@import "@fontsource/nanum-gothic/latin-800.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -7,8 +17,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-noto-sans);
-  --font-nanum: var(--font-nanum-gothic);
+  --font-sans: "Noto Sans KR", sans-serif;
+  --font-nanum: "Nanum Gothic", sans-serif;
   --color-gomin-primary-700: var(--primary-700);
   --color-gomin-primary-600: var(--primary-600);
   --color-gomin-primary-500: var(--primary-500);

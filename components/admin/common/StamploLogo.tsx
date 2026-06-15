@@ -1,7 +1,13 @@
+import Image from "next/image";
+
 export default function StamploLogo() {
   return (
-    <h1 className="text-4xl text-gomin-primary-700 tracking-tight [font-family:var(--font-monomaniac-one)]">
-      Stamplo
-    </h1>
+    <Image
+      src="/images/textLogo.svg"
+      alt="Stamplo"
+      width={144}
+      height={41}
+      priority
+    />
   );
 }

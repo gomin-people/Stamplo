@@ -99,6 +99,12 @@ importers:
         specifier: ^5.0.13
         version: 5.0.13(@types/react@19.2.15)(immer@11.1.8)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
     devDependencies:
+      '@fontsource/nanum-gothic':
+        specifier: ^5.2.7
+        version: 5.2.7
+      '@fontsource/noto-sans-kr':
+        specifier: ^5.2.9
+        version: 5.2.9
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.3.0
@@ -511,6 +517,12 @@ packages:
 
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
+
+  '@fontsource/nanum-gothic@5.2.7':
+    resolution: {integrity: sha512-pJB8vp5c3XLN/pBNvlinivGBxZZkSBS4DpuGht3rOmdmOvvzNf4HUyaIINHRfZmsoCse+QXWGXamNf9JRdMLeg==}
+
+  '@fontsource/noto-sans-kr@5.2.9':
+    resolution: {integrity: sha512-pbF8F0rUzKkDmnk/KYGAbxjgW4TrIHdFKnV6OQ+kUC9ELCn5utrAURcEgMqq3J9SRX+FvjOz+aBCmfcC8/r7cw==}
 
   '@hono/node-server@1.19.14':
     resolution: {integrity: sha512-GwtvgtXxnWsucXvbQXkRgqksiH2Qed37H9xHZocE5sA3N8O8O8/8FA3uclQXxXVzc9XBZuEOMK7+r02FmSpHtw==}
@@ -5889,6 +5901,10 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
 
   '@floating-ui/utils@0.2.11': {}
+
+  '@fontsource/nanum-gothic@5.2.7': {}
+
+  '@fontsource/noto-sans-kr@5.2.9': {}
 
   '@hono/node-server@1.19.14(hono@4.12.21)':
     dependencies:
