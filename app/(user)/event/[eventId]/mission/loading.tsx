@@ -1,7 +1,7 @@
 const MissionLoading = () => {
   return (
     <div className="flex flex-col relative bg-gomin-white h-full pb-21.5">
-      <main className="flex-1 max-w-md w-full mx-auto px-6 pt-4 pb-1.5 overflow-x-hidden">
+      <main className="flex-1 max-w-md w-full mx-auto px-6 pt-18 pb-1.5 overflow-x-hidden">
         {/* 타이틀 & 브로슈어 버튼 */}
         <div className="flex items-center justify-between gap-4 mb-5">
           <div className="h-11 w-52 rounded-xl bg-gomin-neutral-100 animate-pulse" />
