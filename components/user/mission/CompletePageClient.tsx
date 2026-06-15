@@ -75,7 +75,9 @@ const CompletePageClient = () => {
 
   const handleSuccessConfirm = () => {
     setIsQrModalOpen(false);
-    router.push(`/event/${eventId}`);
+    setTimeout(() => {
+      router.push(`/event/${eventId}`);
+    }, 100);
   };
 
   return (

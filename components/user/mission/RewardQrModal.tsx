@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { useModalHistoryBack } from "@/hooks/useModalHistoryBack";
 
 type Props = {
   isOpen: boolean;
@@ -25,6 +26,11 @@ const RewardQrModal = ({
   isSuccess = false,
   onSuccessConfirm,
 }: Props) => {
+  useModalHistoryBack(
+    isOpen,
+    isSuccess ? (onSuccessConfirm ?? onClose) : onClose
+  );
+
   return (
     <Dialog
       open={isOpen}
