@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { requestJson } from "@/features/shared/api/http";
 import { type ParticipantModel } from "@/types/models";
+import { participantSurveyQueryKeys } from "@/constants/participantSurveyQueryKeys";
 
 // 참여자 설문 상태 응답 타입
 type ParticipantSurvey = Pick<
@@ -21,7 +22,7 @@ function getParticipantSurvey() {
  */
 export function useParticipantSurveyQuery() {
   return useQuery({
-    queryKey: ["participant", "survey"],
+    queryKey: participantSurveyQueryKeys.survey,
     queryFn: getParticipantSurvey,
   });
 }
