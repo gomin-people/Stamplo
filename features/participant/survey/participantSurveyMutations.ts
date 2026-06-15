@@ -3,6 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createJsonRequest, requestJson } from "@/features/shared/api/http";
 import { type ParticipantModel, type SurveyPayloadModel } from "@/types/models";
+import { type ParticipantMissions } from "@/features/participant/missions/participantMissionQueries";
+import { participantSurveyQueries } from "@/features/participant/survey/participantSurveyQueries";
 
 function submitParticipantSurvey(payload: SurveyPayloadModel) {
   return requestJson<ParticipantModel>(
@@ -21,8 +23,24 @@ export function useSubmitSurveyMutation() {
 
   return useMutation({
     mutationFn: submitParticipantSurvey,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["participant"] });
+    onSuccess: (data) => {
+      queryClient.setQueryData<ParticipantMissions>(
+        ["participant", "missions"],
+        (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            participant: {
+              ...oldData.participant,
+              gender: data.gender,
+              ageRange: data.ageRange,
+            },
+          };
+        }
+      );
+      queryClient.invalidateQueries({
+        queryKey: participantSurveyQueries.all(),
+      });
     },
   });
 }

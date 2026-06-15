@@ -75,12 +75,14 @@ const CompletePageClient = () => {
 
   const handleSuccessConfirm = () => {
     setIsQrModalOpen(false);
-    router.push(`/event/${eventId}`);
+    setTimeout(() => {
+      router.push(`/event/${eventId}`);
+    }, 100);
   };
 
   return (
     <>
-      <div className="h-full overflow-hidden bg-gomin-primary-700 flex flex-col items-center justify-center p-6 text-center select-none">
+      <div className="fixed inset-0 w-full h-full bg-gomin-primary-700 flex flex-col items-center justify-center p-6 text-center select-none">
         <div className="max-w-md w-full flex flex-col items-center justify-center space-y-10">
           {/* 1. 중앙 Stamplo 대형 원형 도장 그래픽 */}
           <div className="w-64 h-64 shrink-0 flex items-center justify-center relative select-none">

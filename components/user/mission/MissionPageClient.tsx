@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, memo } from "react";
+import { useState, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
@@ -15,6 +15,7 @@ import {
 } from "@/features/participant/missions/participantMissionQueries";
 import { cn } from "@/utils";
 import { buildInitialData } from "@/utils/participant-mission";
+import { type ParticipantModel } from "@/types/models";
 
 // Supabase의 event 테이블 타입 인터페이스 정의
 type EventData = {
@@ -36,6 +37,7 @@ type MissionPageClientProps = {
   event: EventData;
   eventId: string;
   initialMissions: InitialMission[];
+  initialParticipant?: ParticipantModel;
   isPreview?: boolean;
 };
 
@@ -52,6 +54,7 @@ const MissionPageClient = ({
   event,
   eventId,
   initialMissions,
+  initialParticipant,
   isPreview = false,
 }: MissionPageClientProps) => {
   const router = useRouter();
@@ -60,11 +63,11 @@ const MissionPageClient = ({
 
   const initialData: ParticipantMissions | undefined =
     !isPreview && initialMissions.length > 0
-      ? buildInitialData(initialMissions)
+      ? buildInitialData(initialMissions, initialParticipant)
       : undefined;
 
   // React Query를 통해 DB에서 참여자의 실시간 완료 스탬프 현황 데이터를 가져옴
-  const { data, isError } = useParticipantMissionsQuery({
+  const { data, isError, isFetching } = useParticipantMissionsQuery({
     enabled: !isPreview,
     initialData,
   });
@@ -96,6 +99,16 @@ const MissionPageClient = ({
       ? !!data.participant.gender && !!data.participant.ageRange
       : false;
 
+  // 설문 제출 완료 감지 시 자동으로 완료 페이지 이동
+  useEffect(() => {
+    if (isSurveyCompleted && isSurveyOpen) {
+      const timer = setTimeout(() => {
+        router.push(`/event/${eventId}/complete`);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isSurveyCompleted, isSurveyOpen, eventId, router]);
+
   // 리워드 수령 완료 여부
   const isRewardClaimed =
     data && !isPreview ? data.participant.isRewardClaimed : false;
@@ -120,7 +133,9 @@ const MissionPageClient = ({
   };
 
   const handleSurveySubmitSuccess = () => {
-    router.push(`/event/${eventId}/complete`);
+    setTimeout(() => {
+      router.push(`/event/${eventId}/complete`);
+    }, 100);
   };
 
   // DB에서 불러온 title (또는 name)을 1순위로 사용하며 예외 처리 제공
@@ -220,6 +235,7 @@ const MissionPageClient = ({
           onClick={handleAction}
           isPreview={isPreview}
           isRewardClaimed={isRewardClaimed}
+          isLoading={isFetching && !isPreview}
         />
       )}
 
