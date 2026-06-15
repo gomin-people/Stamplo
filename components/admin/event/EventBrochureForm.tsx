@@ -26,7 +26,7 @@ const EventBrochureForm = forwardRef<StepFormHandle, Props>(
       handleDelete,
       handleReplace,
       handleDragEnd,
-    } = usePageUpload(initialData?.brochureImageUrl);
+    } = usePageUpload(initialData?.brochureImageUrl, 624);
 
     useImperativeHandle(
       ref,

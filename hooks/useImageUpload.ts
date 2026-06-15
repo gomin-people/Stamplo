@@ -16,6 +16,7 @@ type UseImageUploadOptions = {
   allowedExtensions?: string[];
   allowedMimeTypes?: string[];
   maxSizeBytes?: number;
+  resizeWidth?: number;
   onUrlChange?: (url: string) => void;
 };
 
@@ -25,6 +26,7 @@ export default function useImageUpload({
   allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS,
   allowedMimeTypes = DEFAULT_ALLOWED_MIME_TYPES,
   maxSizeBytes = DEFAULT_MAX_SIZE_BYTES,
+  resizeWidth,
   onUrlChange,
 }: UseImageUploadOptions) {
   const [path, setPath] = useState<string | null>(initialPath);
@@ -35,7 +37,7 @@ export default function useImageUpload({
     isPending: isUploading,
     isSuccess,
     isError,
-  } = useUploadAdminImageMutation();
+  } = useUploadAdminImageMutation({ width: resizeWidth });
   const { mutate: deleteImage } = useDeleteAdminImageMutation();
 
   const validate = (file: File): string | null => {

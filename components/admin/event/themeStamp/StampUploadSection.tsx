@@ -31,6 +31,7 @@ const StampUploadSection = ({
     triggerFileInput,
   } = useImageUpload({
     fileInputRef,
+    resizeWidth: 220,
     onUrlChange: (url) => {
       onChange(url);
     },
