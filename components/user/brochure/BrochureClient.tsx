@@ -38,7 +38,9 @@ const BrochureClient = ({ images, showGuide }: Props) => {
   }, [isLastPage, eventId, router]);
 
   const handleGoMission = () =>
-    !exiting && (setExiting(true), router.push(`/event/${eventId}/mission`));
+    !exiting &&
+    (setExiting(true),
+    setTimeout(() => router.push(`/event/${eventId}/mission`), 300));
 
   return (
     <AnimatePresence>
@@ -49,9 +51,6 @@ const BrochureClient = ({ images, showGuide }: Props) => {
             "bg-gomin-white flex flex-col items-center pt-4 pb-[calc(2.5rem+env(safe-area-inset-bottom))]",
             showGuide ? "" : "animate-fade-in"
           )}
-          // className={
-          //   "bg-gomin-white flex flex-col items-center pt-4 pb-[calc(2.5rem+env(safe-area-inset-bottom))]"
-          // }
           exit={{ opacity: 0, transition: { duration: 0.35, ease: "easeIn" } }}
         >
           <div className="mb-4">
