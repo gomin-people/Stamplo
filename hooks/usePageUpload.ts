@@ -17,7 +17,7 @@ export type UploadPage = {
   isUploading: boolean;
 };
 
-const usePageUpload = (initialUrls?: string[]) => {
+const usePageUpload = (initialUrls?: string[], resizeWidth?: number) => {
   const [pages, setPages] = useState<UploadPage[]>(
     () =>
       initialUrls?.map((url) => ({
@@ -35,7 +35,9 @@ const usePageUpload = (initialUrls?: string[]) => {
 
   const uploadAndSet = async (id: string, file: File) => {
     try {
-      const { url, path } = await uploadAdminImage(file);
+      const { url, path } = await uploadAdminImage(file, {
+        width: resizeWidth,
+      });
       setPages((prev) =>
         prev.map((p) =>
           p.id === id ? { ...p, url, path, isUploading: false } : p

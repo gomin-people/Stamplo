@@ -1,6 +1,7 @@
 import { supabase } from "@/utils/supabase/server";
 import { badRequest, serverError } from "@/utils/api";
 import { NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 
 const BUCKET = "Stamply";
 
@@ -10,12 +11,23 @@ export async function POST(req: NextRequest) {
 
   if (!file) return badRequest("파일이 없습니다.");
 
-  const ext = file.name.split(".").pop();
-  const path = `events/${crypto.randomUUID()}.${ext}`;
+  const widthParam = formData.get("width");
+  const width = widthParam ? Number(widthParam) : undefined;
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const compressed = await sharp(buffer)
+    .resize(width ? { width, withoutEnlargement: true } : undefined)
+    .webp({ quality: 80 })
+    .toBuffer();
+
+  const path = `events/${crypto.randomUUID()}.webp`;
 
   const { error } = await supabase.storage
     .from(BUCKET)
-    .upload(path, file, { contentType: file.type, cacheControl: "31536000" });
+    .upload(path, compressed, {
+      contentType: "image/webp",
+      cacheControl: "31536000",
+    });
 
   if (error) return serverError("이미지 업로드 실패", error);
 

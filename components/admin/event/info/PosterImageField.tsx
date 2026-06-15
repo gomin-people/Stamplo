@@ -50,6 +50,7 @@ const PosterImageField = memo(function PosterImageField({
     initialPath: value,
     allowedMimeTypes: POSTER_ALLOWED_MIME_TYPES,
     allowedExtensions: POSTER_ALLOWED_EXTENSIONS,
+    resizeWidth: 600,
     onUrlChange: (url) => {
       if (url) field.onChange(url);
     },
@@ -86,6 +87,7 @@ const PosterImageField = memo(function PosterImageField({
               width={400}
               height={600}
               src={value}
+              sizes="600px"
               fetchPriority={"high"}
               loading="eager"
               alt="포스터 미리보기"
