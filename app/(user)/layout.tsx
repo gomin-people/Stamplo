@@ -7,7 +7,7 @@ export default function UserLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col h-svh overflow-hidden">
+    <div className="flex flex-col h-svh overflow-hidden bg-transparent">
       <LayoutHeader />
       <main className="flex-1 overflow-y-auto">{children}</main>
       <Toaster />
