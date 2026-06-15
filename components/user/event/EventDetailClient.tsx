@@ -12,7 +12,7 @@ type Props = {
 
 const EventDetailClient = ({ event }: Props) => {
   return (
-    <div className="bg-white min-h-screen flex flex-col w-full max-w-md mx-auto relative select-none">
+    <div className="bg-white min-h-screen flex flex-col w-full max-w-md mx-auto relative select-none pt-14">
       <div className="px-6 mt-6">
         {event.posterImageUrl && (
           <div className="relative w-full aspect-3/4 rounded-[24px] overflow-hidden shadow-md border border-gomin-neutral-100">

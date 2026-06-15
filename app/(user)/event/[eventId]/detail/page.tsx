@@ -1,4 +1,4 @@
-import { getEntryEvent } from "@/features/qr/entry/api/entry";
+import { fetchParticipantEvent } from "@/features/participant/events/participantEventApi";
 import EventDetailClient from "@/components/user/event/EventDetailClient";
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
 
 const EventDetailPage = async ({ params }: Props) => {
   const { eventId } = await params;
-  const event = await getEntryEvent(eventId);
+  const event = await fetchParticipantEvent(Number(eventId));
 
   return <EventDetailClient event={event} />;
 };
