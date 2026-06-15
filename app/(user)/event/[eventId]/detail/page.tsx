@@ -34,7 +34,7 @@ const EventDetailPage = () => {
   }
 
   return (
-    <div className="bg-white min-h-screen flex flex-col w-full max-w-md mx-auto relative select-none">
+    <div className="bg-white min-h-screen flex flex-col w-full max-w-md mx-auto relative select-none pt-14">
       {/* 1. 대형 포스터 이미지 */}
       <div className="px-6 mt-6">
         {event.posterImageUrl && (

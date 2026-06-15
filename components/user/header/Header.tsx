@@ -20,7 +20,7 @@ const Header = ({ showBackButton = true, onBackClick }: HeaderProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full h-14 flex items-center justify-between px-4 bg-transparent pointer-events-none">
+    <header className="absolute top-0 z-50 w-full h-14 flex items-center justify-between px-4 bg-transparent pointer-events-none">
       {/* Left Area: Back Button */}
       <div className="flex items-center min-w-10">
         {showBackButton && (
