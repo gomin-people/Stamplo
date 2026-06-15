@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, memo } from "react";
+import { useState, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
@@ -98,6 +98,13 @@ const MissionPageClient = ({
     data && !isPreview
       ? !!data.participant.gender && !!data.participant.ageRange
       : false;
+
+  // 설문 제출 완료 감지 시 자동으로 완료 페이지 이동
+  useEffect(() => {
+    if (isSurveyCompleted && isSurveyOpen) {
+      router.push(`/event/${eventId}/complete`);
+    }
+  }, [isSurveyCompleted, isSurveyOpen, eventId, router]);
 
   // 리워드 수령 완료 여부
   const isRewardClaimed =
