@@ -102,7 +102,10 @@ const MissionPageClient = ({
   // 설문 제출 완료 감지 시 자동으로 완료 페이지 이동
   useEffect(() => {
     if (isSurveyCompleted && isSurveyOpen) {
-      router.push(`/event/${eventId}/complete`);
+      const timer = setTimeout(() => {
+        router.push(`/event/${eventId}/complete`);
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [isSurveyCompleted, isSurveyOpen, eventId, router]);
 
@@ -130,7 +133,9 @@ const MissionPageClient = ({
   };
 
   const handleSurveySubmitSuccess = () => {
-    router.push(`/event/${eventId}/complete`);
+    setTimeout(() => {
+      router.push(`/event/${eventId}/complete`);
+    }, 100);
   };
 
   // DB에서 불러온 title (또는 name)을 1순위로 사용하며 예외 처리 제공
