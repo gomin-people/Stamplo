@@ -212,7 +212,7 @@ const QrCheckClient = ({ eventId }: QrCheckClientProps) => {
           hasScannedRef.current = true;
         },
         navigateToMissionPage: () => {
-          window.location.assign(`/event/${eventId}/mission`);
+          window.location.replace(`/event/${eventId}/mission`);
         },
         navigateToEvent: (eventPath) => {
           router.push(eventPath);
