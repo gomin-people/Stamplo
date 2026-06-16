@@ -200,7 +200,7 @@ export async function PATCH(
     return notFound("행사를 찾을 수 없습니다.");
   }
 
-  revalidateTag(`event-theme-${eventId}`);
+  revalidateTag(`event-theme-${eventId}`, "default");
 
   return ok(data);
 }
