@@ -249,7 +249,7 @@ export default function LandingPage() {
             <div className="w-full">
               <div className="grid grid-cols-[1.05fr_0.95fr] gap-14 items-center max-lg:grid-cols-1 max-lg:gap-10">
                 <div className="flex flex-col gap-5">
-                  <h1 className="font-extrabold text-[clamp(30px,4.8vw,58px)] leading-[1.2] tracking-tight font-nanum break-keep word-keep-all reveal">
+                  <h1 className="font-extrabold text-[clamp(24px,4.8vw,56px)] leading-[1.2] tracking-tight font-nanum break-keep word-keep-all reveal">
                     누구나 쉽게
                     <br /> 시작하는 스탬프 투어
                   </h1>
@@ -257,10 +257,10 @@ export default function LandingPage() {
                     <StamploLogo
                       width={280}
                       height={80}
-                      className="w-[clamp(180px,24vw,280px)] h-auto"
+                      className="w-[clamp(210px,28vw,280px)] h-auto"
                     />
                   </div>
-                  <p className="text-[clamp(16px,1.55vw,19px)] text-gomin-neutral-600 leading-[1.62] break-keep word-keep-all reveal">
+                  <p className="text-[clamp(14px,1.5vw,18px)] text-gomin-neutral-600 leading-[1.62] break-keep word-keep-all reveal">
                     행사의 몰입도를 위해 스탬프 투어는 이제 필수.
                     <br />
                     간편하게 내 행사에 스탬프 투어를 적용해 보세요.
@@ -275,11 +275,19 @@ export default function LandingPage() {
                     </a>
                   </div>
                 </div>
-                <div className="relative flex justify-center max-lg:order-first reveal">
+                <div className="relative flex justify-center reveal">
                   <div className="absolute inset-0 z-0 pointer-events-none before:content-[''] before:absolute before:w-[70%] before:h-[70%] before:left-[15%] before:top-[12%] before:bg-[radial-gradient(circle,var(--primary-200)_0%,transparent_68%)] before:filter before:blur-[10px] before:opacity-70"></div>
                   {/* Premium Live Mockup for Hero A */}
                   <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[332px] max-md:max-w-[280px] max-sm:max-w-[240px]">
-                    <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col"></div>
+                    <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
+                      <Image
+                        src="/images/landing/missionPage.webp"
+                        alt="missionPage Mockup"
+                        fill
+                        sizes="(max-width: 640px) 240px, (max-width: 768px) 280px, 332px"
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -404,7 +412,15 @@ export default function LandingPage() {
               {/* Step 1: Scan QR */}
               <div className="flex flex-col items-center gap-[22px] reveal">
                 <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
-                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col"></div>
+                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
+                    <Image
+                      src="/images/landing/qrPage.webp"
+                      alt="QR Scan Mockup"
+                      fill
+                      sizes="(max-width: 480px) 240px, 250px"
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
                 <div className="flex flex-col items-center gap-2.5 text-center max-w-[260px]">
                   <div className="w-10 h-10 rounded-full bg-gomin-primary-700 text-white font-nanum font-extrabold text-base flex items-center justify-center shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)]">
@@ -426,7 +442,15 @@ export default function LandingPage() {
               {/* Step 2: Collect Stamp */}
               <div className="flex flex-col items-center gap-[22px] reveal">
                 <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
-                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col"></div>
+                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
+                    <Image
+                      src="/images/landing/missionPage.webp"
+                      alt="Stamp Card Mockup"
+                      fill
+                      sizes="(max-width: 480px) 240px, 250px"
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
                 <div className="flex flex-col items-center gap-2.5 text-center max-w-[260px]">
                   <div className="w-10 h-10 rounded-full bg-gomin-primary-700 text-white font-nanum font-extrabold text-base flex items-center justify-center shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)]">
@@ -449,7 +473,15 @@ export default function LandingPage() {
               {/* Step 3: Complete / Reward */}
               <div className="flex flex-col items-center gap-[22px] reveal">
                 <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
-                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col"></div>
+                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
+                    <Image
+                      src="/images/landing/rewardPage.webp"
+                      alt="Reward Mockup"
+                      fill
+                      sizes="(max-width: 480px) 240px, 250px"
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
                 <div className="flex flex-col items-center gap-2.5 text-center max-w-[260px]">
                   <div className="w-10 h-10 rounded-full bg-gomin-primary-700 text-white font-nanum font-extrabold text-base flex items-center justify-center shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)]">
@@ -532,129 +564,14 @@ export default function LandingPage() {
                       stamplo.com/admin
                     </div>
                   </div>
-                  <div className="aspect-16/10 bg-slate-50 flex">
-                    {/* Admin Mockup Sidebar */}
-                    <div className="w-1/4 bg-slate-900 text-slate-400 p-2.5 flex flex-col gap-2 shrink-0 border-r border-slate-800 text-[10px]">
-                      <div className="flex items-center gap-1.5 px-1.5 mb-2">
-                        <span className="w-5 h-5 rounded bg-[#5435EB] flex items-center justify-center text-white font-bold text-[10px]">
-                          S
-                        </span>
-                        <span className="font-extrabold text-white text-xs font-logo">
-                          stamplo
-                        </span>
-                      </div>
-                      <span className="bg-slate-800 text-white rounded px-2 py-1 flex items-center gap-1.5 font-bold">
-                        <BarChart3 size={11} />
-                        실시간 통계
-                      </span>
-                      <span className="px-2 py-1 flex items-center gap-1.5 hover:text-white cursor-pointer">
-                        <Scroll size={11} />
-                        미션 관리
-                      </span>
-                      <span className="px-2 py-1 flex items-center gap-1.5 hover:text-white cursor-pointer">
-                        <QrCode size={11} />
-                        QR 토큰 생성
-                      </span>
-                    </div>
-
-                    {/* Admin Mockup Main Content */}
-                    <div className="flex-1 p-3 flex flex-col gap-2.5 overflow-hidden">
-                      {/* Top Metric Cards */}
-                      <div className="grid grid-cols-3 gap-2 text-left">
-                        <div className="bg-white rounded-lg p-2 border border-slate-100 shadow-sm">
-                          <p className="text-[8px] text-slate-400 font-bold">
-                            TOTAL VISITORS
-                          </p>
-                          <p className="text-sm font-extrabold text-slate-800 mt-0.5">
-                            1,248명
-                          </p>
-                          <span className="text-[8px] font-bold text-emerald-500 bg-emerald-50 px-1 py-0.2 rounded">
-                            +12%
-                          </span>
-                        </div>
-                        <div className="bg-white rounded-lg p-2 border border-slate-100 shadow-sm">
-                          <p className="text-[8px] text-slate-400 font-bold">
-                            COMPLETION RATE
-                          </p>
-                          <p className="text-sm font-extrabold text-slate-800 mt-0.5">
-                            78.4%
-                          </p>
-                          <span className="text-[8px] font-bold text-emerald-500 bg-emerald-50 px-1 py-0.2 rounded">
-                            +4.2%
-                          </span>
-                        </div>
-                        <div className="bg-white rounded-lg p-2 border border-slate-100 shadow-sm">
-                          <p className="text-[8px] text-slate-400 font-bold">
-                            REWARD CLAIMED
-                          </p>
-                          <p className="text-sm font-extrabold text-slate-800 mt-0.5">
-                            980개
-                          </p>
-                          <span className="text-[8px] text-slate-400 font-bold">
-                            / 1,000개 limit
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Main Chart Area */}
-                      <div className="bg-white rounded-lg p-3 border border-slate-100 shadow-sm flex-1 flex flex-col justify-between">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-[9px] font-extrabold text-slate-700">
-                            시간대별 실시간 참여량
-                          </span>
-                          <span className="text-[8px] text-slate-400">
-                            Updated: Just now
-                          </span>
-                        </div>
-                        {/* Live CSS bar chart */}
-                        <div className="flex-1 flex items-end gap-2.5 pt-2 border-b border-slate-100 px-2 h-16">
-                          <div className="flex-1 bg-slate-100 rounded-t h-4 flex justify-center relative group cursor-pointer">
-                            <span className="absolute -top-4 text-[7px] font-bold opacity-0 group-hover:opacity-100 bg-slate-900 text-white rounded px-1">
-                              10
-                            </span>
-                          </div>
-                          <div className="flex-1 bg-slate-100 rounded-t h-8 flex justify-center relative group cursor-pointer">
-                            <span className="absolute -top-4 text-[7px] font-bold opacity-0 group-hover:opacity-100 bg-slate-900 text-white rounded px-1">
-                              32
-                            </span>
-                          </div>
-                          <div className="flex-1 bg-[#BFB5ED] rounded-t h-12 flex justify-center relative group cursor-pointer">
-                            <span className="absolute -top-4 text-[7px] font-bold opacity-0 group-hover:opacity-100 bg-slate-900 text-white rounded px-1">
-                              50
-                            </span>
-                          </div>
-                          <div className="flex-1 bg-[#8A77E7] rounded-t h-16 flex justify-center relative group cursor-pointer">
-                            <span className="absolute -top-4 text-[7px] font-bold opacity-0 group-hover:opacity-100 bg-slate-900 text-white rounded px-1">
-                              98
-                            </span>
-                          </div>
-                          <div className="flex-1 bg-[#5435EB] rounded-t h-20 flex justify-center relative group cursor-pointer animate-pulse">
-                            <span className="absolute -top-4 text-[7px] font-bold opacity-0 group-hover:opacity-100 bg-slate-900 text-white rounded px-1">
-                              140
-                            </span>
-                          </div>
-                          <div className="flex-1 bg-[#8A77E7] rounded-t h-14 flex justify-center relative group cursor-pointer">
-                            <span className="absolute -top-4 text-[7px] font-bold opacity-0 group-hover:opacity-100 bg-slate-900 text-white rounded px-1">
-                              75
-                            </span>
-                          </div>
-                          <div className="flex-1 bg-[#BFB5ED] rounded-t h-10 flex justify-center relative group cursor-pointer">
-                            <span className="absolute -top-4 text-[7px] font-bold opacity-0 group-hover:opacity-100 bg-slate-900 text-white rounded px-1">
-                              45
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between text-[7px] text-slate-450 mt-1 px-1 font-bold">
-                          <span>10:00</span>
-                          <span>12:00</span>
-                          <span>14:00</span>
-                          <span>16:00</span>
-                          <span>18:00</span>
-                          <span>20:00</span>
-                          <span>22:00</span>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="aspect-16/10 bg-slate-50 relative overflow-hidden">
+                    <Image
+                      src="/images/landing/dashboardPage.webp"
+                      alt="Dashboard Mockup"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 700px"
+                      className="object-fit"
+                    />
                   </div>
                 </div>
               </div>
