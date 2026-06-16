@@ -224,11 +224,13 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
                   </div>
                 </Field>
                 <Field data-invalid={!!operatingHoursError}>
-                  <FieldLabel>
+                  <FieldLabel htmlFor="startTime">
                     운영시간 <span className="text-destructive">*</span>
                   </FieldLabel>
                   <div className="flex items-center gap-2">
                     <Input
+                      id="startTime"
+                      aria-label="운영 시작 시간"
                       type="time"
                       {...register("startTime")}
                       aria-invalid={!!errors.startTime}
@@ -236,6 +238,7 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
                     />
                     <span className="shrink-0 text-muted-foreground">~</span>
                     <Input
+                      aria-label="운영 종료 시간"
                       type="time"
                       {...register("endTime")}
                       aria-invalid={!!errors.endTime}
