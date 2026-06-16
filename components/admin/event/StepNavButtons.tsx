@@ -46,8 +46,8 @@ const StepNavButtons = ({
     <div className="flex gap-2">
       <Button
         type="button"
+        aria-label="이전"
         variant="outline"
-        size={null}
         className={cn(
           "size-11 rounded-full border-gomin-neutral-100 p-0 transition-all hover:-translate-y-0.5 active:translate-y-0",
           currentStep === 1 && "pointer-events-none opacity-40"
@@ -68,7 +68,7 @@ const StepNavButtons = ({
             >
               <Button
                 type="button"
-                size={null}
+                aria-label="다음"
                 className={cn(
                   "size-11 rounded-full bg-gomin-primary-700 bg-clip-border p-0 shadow-[0px_5px_14px_-5px_rgba(84,53,235,0.55)] transition-all hover:-translate-y-0.5 hover:bg-gomin-primary-700/90 active:translate-y-0",
                   !isLastStep &&
