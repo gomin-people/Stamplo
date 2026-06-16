@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, Plus } from "lucide-react";
 import { cn } from "@/utils";
@@ -17,11 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAdminEventsQuery } from "@/features/admin/events/adminEventQueries";
 import type { EventModel } from "@/types/models";
-import {
-  useSetSelectedEventId,
-  useIsEditMode,
-  useSetPendingHref,
-} from "@/stores/admin";
+import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
 
 type Props = {
   eventId: string;
@@ -121,7 +117,6 @@ const EventSelector = ({ eventId }: Props) => {
   const [activeScrollTarget, setActiveScrollTarget] = useState<string | null>(
     null
   );
-  const setSelectedEventId = useSetSelectedEventId();
   const isEditMode = useIsEditMode();
   const setPendingHref = useSetPendingHref();
   const { data: events = [], isError, isLoading } = useAdminEventsQuery();
@@ -136,14 +131,6 @@ const EventSelector = ({ eventId }: Props) => {
       ? "행사 목록 조회 실패"
       : (selectedEvent?.title ?? `행사 ${eventId}`);
 
-  useEffect(() => {
-    if (!selectedEvent) {
-      return;
-    }
-
-    setSelectedEventId(String(selectedEvent.id));
-  }, [selectedEvent, setSelectedEventId]);
-
   const selectEvent = (nextEventId: string) => {
     if (nextEventId === eventId) return;
 
@@ -155,7 +142,6 @@ const EventSelector = ({ eventId }: Props) => {
     if (isEditMode) {
       setPendingHref(href);
     } else {
-      setSelectedEventId(nextEventId);
       router.push(href);
     }
   };

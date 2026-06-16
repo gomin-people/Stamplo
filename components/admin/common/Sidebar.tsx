@@ -15,12 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ScanTextIcon, type ScanTextIconHandle } from "lucide-animated";
 import { X } from "lucide-react";
 import { useAdminEventsQuery } from "@/features/admin/events/adminEventQueries";
-import {
-  useSelectedEventId,
-  useSetSelectedEventId,
-  useIsEditMode,
-  useSetPendingHref,
-} from "@/stores/admin";
+import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
 
 // 관리자 이벤트 화면의 사이드바와 행사 등록 취소 이동 버튼 렌더링
 const Sidebar = () => {
@@ -28,8 +23,6 @@ const Sidebar = () => {
   const pathname = usePathname();
   const { eventId } = useParams<{ eventId?: string }>();
   const route = getAdminRouteConfig(pathname);
-  const selectedEventId = useSelectedEventId();
-  const setSelectedEventId = useSetSelectedEventId();
   const isEditMode = useIsEditMode();
   const setPendingHref = useSetPendingHref();
   const [isRewardQrOpen, setIsRewardQrOpen] = useState(false);
@@ -39,15 +32,8 @@ const Sidebar = () => {
     () => [...events].sort(compareEventsByDisplayPriority)[0],
     [events]
   );
-  const selectedEvent = events.find(
-    (event) => String(event.id) === selectedEventId
-  );
-  const cancelTargetEventId =
-    selectedEvent !== undefined
-      ? String(selectedEvent.id)
-      : firstEvent
-        ? String(firstEvent.id)
-        : null;
+
+  const cancelTargetEventId = firstEvent ? String(firstEvent.id) : null;
 
   if (!route) {
     return null;
@@ -62,7 +48,6 @@ const Sidebar = () => {
     if (isEditMode) {
       setPendingHref(href);
     } else {
-      setSelectedEventId(cancelTargetEventId);
       router.push(href);
     }
   };

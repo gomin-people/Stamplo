@@ -1,23 +1,31 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSelectedEventId } from "@/stores/admin";
+import { redirect } from "next/navigation";
 import { ADMIN_EVENT_REGISTER_PATH } from "@/constants/adminRoutes";
+import { createSessionClient } from "@/utils/supabase/session-server";
 
-const AuthRedirect = () => {
-  const router = useRouter();
-  const selectedEventId = useSelectedEventId();
+export default async function AuthRedirect() {
+  const supabase = await createSessionClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    if (selectedEventId) {
-      router.replace(`/admin/events/${selectedEventId}/dashboard`);
-    } else {
-      router.replace(ADMIN_EVENT_REGISTER_PATH);
-    }
-  }, [router, selectedEventId]);
+  if (userError || !user) {
+    await supabase.auth.signOut();
+    redirect("/admin");
+  }
 
-  return null;
-};
+  const { data: eventId, error: eventsError } = await supabase.rpc(
+    "get_priority_admin_event_id"
+  );
 
-export default AuthRedirect;
+  if (eventsError) {
+    console.error("Error fetching priority admin event:", eventsError);
+    redirect("/admin");
+  }
+
+  if (eventId != null) {
+    redirect(`/admin/events/${eventId}/dashboard`);
+  }
+
+  redirect(ADMIN_EVENT_REGISTER_PATH);
+}
