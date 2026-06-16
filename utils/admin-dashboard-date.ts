@@ -96,7 +96,7 @@ const parseDateOnly = (value: string): DateParts | null => {
 };
 
 const getTodayInTimeZone = (timeZone: string): DateParts | null => {
-  const parts = new Intl.DateTimeFormat("en-US", {
+  const parts = new Intl.DateTimeFormat("ko-KR", {
     timeZone,
     year: "numeric",
     month: "2-digit",

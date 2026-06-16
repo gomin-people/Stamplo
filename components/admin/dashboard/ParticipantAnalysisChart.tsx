@@ -403,7 +403,7 @@ function formatChartTick(value: number) {
 }
 
 function getTodayDateOption() {
-  const parts = new Intl.DateTimeFormat("en-US", {
+  const parts = new Intl.DateTimeFormat("ko-KR", {
     timeZone: ADMIN_DASHBOARD_TIME_ZONE,
     month: "numeric",
     day: "numeric",
