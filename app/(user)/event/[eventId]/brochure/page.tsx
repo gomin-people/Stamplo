@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getEntryEvent } from "@/features/qr/entry/api/entry";
+import { fetchParticipantEventBrochure } from "@/features/participant/events/participantEventApi";
 import BrochureClient from "@/components/user/brochure/BrochureClient";
 import { redirect } from "next/navigation";
 
@@ -12,7 +12,7 @@ const BrochurePage = async ({ params, searchParams }: Props) => {
   const { eventId } = await params;
   const { from } = await searchParams;
 
-  const event = await getEntryEvent(eventId);
+  const event = await fetchParticipantEventBrochure(Number(eventId));
 
   if (!event.brochureImageUrl?.length) {
     redirect(`/event/${eventId}/${from === "mission" ? "detail" : "mission"}`);

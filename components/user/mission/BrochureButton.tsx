@@ -6,13 +6,22 @@ import { cn } from "@/utils";
 
 type BrochureButtonProps = {
   eventId: string;
+  hasBrochure: boolean;
   className?: string;
 };
 
-const BrochureButton = ({ eventId, className }: BrochureButtonProps) => {
+export default function BrochureButton({
+  eventId,
+  hasBrochure,
+  className,
+}: BrochureButtonProps) {
   return (
     <Link
-      href={`/event/${eventId}/brochure?from=mission`}
+      href={
+        hasBrochure
+          ? `/event/${eventId}/brochure?from=mission`
+          : `/event/${eventId}/detail`
+      }
       className={cn(
         "flex items-center justify-center w-13 h-13 shrink-0 rounded-full border-2 border-gomin-primary-700 bg-gomin-white text-gomin-primary-700 hover:bg-gomin-primary-100/50 active:scale-95 transition-all duration-200 shadow-md",
         className
@@ -22,6 +31,4 @@ const BrochureButton = ({ eventId, className }: BrochureButtonProps) => {
       <Newspaper className="w-6 h-6" />
     </Link>
   );
-};
-
-export default BrochureButton;
+}

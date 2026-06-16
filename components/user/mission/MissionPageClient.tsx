@@ -25,6 +25,7 @@ type EventData = {
   name?: string;
   description?: string;
   stampImageUrl?: string | null;
+  brochureImageUrl?: string[] | null;
 };
 
 type InitialMission = {
@@ -167,6 +168,7 @@ const MissionPageClient = ({
           {showBrochureButton && (
             <BrochureButton
               eventId={eventId}
+              hasBrochure={!!event.brochureImageUrl?.length}
               className={cn(!newlyStampedId && "animate-bounce-once")}
             />
           )}
