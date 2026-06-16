@@ -1,0 +1,89 @@
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+
+export const LandingFooter = () => {
+  return (
+    <footer className="bg-[#0e0d14] text-white/70 py-[60px] px-0 pb-10">
+      <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
+        <div className="flex justify-between items-start gap-10 flex-wrap max-md:flex-col max-md:gap-8">
+          <div>
+            <a className="flex items-center gap-2.5 no-underline" href="#top">
+              <Image
+                src="/images/landing/logo_stamplo_white.svg"
+                alt="Stamplo 로고"
+                width={32}
+                height={32}
+                unoptimized
+              />
+              <span className="font-(--font-monomaniac-one) text-[25px] tracking-[0.01em] text-white leading-none pt-[3px]">
+                stamplo
+              </span>
+            </a>
+            <p className="text-sm text-white/55 mt-3.5 max-w-[34ch] leading-[1.6] break-keep word-keep-all">
+              누구나 쉽게 시작하는 스탬프 투어 플랫폼.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <span className="text-[13px] font-bold text-white/45 tracking-wider">
+              바로가기
+            </span>
+            <a
+              href="#problem"
+              className="text-[14.5px] text-white/78 hover:text-white no-underline"
+            >
+              문제 해결
+            </a>
+            <a
+              href="#usage"
+              className="text-[14.5px] text-white/78 hover:text-white no-underline"
+            >
+              사용 방법
+            </a>
+            <a
+              href="#data"
+              className="text-[14.5px] text-white/78 hover:text-white no-underline"
+            >
+              데이터 분석
+            </a>
+            <a
+              href="#builder"
+              className="text-[14.5px] text-white/78 hover:text-white no-underline"
+            >
+              페이지 만들기
+            </a>
+          </div>
+          <div className="flex flex-col gap-3">
+            <span className="text-[13px] font-bold text-white/45 tracking-wider">
+              문의
+            </span>
+            <span className="text-[14.5px] text-white/78">고민하는 사람들</span>
+            <a
+              href="mailto:gominpeople26@gmail.com"
+              className="text-[14.5px] text-white/78 hover:text-white no-underline"
+            >
+              gominpeople26@gmail.com
+            </a>
+          </div>
+          <div className="flex flex-col gap-3.5 items-start">
+            <span className="text-[13px] font-bold text-white/45 tracking-wider">
+              지금 시작하기
+            </span>
+            <a
+              href="/admin"
+              className="inline-flex items-center justify-center gap-2 font-sans font-bold text-base border-0 rounded-xl cursor-pointer py-3.5 px-6 leading-none transition-all duration-120 ease-[cubic-bezier(.2,.7,.2,1)] whitespace-nowrap no-underline active:scale-[0.98] bg-gomin-primary-700 text-white hover:bg-gomin-primary-600 shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)]"
+            >
+              시작하기
+              <ArrowRight className="ml-1 inline" />
+            </a>
+          </div>
+        </div>
+        <div className="mt-11 pt-6 border-t border-white/10 flex justify-between gap-4 flex-wrap text-xs text-white/45">
+          <span>
+            © 2026 고민하는 사람들 (Gomin People). All rights reserved.
+          </span>
+          <span>Stamplo</span>
+        </div>
+      </div>
+    </footer>
+  );
+};
