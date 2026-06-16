@@ -11,6 +11,8 @@ import { completeMissionFromQr } from "./completeMissionFromQr";
 
 type QrCheckClientProps = {
   eventId: string;
+  onBack: () => void;
+  onMissionComplete: () => void;
 };
 
 type HandleQrScanResultParams = {
@@ -18,6 +20,7 @@ type HandleQrScanResultParams = {
   hasScanned: boolean;
   currentEventId: string;
   markScanned: () => void;
+  navigateToMissionPage: () => void;
   navigateToEvent: (path: string) => void;
   releaseScanLockAfterMessage: () => void;
   setMissionChecking: (isChecking: boolean) => void;
@@ -47,6 +50,7 @@ const handleQrScanResult = async ({
   hasScanned,
   currentEventId,
   markScanned,
+  navigateToMissionPage,
   navigateToEvent,
   releaseScanLockAfterMessage,
   setMissionChecking,
@@ -69,9 +73,7 @@ const handleQrScanResult = async ({
     const missionCheckResult = await completeMissionFromQr(scanTarget.path);
 
     if (missionCheckResult.type === "completed") {
-      window.location.assign(
-        `/event/${currentEventId}/mission?newMission=${missionCheckResult.missionId}`
-      );
+      navigateToMissionPage();
       return;
     }
 
@@ -159,27 +161,18 @@ const ScanGuideBubble = ({
  * @param props - QR 스캔 화면에 필요한 현재 행사 정보
  * @returns QR 스캔 클라이언트 화면
  */
-const QrCheckClient = ({ eventId }: QrCheckClientProps) => {
+const QrCheckClient = ({
+  eventId,
+  onBack,
+  onMissionComplete,
+}: QrCheckClientProps) => {
   const router = useRouter();
   const hasScannedRef = useRef(false);
-  const isBackNavigatingRef = useRef(false);
   const releaseScanLockTimeoutRef = useRef<number | null>(null);
   const [isMissionChecking, setIsMissionChecking] = useState(false);
-  const [isBackNavigating, setIsBackNavigating] = useState(false);
   const [loadingDotCount, setLoadingDotCount] = useState(1);
   const { guideMessage, showQrGuideMessage, showUnsupportedQrMessage } =
     useQrGuideMessage();
-
-  /**
-   * 현재 행사 미션 페이지 이동
-   */
-  const handleBack = () => {
-    if (isBackNavigatingRef.current) return;
-
-    isBackNavigatingRef.current = true;
-    setIsBackNavigating(true);
-    router.back();
-  };
 
   const clearReleaseScanLockTimer = useCallback(() => {
     if (releaseScanLockTimeoutRef.current === null) return;
@@ -211,6 +204,7 @@ const QrCheckClient = ({ eventId }: QrCheckClientProps) => {
         markScanned: () => {
           hasScannedRef.current = true;
         },
+        navigateToMissionPage: onMissionComplete,
         navigateToEvent: (eventPath) => {
           router.push(eventPath);
         },
@@ -222,6 +216,7 @@ const QrCheckClient = ({ eventId }: QrCheckClientProps) => {
     },
     [
       eventId,
+      onMissionComplete,
       releaseScanLockAfterMessage,
       router,
       showQrGuideMessage,
@@ -255,7 +250,7 @@ const QrCheckClient = ({ eventId }: QrCheckClientProps) => {
   }, [cameraStatus, isMissionChecking]);
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-gomin-black text-gomin-white">
+    <div className="relative h-full overflow-hidden bg-gomin-black text-gomin-white">
       {/* 카메라 영상 */}
       <video
         ref={setVideoRef}
@@ -282,12 +277,11 @@ const QrCheckClient = ({ eventId }: QrCheckClientProps) => {
       <div className="absolute inset-x-0 bottom-[calc(3rem+env(safe-area-inset-bottom))] px-6">
         <div className="mx-auto w-72 max-w-[78vw]">
           <button
-            className="max-w-none w-full h-14 rounded-[20px] text-white font-sans font-extrabold text-lg transition-all duration-300 active:scale-[0.97] hover:scale-[1.01] disabled:pointer-events-none disabled:opacity-80 flex items-center justify-center gap-2"
-            disabled={isBackNavigating}
-            onClick={handleBack}
+            className="max-w-none w-full h-14 rounded-[20px] text-white font-sans font-extrabold text-lg transition-all duration-300 active:scale-[0.97] hover:scale-[1.01] flex items-center justify-center gap-2"
+            onClick={onBack}
             style={PRIMARY_700_BACKGROUND_STYLE}
           >
-            {isBackNavigating ? "이동 중..." : "돌아가기"}
+            돌아가기
           </button>
         </div>
       </div>

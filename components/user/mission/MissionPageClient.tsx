@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
 import MissionStamp from "@/components/user/mission/MissionStamp";
 import MissionItem from "@/components/user/mission/MissionItem";
 import FloatingActionButton from "@/components/user/mission/FloatingActionButton";
 import SurveyModal from "@/components/user/mission/SurveyModal";
+import QrCheckModal from "@/components/user/mission/QrCheckModal";
 import {
   useParticipantMissionsQuery,
   type ParticipantMission,
@@ -62,8 +64,10 @@ const MissionPageClient = ({
   newlyStampedId,
 }: MissionPageClientProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
+  const [isQrCheckOpen, setIsQrCheckOpen] = useState(false);
 
   const initialData: ParticipantMissions | undefined =
     !isPreview && initialMissions.length > 0
@@ -134,7 +138,7 @@ const MissionPageClient = ({
         setIsSurveyOpen(true);
       }
     } else {
-      window.location.assign(`/event/${eventId}/qr-check`);
+      setIsQrCheckOpen(true);
     }
   };
 
@@ -142,6 +146,10 @@ const MissionPageClient = ({
     setTimeout(() => {
       router.push(`/event/${eventId}/complete`);
     }, 100);
+  };
+
+  const handleMissionComplete = () => {
+    queryClient.invalidateQueries({ queryKey: ["participant", "missions"] });
   };
 
   // DB에서 불러온 title (또는 name)을 1순위로 사용하며 예외 처리 제공
@@ -263,6 +271,14 @@ const MissionPageClient = ({
           className={isPreview ? "" : "animate-fade-up"}
         />
       )}
+
+      {/* QR 체크 모달 */}
+      <QrCheckModal
+        isOpen={isQrCheckOpen}
+        onClose={() => setIsQrCheckOpen(false)}
+        eventId={eventId}
+        onMissionComplete={handleMissionComplete}
+      />
 
       {/* 설문조사 모달 */}
       <SurveyModal
