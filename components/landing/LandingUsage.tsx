@@ -20,7 +20,7 @@ export const LandingUsage = () => {
         <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] gap-2 items-start max-lg:grid-cols-1 max-lg:gap-10">
           {/* Step 1: Scan QR */}
           <div className="flex flex-col items-center gap-[22px] reveal">
-            <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
+            <div className="relative w-[250px] max-w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)]">
               <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
                 <Image
                   src="/images/landing/qrPage.webp"
@@ -50,7 +50,7 @@ export const LandingUsage = () => {
 
           {/* Step 2: Collect Stamp */}
           <div className="flex flex-col items-center gap-[22px] reveal">
-            <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
+            <div className="relative w-[250px] max-w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)]">
               <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
                 <Image
                   src="/images/landing/missionPage.webp"
@@ -81,7 +81,7 @@ export const LandingUsage = () => {
 
           {/* Step 3: Complete / Reward */}
           <div className="flex flex-col items-center gap-[22px] reveal">
-            <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
+            <div className="relative w-[250px] max-w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)]">
               <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
                 <Image
                   src="/images/landing/rewardPage.webp"

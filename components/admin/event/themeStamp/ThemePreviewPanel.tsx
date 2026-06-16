@@ -65,16 +65,11 @@ const ThemePreviewPanel = ({ stampImage, palette }: Props) => {
 
       {/* 모바일 폰 프레임 */}
       <div
-        className="preview-mobile-frame w-60 h-fit bg-white rounded-[32px] shadow-2xl border-[5px] border-white overflow-hidden relative flex items-center justify-center pointer-events-none select-none"
+        className="preview-mobile-frame w-[234px] h-[456px] bg-white rounded-[32px] shadow-2xl border-[5px] border-white overflow-hidden relative pointer-events-none select-none shrink-0"
         style={previewThemeVars}
       >
-        {/* 표준 모바일 규격 해상도로 1:1 렌더링 후 zoom으로 물리적 리사이징 축소 */}
-        <div
-          className="w-[390px] h-[760px] bg-white flex flex-col shrink-0"
-          style={{
-            zoom: 0.6,
-          }}
-        >
+        {/* 표준 모바일 규격 해상도로 1:1 렌더링 후 scale로 물리적 리사이징 축소 */}
+        <div className="w-[390px] h-[760px] bg-white flex flex-col shrink-0 absolute top-0 left-0 origin-top-left scale-[0.6]">
           <MissionPageClient
             event={previewEvent}
             eventId="preview"
