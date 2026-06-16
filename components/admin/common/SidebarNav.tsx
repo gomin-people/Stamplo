@@ -15,6 +15,7 @@ import type {
   AnimatedIconComponent,
   AnimatedIconHandle,
 } from "@/types/animated-icon";
+import { cn } from "@/utils";
 
 type SidebarNavItem = {
   label: string;
@@ -54,11 +55,12 @@ const SidebarNavLink = ({
       onClick={(e) => onNavClick(e, item.href)}
       onMouseEnter={() => iconRef.current?.startAnimation()}
       onMouseLeave={() => iconRef.current?.stopAnimation()}
-      className={`flex items-center gap-2 rounded-lg px-3 py-3 text-sm transition-[background-color,color,box-shadow,transform] duration-150 ease-out ${
+      className={cn(
+        "flex items-center gap-2 rounded-lg px-3 py-3 text-sm transition-[background-color,color,box-shadow,transform] duration-150 ease-out",
         isActive
-          ? " bg-gomin-primary-700 text-gomin-white shadow-lg shadow-gomin-primary-700/30"
+          ? "bg-gomin-primary-700 text-gomin-white shadow-lg shadow-gomin-primary-700/30"
           : "text-gomin-neutral-700 hover:bg-gomin-neutral-100 hover:text-gomin-black"
-      }`}
+      )}
     >
       <Icon
         ref={iconRef}
