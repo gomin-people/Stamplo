@@ -1,17 +1,45 @@
+import { redirect } from "next/navigation";
 import Footer from "@/components/admin/common/Footer";
 import Header from "@/components/admin/common/Header";
 import Sidebar from "@/components/admin/common/Sidebar";
+import type { EventModel } from "@/types/models";
+import { toCamelKeys } from "@/utils/case";
+import { createSessionClient } from "@/utils/supabase/session-server";
 
-export default function AdminEventsLayout({
+export default async function AdminEventsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createSessionClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    await supabase.auth.signOut();
+    redirect("/admin");
+  }
+
+  const { data: events, error: eventsError } = await supabase
+    .from("events")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false });
+
+  if (eventsError) {
+    console.error("Error loading admin events layout data:", eventsError);
+    throw new Error("관리자 행사 목록 조회에 실패했습니다.");
+  }
+
+  const normalizedEvents = toCamelKeys(events ?? []) as EventModel[];
+
   return (
     <div className="flex h-screen overflow-hidden bg-gomin-neutral-100">
-      <Sidebar />
+      <Sidebar events={normalizedEvents} />
       <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-        <Header />
+        <Header events={normalizedEvents} />
         <main>{children}</main>
         <Footer />
       </div>

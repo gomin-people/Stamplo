@@ -15,12 +15,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAdminEventsQuery } from "@/features/admin/events/adminEventQueries";
 import type { EventModel } from "@/types/models";
 import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
 
 type Props = {
   eventId: string;
+  events: EventModel[];
 };
 
 type AdminEventStatus = "진행중" | "예정" | "종료";
@@ -110,7 +110,7 @@ export const compareEventsByDisplayPriority = (
 };
 
 // 현재 행사 선택 드롭다운과 행사 전환 동작을 담당하는 사이드바 컴포넌트
-const EventSelector = ({ eventId }: Props) => {
+const EventSelector = ({ eventId, events }: Props) => {
   const pathname = usePathname();
   const router = useRouter();
   const [isEventMenuOpen, setIsEventMenuOpen] = useState(false);
@@ -119,17 +119,12 @@ const EventSelector = ({ eventId }: Props) => {
   );
   const isEditMode = useIsEditMode();
   const setPendingHref = useSetPendingHref();
-  const { data: events = [], isError, isLoading } = useAdminEventsQuery();
   const sortedEvents = useMemo(
     () => [...events].sort(compareEventsByDisplayPriority),
     [events]
   );
   const selectedEvent = events.find((event) => String(event.id) === eventId);
-  const selectedEventLabel = isLoading
-    ? "행사 불러오는 중"
-    : isError
-      ? "행사 목록 조회 실패"
-      : (selectedEvent?.title ?? `행사 ${eventId}`);
+  const selectedEventLabel = selectedEvent?.title ?? `행사 ${eventId}`;
 
   const selectEvent = (nextEventId: string) => {
     if (nextEventId === eventId) return;

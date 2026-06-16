@@ -28,4 +28,6 @@ export default async function AuthRedirect() {
   }
 
   redirect(ADMIN_EVENT_REGISTER_PATH);
+
+  return null;
 }

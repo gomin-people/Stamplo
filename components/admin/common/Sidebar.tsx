@@ -14,11 +14,15 @@ import RewardQrScannerClient from "@/components/admin/reward/RewardQrScannerClie
 import { Button } from "@/components/ui/button";
 import { ScanTextIcon, type ScanTextIconHandle } from "lucide-animated";
 import { X } from "lucide-react";
-import { useAdminEventsQuery } from "@/features/admin/events/adminEventQueries";
 import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
+import type { EventModel } from "@/types/models";
+
+type Props = {
+  events: EventModel[];
+};
 
 // 관리자 이벤트 화면의 사이드바와 행사 등록 취소 이동 버튼 렌더링
-const Sidebar = () => {
+const Sidebar = ({ events }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const { eventId } = useParams<{ eventId?: string }>();
@@ -27,7 +31,6 @@ const Sidebar = () => {
   const setPendingHref = useSetPendingHref();
   const [isRewardQrOpen, setIsRewardQrOpen] = useState(false);
   const rewardQrIconRef = useRef<ScanTextIconHandle>(null);
-  const { data: events = [] } = useAdminEventsQuery({ enabled: !eventId });
   const firstEvent = useMemo(
     () => [...events].sort(compareEventsByDisplayPriority)[0],
     [events]
@@ -69,7 +72,7 @@ const Sidebar = () => {
 
       {eventId ? (
         <>
-          <EventSelector key={eventId} eventId={eventId} />
+          <EventSelector key={eventId} eventId={eventId} events={events} />
           <SidebarNav items={items} pathname={pathname} />
         </>
       ) : cancelTargetEventId ? (
