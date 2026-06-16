@@ -1,8 +1,26 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import StamploLogo from "@/components/admin/common/StamploLogo";
 import { ArrowRight } from "lucide-react";
 
+const HERO_MOCKUPS = [
+  "/images/landing/missionPage.webp",
+  "/images/landing/missionListPage.webp",
+];
+
 export const LandingHero = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % HERO_MOCKUPS.length);
+    }, 2000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section
       className="pt-[clamp(48px,7vw,88px)] pb-[clamp(60px,8vw,110px)] relative"
@@ -43,13 +61,18 @@ export const LandingHero = () => {
               {/* Premium Live Mockup for Hero A */}
               <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[332px] max-md:max-w-[280px] max-sm:max-w-[240px]">
                 <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
-                  <Image
-                    src="/images/landing/missionPage.webp"
-                    alt="missionPage Mockup"
-                    fill
-                    sizes="(max-width: 640px) 240px, (max-width: 768px) 280px, 332px"
-                    className="object-cover"
-                  />
+                  {HERO_MOCKUPS.map((src, index) => (
+                    <Image
+                      key={src}
+                      src={src}
+                      alt={`mockup ${index}`}
+                      fill
+                      sizes="(max-width: 640px) 240px, (max-width: 768px) 280px, 332px"
+                      className={`object-cover transition-opacity duration-700 ease-in-out ${
+                        currentIndex === index ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
