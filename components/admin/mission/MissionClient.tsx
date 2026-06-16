@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { adminMissionQueryOptions } from "@/features/admin/missions/adminMissionQueries";
-import { useAdminEventQuery } from "@/features/admin/events/adminEventQueries";
 import MissionFilter from "@/components/admin/mission/MissionFilter";
 import MissionAddButton from "@/components/admin/mission/MissionAddButton";
 import { Info } from "lucide-react";
@@ -20,9 +19,15 @@ const QRDownloadButton = dynamic(
 
 type Props = {
   eventId: number;
+  eventStartDate: string | null;
+  eventEndDate: string | null;
 };
 
 const MissionClient = ({ eventId }: Props) => {
+  eventId,
+  eventStartDate,
+  eventEndDate,
+}: Props) => {
   const [filter, setFilter] = useState("all");
 
   const {
@@ -30,8 +35,6 @@ const MissionClient = ({ eventId }: Props) => {
     isError,
     refetch,
   } = useQuery(adminMissionQueryOptions.list(eventId));
-
-  const { data: event } = useAdminEventQuery(eventId);
 
   const filteredMissions = useMemo(() => {
     if (!missions) return [];
@@ -45,7 +48,9 @@ const MissionClient = ({ eventId }: Props) => {
 
   const isMissionCountOver = (missions?.length ?? 0) >= 10;
   const isAfter =
-    !!event && getEventOperationStatus(event.startDate, event.endDate).isAfter;
+    typeof eventStartDate === "string" &&
+    typeof eventEndDate === "string" &&
+    getEventOperationStatus(eventStartDate, eventEndDate).isAfter;
 
   const handleToggle = (value: string) => {
     setFilter(value);

@@ -15,10 +15,7 @@ import EventEditCancelDialog from "@/components/admin/event/edit/EventEditCancel
 import EventDeleteDialog from "@/components/admin/event/edit/EventDeleteDialog";
 import EventDeleteContactDialog from "@/components/admin/event/edit/EventDeleteContactDialog";
 import { type StepFormHandle } from "@/types";
-import {
-  useAdminEventQuery,
-  useAdminEventsQuery,
-} from "@/features/admin/events/adminEventQueries";
+import { useAdminEventQuery } from "@/features/admin/events/adminEventQueries";
 import {
   useUpdateEventMutation,
   useDeleteEventMutation,
@@ -58,7 +55,6 @@ const EventEditClient = () => {
   }, [mode, setIsEditMode]);
 
   const { data: event, isLoading } = useAdminEventQuery(eventIdNum);
-  const { data: events = [] } = useAdminEventsQuery();
   const { mutateAsync: updateEvent, isPending } = useUpdateEventMutation();
   const { mutateAsync: deleteEvent } = useDeleteEventMutation();
 
@@ -88,10 +84,7 @@ const EventEditClient = () => {
     try {
       await deleteEvent(eventIdNum);
       toast.success("행사가 삭제되었습니다.", { id: "event-delete-success" });
-      const nextEvent = events.find((e) => e.id !== eventIdNum);
-      router.replace(
-        nextEvent ? `/admin/events/${nextEvent.id}` : "/admin/events/register"
-      );
+      router.replace("/admin");
     } catch {
       toast.error("삭제에 실패했습니다. 다시 시도해주세요.", {
         id: "event-delete-error",
