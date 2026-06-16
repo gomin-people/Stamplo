@@ -2,10 +2,12 @@
 
 import { useMemo } from "react";
 import MissionPageClient from "@/components/user/mission/MissionPageClient";
+import { cn } from "@/utils";
 
 type Props = {
   stampImage: string | null;
   palette: Record<string, string>;
+  className?: string;
 };
 
 const PREVIEW_MISSIONS = [
@@ -32,7 +34,7 @@ const PREVIEW_MISSIONS = [
 /**
  * 실시간 모바일 참가자 화면 미리보기 패널 컴포넌트
  */
-const ThemePreviewPanel = ({ stampImage, palette }: Props) => {
+const ThemePreviewPanel = ({ stampImage, palette, className }: Props) => {
   // preview용 props 객체들의 참조 고정 (React.memo 최적화 매칭)
   const previewEvent = useMemo(
     () => ({
@@ -56,7 +58,12 @@ const ThemePreviewPanel = ({ stampImage, palette }: Props) => {
   } as React.CSSProperties;
 
   return (
-    <div className="w-full lg:w-[320px] bg-[#EBE7FD]/50 h-162.5 p-5 rounded-[28px] flex flex-col items-center justify-center shadow-inner border border-[#E1DBFA]">
+    <div
+      className={cn(
+        "bg-[#EBE7FD]/50 p-5 rounded-[28px] flex flex-col items-center justify-center shadow-inner border border-[#E1DBFA]",
+        className
+      )}
+    >
       {/* 참가자 화면 미리보기 뱃지 */}
       <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-[11px] font-extrabold text-[#5435EB] shadow-sm mb-4 select-none border border-[#ECE7FC]">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />

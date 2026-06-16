@@ -225,7 +225,11 @@ export const LandingBuilderDemo = () => {
 
       {/* 오른쪽: 실시간 모바일 프리뷰 패널 이식 */}
       <div className="reveal shrink-0">
-        <ThemePreviewPanel stampImage={stampImage} palette={palette} />
+        <ThemePreviewPanel
+          stampImage={stampImage}
+          palette={palette}
+          className="w-full lg:w-[320px] h-162.5"
+        />
       </div>
     </div>
   );

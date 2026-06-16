@@ -94,6 +94,7 @@ const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
         <ThemePreviewPanel
           stampImage={stampFileUrl} // 실시간 모바일 미리보기에는 로컬 Object URL(지연 0초)을 즉시 렌더링
           palette={palette}
+          className="w-full lg:w-[320px] h-162.5"
         />
       </div>
     );
