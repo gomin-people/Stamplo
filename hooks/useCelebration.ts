@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
+import { useHasCelebrationFired, useMarkCelebrationFired } from "@/stores/user";
 
 export function useCelebration() {
   const [showCelebration, setShowCelebration] = useState(false);
-  const hasAnimationFired = useRef(false);
+  const hasCelebrationFired = useHasCelebrationFired();
+  const markCelebrationFired = useMarkCelebrationFired();
 
   const handleStampReady = () => {
-    if (hasAnimationFired.current) return;
-    hasAnimationFired.current = true;
+    if (hasCelebrationFired) return;
+    markCelebrationFired();
 
     setTimeout(() => setShowCelebration(true), 600);
 

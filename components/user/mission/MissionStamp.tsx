@@ -82,7 +82,10 @@ const MissionStamp = ({
                 />
               </div>
             ) : (
-              <IconStamplo className="w-[81%] h-[85%] aspect-162/171 opacity-95" />
+              <IconStamplo
+                className="w-[81%] h-[85%] aspect-162/171 opacity-95"
+                onAnimationEnd={isNewStamped ? onStampReady : undefined}
+              />
             )}
           </div>
         )}

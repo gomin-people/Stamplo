@@ -18,12 +18,14 @@ type MissionItemProps = {
   mission: Mission;
   stampImageUrl?: string | null;
   isNewStamped?: boolean;
+  onStampReady?: () => void;
 };
 
 const MissionItem = ({
   mission,
   stampImageUrl,
   isNewStamped = false,
+  onStampReady,
 }: MissionItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [stampReady, setStampReady] = useState(!isNewStamped || !stampImageUrl);
@@ -57,7 +59,10 @@ const MissionItem = ({
                 isNewStamped && !stampReady && "invisible",
                 isNewStamped && stampReady && "animate-stamp-press"
               )}
-              onLoad={() => setStampReady(true)}
+              onLoad={() => {
+                setStampReady(true);
+                onStampReady?.();
+              }}
             />
           ) : (
             <IconStamplo
