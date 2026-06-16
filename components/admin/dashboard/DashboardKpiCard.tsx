@@ -1,30 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import type {
-  ForwardRefExoticComponent,
-  HTMLAttributes,
-  RefAttributes,
-} from "react";
 import { Info } from "lucide-react";
 import AnimatedNumber from "@/components/admin/common/AnimatedNumber";
+import type {
+  AnimatedIconComponent,
+  AnimatedIconHandle,
+} from "@/types/animated-icon";
 import { cn, formatNumber } from "@/utils";
 
 const KPI_ICON_ANIMATION_DURATION_MS = 900;
 
-type AnimatedIconHandle = {
-  startAnimation: () => void;
-  stopAnimation: () => void;
-};
-
-type AnimatedIconProps = HTMLAttributes<HTMLDivElement> & {
-  size?: number;
-  animateOnHover?: boolean;
-};
-
-export type KpiIconComponent = ForwardRefExoticComponent<
-  AnimatedIconProps & RefAttributes<AnimatedIconHandle>
->;
+export type KpiIconComponent = AnimatedIconComponent;
 
 type Props = {
   title: string;

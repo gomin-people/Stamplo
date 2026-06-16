@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import { useRef } from "react";
-import type {
-  ForwardRefExoticComponent,
-  HTMLAttributes,
-  MouseEvent,
-  RefAttributes,
-} from "react";
+import type { MouseEvent } from "react";
 import {
   CalendarCheck2Icon,
   ClipboardCheckIcon,
@@ -16,6 +11,10 @@ import {
 import type { AdminSidebarIconName } from "@/constants/adminRoutes";
 import { Separator } from "@/components/ui/separator";
 import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
+import type {
+  AnimatedIconComponent,
+  AnimatedIconHandle,
+} from "@/types/animated-icon";
 
 type SidebarNavItem = {
   label: string;
@@ -28,27 +27,13 @@ type SidebarNavProps = {
   pathname: string;
 };
 
-type AnimatedIconHandle = {
-  startAnimation: () => void;
-  stopAnimation: () => void;
-};
-
-type AnimatedIconProps = HTMLAttributes<HTMLDivElement> & {
-  size?: number;
-  animateOnHover?: boolean;
-};
-
-type AnimatedIcon = ForwardRefExoticComponent<
-  AnimatedIconProps & RefAttributes<AnimatedIconHandle>
->;
-
 type SidebarNavLinkProps = {
   item: SidebarNavItem;
   pathname: string;
   onNavClick: (e: MouseEvent<HTMLAnchorElement>, href: string) => void;
 };
 
-const SIDEBAR_ICONS: Record<AdminSidebarIconName, AnimatedIcon> = {
+const SIDEBAR_ICONS: Record<AdminSidebarIconName, AnimatedIconComponent> = {
   "layout-grid": LayoutGridIcon,
   "calendar-check-2": CalendarCheck2Icon,
   "clipboard-check": ClipboardCheckIcon,
