@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Image from "next/image";
-import { cn } from "@/utils";
+import { cn, generatePalette, hslToHex, hexToHsl } from "@/utils";
+import StamploLogo from "@/components/admin/common/StamploLogo";
+import ThemePreviewPanel from "@/components/admin/event/themeStamp/ThemePreviewPanel";
+import AnimatedIconStamplo from "@/components/icons/AnimatedIconStamplo";
 import {
   ArrowRight,
   CheckCircle2,
@@ -10,16 +13,158 @@ import {
   Scroll,
   Users,
   QrCode,
-  Image as ImageIcon,
-  Stamp,
   BarChart3,
   Clock,
   Lock,
-  Award,
+  Info,
+  Plus,
+  X,
 } from "lucide-react";
+
+// 모듈 레벨 — React cleanup과 완전히 독립적으로 유지됨
+let _revealIo: IntersectionObserver | null = null;
+
+const inViewport = (el: Element): boolean => {
+  if (typeof window === "undefined") return false;
+  const r = el.getBoundingClientRect();
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  return r.top < vh && r.bottom > 0;
+};
+
+const runReveal = (forceAll = false): void => {
+  if (typeof document === "undefined") return;
+
+  const elements = Array.from(document.querySelectorAll<Element>(".reveal"));
+  if (elements.length === 0) return; // 아직 DOM 없음 → 다음 트리거에서 처리
+
+  _revealIo?.disconnect();
+
+  if (forceAll) {
+    elements.forEach((el) => el.setAttribute("data-in", "true"));
+    return;
+  }
+
+  elements.forEach((el) => {
+    if (inViewport(el)) el.setAttribute("data-in", "true");
+  });
+
+  _revealIo = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.setAttribute("data-in", "true");
+          _revealIo?.unobserve(entry.target);
+        }
+      });
+    },
+    { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
+  );
+  elements.forEach((el) => {
+    if (el.getAttribute("data-in") !== "true") _revealIo!.observe(el);
+  });
+};
+
+const isRestore = (persisted: boolean): boolean => {
+  if (persisted) return true;
+  const nav = performance.getEntriesByType("navigation")[0] as
+    | PerformanceNavigationTiming
+    | undefined;
+  return nav?.type === "back_forward"; // persisted=false여도 뒤로가기면 복원
+};
+
+if (typeof window !== "undefined") {
+  window.addEventListener("pageshow", (e: Event) => {
+    const restore = isRestore((e as PageTransitionEvent).persisted);
+    runReveal(restore);
+    // DOM/스크롤 복원이 늦게 끝나는 경우 대비, 다음 프레임에 한 번 더
+    requestAnimationFrame(() => runReveal(restore));
+  });
+}
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // 어드민 Step 3 (EventThemeStampForm) 행사 생성 체험용 상태
+  const [stampImage, setStampImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [h, setH] = useState(250); // Stamplo 기본 브랜드 퍼플 컬러 #5435EB의 H
+
+  const keyColor = useMemo(() => {
+    return hslToHex(h, 85, 50);
+  }, [h]);
+
+  const palette = useMemo(() => {
+    try {
+      return generatePalette(keyColor);
+    } catch {
+      return generatePalette("#5435EB");
+    }
+  }, [keyColor]);
+
+  const [isFocused, setIsFocused] = useState(false);
+  const [typingValue, setTypingValue] = useState("");
+
+  const handleStampFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    const allowedExtensions = ["png", "jpg", "jpeg", "webp"];
+    const allowedMimeTypes = ["image/png", "image/jpeg", "image/webp"];
+    if (
+      !ext ||
+      !allowedExtensions.includes(ext) ||
+      !allowedMimeTypes.includes(file.type)
+    ) {
+      alert(
+        "지원하지 않는 파일 형식입니다. (png, jpg, jpeg, webp 이미지만 업로드 가능)"
+      );
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("파일 크기는 5MB 이하여야 합니다.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    if (stampImage) {
+      URL.revokeObjectURL(stampImage);
+    }
+
+    const localUrl = URL.createObjectURL(file);
+    setStampImage(localUrl);
+  };
+
+  const handleStampRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (stampImage) {
+      URL.revokeObjectURL(stampImage);
+    }
+    setStampImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const triggerFileInput = () => fileInputRef.current?.click();
+
+  const handleHexInputChange = (val: string) => {
+    const cleanHex = val.replace(/[^0-9a-fA-F]/g, "");
+    const formattedInput = `#${cleanHex}`;
+    setTypingValue(formattedInput);
+
+    const isValidHexFormat = cleanHex.length === 3 || cleanHex.length === 6;
+    if (isValidHexFormat) {
+      try {
+        const [parsedH] = hexToHsl(formattedInput);
+        setH(Math.round(parsedH));
+      } catch {
+        // 타이핑 시 에러 무시
+      }
+    }
+  };
 
   // Scroll event for sticky nav border/shadow
   useEffect(() => {
@@ -30,26 +175,12 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // IntersectionObserver for scroll reveal animations (.reveal -> .in)
   useEffect(() => {
-    const reveals = document.querySelectorAll(".reveal");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        rootMargin: "0px 0px -8% 0px",
-        threshold: 0.05,
-      }
-    );
-
-    reveals.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    runReveal(); // 첫 로드 애니메이션 (복구는 pageshow가 담당)
+    return () => {
+      _revealIo?.disconnect();
+      _revealIo = null;
+    };
   }, []);
 
   return (
@@ -57,7 +188,7 @@ export default function LandingPage() {
       {/* ===================== NAV ===================== */}
       <header
         className={cn(
-          "sticky top-0 z-50 bg-white/82 backdrop-blur-[14px] backdrop-saturate-[180%] border-b transition-all duration-200 ease-[cubic-bezier(.2,.7,.2,1)] border-transparent",
+          "sticky top-0 z-50 bg-white/82 backdrop-blur-[14px] backdrop-saturate-180 border-b transition-all duration-200 ease-[cubic-bezier(.2,.7,.2,1)] border-transparent",
           isScrolled &&
             "border-gomin-neutral-100/50 shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)]"
         )}
@@ -69,9 +200,7 @@ export default function LandingPage() {
             href="#top"
             aria-label="Stamplo"
           >
-            <span className="font-[var(--font-monomaniac-one)] text-[25px] tracking-[0.01em] text-gomin-primary-700 leading-none pt-[3px]">
-              stamplo
-            </span>
+            <StamploLogo width={112} height={32} />
           </a>
           <nav className="flex items-center gap-[30px] max-md:hidden">
             <a
@@ -101,7 +230,7 @@ export default function LandingPage() {
           </nav>
           <div className="flex items-center gap-3">
             <a
-              href="#cta"
+              href="/admin"
               className="inline-flex items-center justify-center gap-2 font-sans font-bold border-0 rounded-xl cursor-pointer whitespace-nowrap no-underline active:scale-[0.98] transition-all duration-120 ease-[cubic-bezier(.2,.7,.2,1)] bg-gomin-primary-700 text-white hover:bg-gomin-primary-600 shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)] py-2.75 px-5 text-[15px]"
             >
               시작하기
@@ -119,26 +248,26 @@ export default function LandingPage() {
           <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
             <div className="w-full">
               <div className="grid grid-cols-[1.05fr_0.95fr] gap-14 items-center max-lg:grid-cols-1 max-lg:gap-10">
-                <div className="flex flex-col gap-6.5">
-                  <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                    무료 스탬프 투어 플랫폼
-                  </span>
-                  <h1 className="font-extrabold text-[clamp(38px,5.4vw,68px)] leading-[1.1] tracking-tight font-nanum break-keep word-keep-all reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                    누구나 쉽게 시작하는
-                    <br />
-                    스탬프 투어,{" "}
-                    <span className="font-[var(--font-monomaniac-one)] text-gomin-primary-700 tracking-[0.01em]">
-                      Stamplo
-                    </span>
+                <div className="flex flex-col gap-5">
+                  <h1 className="font-extrabold text-[clamp(30px,4.8vw,58px)] leading-[1.2] tracking-tight font-nanum break-keep word-keep-all reveal">
+                    누구나 쉽게
+                    <br /> 시작하는 스탬프 투어
                   </h1>
-                  <p className="text-[clamp(16px,1.55vw,19px)] text-gomin-neutral-600 leading-[1.62] break-keep word-keep-all reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+                  <div className="reveal">
+                    <StamploLogo
+                      width={280}
+                      height={80}
+                      className="w-[clamp(180px,24vw,280px)] h-auto"
+                    />
+                  </div>
+                  <p className="text-[clamp(16px,1.55vw,19px)] text-gomin-neutral-600 leading-[1.62] break-keep word-keep-all reveal">
                     행사의 몰입도를 위해 스탬프 투어는 이제 필수.
                     <br />
                     간편하게 내 행사에 스탬프 투어를 적용해 보세요.
                   </p>
-                  <div className="flex gap-3.5 flex-wrap reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+                  <div className="flex gap-3.5 flex-wrap reveal">
                     <a
-                      href="#cta"
+                      href="/admin"
                       className="inline-flex items-center justify-center gap-2 font-sans font-bold border-0 cursor-pointer leading-none transition-all duration-120 ease-[cubic-bezier(.2,.7,.2,1)] whitespace-nowrap no-underline active:scale-[0.98] bg-gomin-primary-700 text-white hover:bg-gomin-primary-600 shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)] py-[17px] px-[30px] text-[17px] rounded-2xl"
                     >
                       시작하기
@@ -146,7 +275,7 @@ export default function LandingPage() {
                     </a>
                   </div>
                 </div>
-                <div className="relative flex justify-center max-lg:order-first reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+                <div className="relative flex justify-center max-lg:order-first reveal">
                   <div className="absolute inset-0 z-0 pointer-events-none before:content-[''] before:absolute before:w-[70%] before:h-[70%] before:left-[15%] before:top-[12%] before:bg-[radial-gradient(circle,var(--primary-200)_0%,transparent_68%)] before:filter before:blur-[10px] before:opacity-70"></div>
                   {/* Premium Live Mockup for Hero A */}
                   <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[332px] max-md:max-w-[280px] max-sm:max-w-[240px]">
@@ -165,22 +294,22 @@ export default function LandingPage() {
         >
           <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
             <div className="max-w-[720px] mx-auto mb-14 text-center flex flex-col items-center gap-4">
-              <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal">
                 스탬프 투어 기존 방식의 문제점
               </span>
-              <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                실물 스탬프 투어,
+              <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal">
+                스탬프 투어,
                 <br />
-                이제는 한계가 분명합니다
+                모바일로 더 편리하게{" "}
               </h2>
-              <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-1.6 break-keep word-keep-all reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                종이와 도장에 묶인 운영은 행사의 몰입을 깨뜨립니다. Stamplo는
-                웹과 QR로 그 마찰을 없앱니다.
+              <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-[1.6] break-keep word-keep-all reveal">
+                종이와 도장을 사용하는 기존 방법은 여러가지 문제가 있습니다.
+                Stamplo는 웹과 QR로 그 문제를 해결합니다.
               </p>
             </div>
 
             <div className="grid grid-cols-[1fr_auto_1fr] gap-7 items-stretch max-lg:grid-cols-1 max-lg:gap-2">
-              <div className="flex flex-col gap-4 reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex flex-col gap-4 reveal">
                 <div className="flex items-center gap-2.25 text-sm font-bold text-red-500 mb-0.5">
                   <XCircle className="inline text-rose-500" />
                   실물 스탬프 투어의 문제
@@ -191,11 +320,11 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <div className="text-[17px] font-bold font-nanum break-keep word-keep-all">
-                      종이 훼손 문제
+                      종이와 스탬프의 문제
                     </div>
                     <div className="text-sm text-gomin-neutral-500 mt-1.25 leading-[1.55] break-keep word-keep-all">
-                      비에 젖고 찢어지는 종이 스탬프지. 분실하면 그동안의 참여
-                      기록이 한순간에 사라집니다.
+                      종이는 쉽게 훼손되고 분실의 우려가 있습니다. 또한 제작,
+                      인쇄, 관리에 비용이 추가적으로 발생합니다.
                     </div>
                   </div>
                 </div>
@@ -215,16 +344,16 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-center text-gomin-neutral-300 max-lg:rotate-90 max-lg:py-2 reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex items-center justify-center text-gomin-neutral-300 max-lg:rotate-90 max-lg:py-2 reveal">
                 <ArrowRight className="inline w-[34px] h-[34px] stroke-[1.6]" />
               </div>
 
-              <div className="flex flex-col gap-4 reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex flex-col gap-4 reveal">
                 <div className="flex items-center gap-2.25 text-sm font-bold text-emerald-500 mb-0.5">
                   <CheckCircle2 className="inline text-emerald-500" />
                   Stamplo의 해결
                 </div>
-                <div className="bg-gradient-to-br from-[#5f41ee] to-[#5435EB] text-white rounded-[18px] p-7 shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)] flex flex-col gap-3.5 h-full justify-center relative overflow-hidden after:content-[''] after:absolute after:-right-[50px] after:-bottom-[50px] after:w-[170px] after:h-[170px] after:rounded-full after:bg-white/10">
+                <div className="bg-linear-to-br from-[#5f41ee] to-[#5435EB] text-white rounded-[18px] p-7 shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)] flex flex-col gap-3.5 h-full justify-center relative overflow-hidden after:content-[''] after:absolute after:right-[-50px] after:bottom-[-50px] after:w-[170px] after:h-[170px] after:rounded-full after:bg-white/10">
                   <div className="w-[50px] h-[50px] rounded-2xl bg-white/16 flex items-center justify-center relative z-10">
                     <QrCode className="w-6.5 h-6.5" />
                   </div>
@@ -233,8 +362,8 @@ export default function LandingPage() {
                   </div>
                   <div className="text-[14.5px] text-white/88 leading-[1.6] relative z-10 break-keep word-keep-all">
                     설치할 앱도, 나눠줄 종이도 없습니다. 참여자는 QR을 스캔해
-                    바로 스탬프를 받고, 운영자는 부스 없이 동선을 흐르게
-                    만듭니다.
+                    바로 스탬프 투어를 시작하고, 미션을 완료하면서 자연스러운
+                    행사 흐름을 경험합니다.
                   </div>
                   <div className="flex gap-2 flex-wrap relative z-10 mt-0.5">
                     <span className="text-[12.5px] font-bold py-1.5 px-3 rounded-full bg-white/16">
@@ -260,48 +389,22 @@ export default function LandingPage() {
         >
           <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
             <div className="max-w-[720px] mx-auto mb-14 text-center flex flex-col items-center gap-4">
-              <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                유저 사용 방법
+              <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal">
+                간편한 유저 사용법
               </span>
-              <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                스캔하고, 모으고, 보상받기까지 3단계
+              <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal">
+                미션하고, 스캔하고, 보상받기
               </h2>
-              <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-1.6 break-keep word-keep-all reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-[1.6] break-keep word-keep-all reveal">
                 참여자는 별도 설치 없이, 행사장에서 휴대폰만 있으면 됩니다.
               </p>
             </div>
 
             <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] gap-2 items-start max-lg:grid-cols-1 max-lg:gap-10">
               {/* Step 1: Scan QR */}
-              <div className="flex flex-col items-center gap-[22px] reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex flex-col items-center gap-[22px] reveal">
                 <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
-                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-900 flex flex-col">
-                    {/* Live Camera Scanner UI */}
-                    <div className="absolute inset-0 bg-slate-950 flex flex-col justify-between p-4 z-0">
-                      {/* Scanner guide boundary */}
-                      <div className="my-auto mx-auto w-40 h-40 border-2 border-emerald-400 rounded-2xl relative flex items-center justify-center">
-                        <div
-                          className="absolute -inset-1 border border-emerald-400/30 rounded-3xl animate-ping will-change-[transform,opacity]"
-                          style={{ animationDuration: "3s" }}
-                        ></div>
-                        <QrCode className="text-emerald-400/30 w-16 h-16" />
-
-                        {/* Scanning beam animation */}
-                        <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent top-0 animate-[bounce_2s_infinite] will-change-[transform,opacity]"></div>
-                      </div>
-
-                      {/* Text */}
-                      <div className="text-center text-white shrink-0 mt-2">
-                        <p className="text-xs font-semibold">
-                          QR 코드를 스캔하세요
-                        </p>
-                        <p className="text-[10px] text-slate-400 mt-1">
-                          포스터나 배너의 QR을 감지하면 자동 스탬프가
-                          지급됩니다.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col"></div>
                 </div>
                 <div className="flex flex-col items-center gap-2.5 text-center max-w-[260px]">
                   <div className="w-10 h-10 rounded-full bg-gomin-primary-700 text-white font-nanum font-extrabold text-base flex items-center justify-center shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)]">
@@ -316,100 +419,14 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-center pt-[220px] text-gomin-primary-300 max-lg:pt-0 max-lg:rotate-90 reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex items-center justify-center pt-[220px] text-gomin-primary-300 max-lg:pt-0 max-lg:rotate-90 reveal">
                 <ArrowRight className="inline w-[30px] h-[30px] stroke-[1.8]" />
               </div>
 
               {/* Step 2: Collect Stamp */}
-              <div className="flex flex-col items-center gap-[22px] reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex flex-col items-center gap-[22px] reveal">
                 <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
-                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
-                    {/* Event Banner */}
-                    <div className="relative h-20 shrink-0 bg-[#5435EB] overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/landing/landing_poster.png"
-                        alt="Poster"
-                        fill
-                        sizes="(max-width: 768px) 100vw, 250px"
-                        className="object-cover opacity-80"
-                      />
-                      <div className="absolute inset-0 bg-black/40"></div>
-                      <div className="absolute bottom-2 left-3 text-white">
-                        <h4 className="text-xs font-bold leading-none">
-                          NEON TRACKS
-                        </h4>
-                      </div>
-                    </div>
-
-                    <div className="p-3 flex-1 flex flex-col justify-between">
-                      {/* Stamp Grid */}
-                      <div className="bg-white rounded-lg p-3 border border-slate-100 shadow-sm flex-1 flex flex-col justify-between">
-                        <div>
-                          <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-[9px] font-bold text-slate-400">
-                              STAMP CHECK
-                            </span>
-                            <span className="text-[10px] font-extrabold text-[#5435EB]">
-                              3 / 6 completed
-                            </span>
-                          </div>
-
-                          {/* Live representation of the user image decoded from base64 */}
-                          <div className="grid grid-cols-3 gap-2">
-                            {[1, 2].map((i) => (
-                              <div
-                                key={i}
-                                className="aspect-square rounded-md bg-[#F3F1FE] border border-[#D9D3F9] flex items-center justify-center p-1 relative overflow-hidden"
-                              >
-                                <Image
-                                  src="/images/landing/landing_stamp.png"
-                                  alt="stamp"
-                                  fill
-                                  sizes="80px"
-                                  className="object-contain p-1"
-                                />
-                              </div>
-                            ))}
-                            {/* The base64 Decoded custom Image from bundle */}
-                            <div className="aspect-square rounded-md bg-[#F3F1FE] border border-[#D9D3F9] flex items-center justify-center p-1 relative overflow-hidden">
-                              <Image
-                                src="/images/landing/usage_stamp.webp"
-                                alt="Decoded Stamp"
-                                fill
-                                sizes="80px"
-                                className="object-contain p-1"
-                              />
-                            </div>
-                            {[4, 5, 6].map((i) => (
-                              <div
-                                key={i}
-                                className="aspect-square rounded-md bg-slate-50 border border-dashed border-slate-200 flex items-center justify-center"
-                              >
-                                <span className="text-slate-300 text-[10px] font-bold">
-                                  {i}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="mt-2.5">
-                          <div className="w-full bg-slate-100 rounded-full h-1 overflow-hidden">
-                            <div
-                              className="bg-[#5435EB] h-full rounded-full"
-                              style={{ width: "50%" }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="mt-2">
-                        <button className="w-full bg-[#5435EB] text-white text-[10px] font-bold py-1.5 rounded shadow flex items-center justify-center gap-1">
-                          <QrCode size={10} />
-                          스탬프 추가 적립
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col"></div>
                 </div>
                 <div className="flex flex-col items-center gap-2.5 text-center max-w-[260px]">
                   <div className="w-10 h-10 rounded-full bg-gomin-primary-700 text-white font-nanum font-extrabold text-base flex items-center justify-center shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)]">
@@ -425,80 +442,14 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-center pt-[220px] text-gomin-primary-300 max-lg:pt-0 max-lg:rotate-90 reveal delay-[240ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex items-center justify-center pt-[220px] text-gomin-primary-300 max-lg:pt-0 max-lg:rotate-90 reveal">
                 <ArrowRight className="inline w-[30px] h-[30px] stroke-[1.8]" />
               </div>
 
               {/* Step 3: Complete / Reward */}
-              <div className="flex flex-col items-center gap-[22px] reveal delay-[240ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex flex-col items-center gap-[22px] reveal">
                 <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[250px] max-xs:max-w-[240px]">
-                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-100 flex flex-col">
-                    {/* Header */}
-                    <div className="h-8 bg-white border-b border-slate-100 flex items-center px-3 justify-between shrink-0">
-                      <span className="text-[10px] font-bold text-slate-400">
-                        MISSION END
-                      </span>
-                    </div>
-
-                    {/* Stamp fully filled in background */}
-                    <div className="p-3 opacity-30 flex-1 flex flex-col justify-between pointer-events-none">
-                      <div className="bg-white rounded-lg p-3 flex-1 flex flex-col justify-between">
-                        <div className="grid grid-cols-3 gap-2">
-                          {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <div
-                              key={i}
-                              className="aspect-square rounded-md bg-[#F3F1FE] border border-[#D9D3F9] flex items-center justify-center p-1 relative overflow-hidden"
-                            >
-                              <Image
-                                src="/images/landing/landing_stamp.png"
-                                alt="stamp"
-                                fill
-                                sizes="80px"
-                                className="object-contain p-1"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Popup overlay reward modal */}
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center p-4 z-10">
-                      <div className="bg-white rounded-2xl p-4 w-full text-center shadow-2xl flex flex-col items-center gap-2.5 animate-[bounce_1s_1] border border-slate-50">
-                        <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                          <Award size={20} />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-black text-slate-800 leading-tight">
-                            미션 달성 완료!
-                          </h4>
-                          <p className="text-[9px] text-slate-400 mt-1 leading-normal">
-                            모든 스탬프 투어를 완주하셨습니다. 아래 보상을
-                            수령하세요.
-                          </p>
-                        </div>
-
-                        {/* Coupon card wrapper */}
-                        <div className="w-full bg-[#F3F1FE] rounded-lg p-2.5 border border-[#D9D3F9] flex items-center gap-2">
-                          <div className="w-8 h-8 rounded bg-white border border-[#D9D3F9] flex items-center justify-center text-[#5435EB] font-bold text-[10px]">
-                            COUPON
-                          </div>
-                          <div className="text-left">
-                            <p className="text-[10px] font-bold text-slate-700 leading-tight">
-                              무료 아메리카노 교환권
-                            </p>
-                            <p className="text-[8px] text-[#5435EB] mt-0.5 leading-none">
-                              리워드 데스크에서 교환하세요
-                            </p>
-                          </div>
-                        </div>
-
-                        <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold py-2 rounded shadow transition-colors">
-                          교환용 QR 코드 보기
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col"></div>
                 </div>
                 <div className="flex flex-col items-center gap-2.5 text-center max-w-[260px]">
                   <div className="w-10 h-10 rounded-full bg-gomin-primary-700 text-white font-nanum font-extrabold text-base flex items-center justify-center shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)]">
@@ -525,20 +476,20 @@ export default function LandingPage() {
           <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
             <div className="grid grid-cols-[0.86fr_1.14fr] gap-14 items-center max-lg:grid-cols-1 max-lg:gap-10">
               <div className="flex flex-col gap-[22px]">
-                <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+                <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal">
                   디테일한 데이터 분석
                 </span>
-                <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+                <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal">
                   행사가 끝나면
                   <br />
                   인사이트가 남습니다
                 </h2>
-                <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-1.6 break-keep word-keep-all reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+                <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-[1.6] break-keep word-keep-all reveal">
                   실시간 대시보드로 참여 흐름을 한눈에. 다음 행사를 위한
                   데이터가 자동으로 쌓입니다.
                 </p>
                 <div className="flex flex-col gap-3.5 mt-1">
-                  <div className="flex gap-3.5 items-start bg-white border border-gomin-neutral-100 rounded-2xl p-[16px_18px] shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)] reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+                  <div className="flex gap-3.5 items-start bg-white border border-gomin-neutral-100 rounded-2xl p-[16px_18px] shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)] reveal">
                     <div className="w-10 h-10 shrink-0 rounded-xl bg-gomin-primary-100 text-gomin-primary-700 flex items-center justify-center">
                       <Clock />
                     </div>
@@ -546,12 +497,12 @@ export default function LandingPage() {
                       <div className="text-base font-bold font-nanum break-keep word-keep-all">
                         시간대별 · 연령별 데이터
                       </div>
-                      <div className="text-[13.5px] text-gomin-neutral-500 mt-0.75 leading-1.5 break-keep word-keep-all">
+                      <div className="text-[13.5px] text-gomin-neutral-500 mt-0.75 leading-[1.5] break-keep word-keep-all">
                         언제, 누가 가장 활발히 참여했는지 한눈에 파악하세요.
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-3.5 items-start bg-white border border-gomin-neutral-100 rounded-2xl p-[16px_18px] shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)] reveal delay-[240ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+                  <div className="flex gap-3.5 items-start bg-white border border-gomin-neutral-100 rounded-2xl p-[16px_18px] shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)] reveal">
                     <div className="w-10 h-10 shrink-0 rounded-xl bg-gomin-primary-100 text-gomin-primary-700 flex items-center justify-center">
                       <BarChart3 />
                     </div>
@@ -559,7 +510,7 @@ export default function LandingPage() {
                       <div className="text-base font-bold font-nanum break-keep word-keep-all">
                         미션별 참여율 데이터
                       </div>
-                      <div className="text-[13.5px] text-gomin-neutral-500 mt-0.75 leading-1.5 break-keep word-keep-all">
+                      <div className="text-[13.5px] text-gomin-neutral-500 mt-0.75 leading-[1.5] break-keep word-keep-all">
                         어떤 미션이 잘 통했는지, 어디서 이탈했는지 미션 단위로
                         확인하세요.
                       </div>
@@ -567,7 +518,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              <div className="relative flex justify-center max-lg:order-first reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="relative flex justify-center max-lg:order-first reveal">
                 {/* Premium Live Mockup Dashboard (Admin PC Web style) */}
                 <div className="w-full bg-white rounded-2xl shadow-[0_40px_80px_-28px_rgba(20,12,60,0.40),0_4px_14px_rgba(17,17,17,0.10)] overflow-hidden border border-gomin-neutral-100/50">
                   <div className="h-[46px] flex items-center gap-4 px-[18px] bg-gomin-neutral-100/50 border-b border-gomin-neutral-100/50">
@@ -578,10 +529,10 @@ export default function LandingPage() {
                     </div>
                     <div className="flex-1 max-w-[360px] h-[26px] rounded-full bg-white border border-gomin-neutral-100 flex items-center gap-1.75 px-3.5 text-[12.5px] text-gomin-neutral-500 font-mono">
                       <Lock className="w-[13px] h-[13px] text-emerald-500" />
-                      stamplo.io/dashboard
+                      stamplo.com/admin
                     </div>
                   </div>
-                  <div className="aspect-[16/10] bg-slate-50 flex">
+                  <div className="aspect-16/10 bg-slate-50 flex">
                     {/* Admin Mockup Sidebar */}
                     <div className="w-1/4 bg-slate-900 text-slate-400 p-2.5 flex flex-col gap-2 shrink-0 border-r border-slate-800 text-[10px]">
                       <div className="flex items-center gap-1.5 px-1.5 mb-2">
@@ -713,180 +664,161 @@ export default function LandingPage() {
 
         {/* ===================== BUILDER ===================== */}
         <section
-          className="py-[clamp(72px,9vw,120px)] px-0 relative"
+          className="py-[clamp(72px,9vw,120px)] px-0 relative bg-linear-to-b from-white to-gomin-neutral-50/20"
           id="builder"
         >
           <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
             <div className="max-w-[720px] mx-auto mb-14 text-center flex flex-col items-center gap-4">
-              <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                쉬운 페이지 만들기
+              <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal">
+                행사 만들기 체험
               </span>
-              <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                이미지 두 장이면, 페이지가 완성됩니다
+              <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal">
+                스탬프 및 테마 디자인 설정
               </h2>
-              <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-1.6 break-keep word-keep-all reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                포스터 이미지와 스탬프 이미지만 준비되어 있다면 OK. 브랜드
-                컬러를 입힌 디자인으로 누구든 쉽게 우리 행사를 드러내는 페이지를
-                만들 수 있습니다.
+              <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-[1.6] break-keep word-keep-all reveal">
+                실제 서비스의 행사 생성 에디터 화면입니다. 스탬프 이미지를
+                등록하고 색상 슬라이더로 행사 고유의 테마 색상을 직접
+                설정해보세요.
               </p>
             </div>
 
-            <div className="grid grid-cols-[0.9fr_auto_1.1fr] gap-8 items-center max-lg:grid-cols-1 max-lg:gap-7">
-              <div className="flex flex-col gap-4.5 reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2 text-sm font-bold text-gomin-neutral-600">
-                    <ImageIcon className="w-[17px] h-[17px] text-gomin-primary-700" />
-                    포스터 이미지
-                  </div>
-                  <div className="relative w-full rounded-2xl shadow-[0_4px_10px_rgba(17,17,17,0.06),0_1px_2px_rgba(17,17,17,0.04)] overflow-hidden bg-gomin-neutral-100/50 h-[200px]">
-                    <Image
-                      src="/images/landing/landing_poster.png"
-                      alt="Festival Poster"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 400px"
-                      className="object-cover p-1"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2 text-sm font-bold text-gomin-neutral-600">
-                    <Stamp className="w-[17px] h-[17px] text-gomin-primary-700" />
-                    스탬프 이미지
-                  </div>
-                  <div className="flex gap-4 items-center">
-                    <div className="relative w-full rounded-2xl shadow-[0_4px_10px_rgba(17,17,17,0.06),0_1px_2px_rgba(17,17,17,0.04)] overflow-hidden bg-gomin-neutral-100/50 h-[120px] w-[120px] rounded-xl flex items-center justify-center p-2">
+            <div className="flex flex-col lg:flex-row gap-10 items-start justify-center max-lg:items-stretch max-w-[960px] mx-auto">
+              {/* 왼쪽: 어드민 등록 Step 3 디자인 폼 이식 */}
+              <div className="flex-1 bg-white border border-gomin-neutral-100 rounded-3xl p-6 md:p-8 shadow-[0_16px_36px_rgba(17,17,17,0.03)] space-y-8 reveal text-gomin-black">
+                {/* 1. 스탬프 모양 설정 섹션 */}
+                <div className="space-y-3 text-gomin-black text-left">
+                  <h3 className="text-base font-bold text-gomin-neutral-700">
+                    스탬프 모양
+                  </h3>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleStampFileChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+
+                  {stampImage ? (
+                    <div className="relative w-[150px] h-[150px] rounded-2xl border border-gomin-neutral-200 flex items-center justify-center p-4 group transition-all hover:shadow-sm">
+                      <div className="absolute inset-0 bg-checkerboard rounded-2xl overflow-hidden z-0" />
                       <Image
-                        src="/images/landing/landing_stamp.png"
-                        alt="Stamp Badge"
-                        fill
-                        sizes="120px"
-                        className="object-contain p-2"
+                        width={122}
+                        height={122}
+                        fetchPriority={"high"}
+                        loading="eager"
+                        src={stampImage}
+                        alt="스탬프 모양 미리보기"
+                        className="w-full h-full object-contain relative z-10"
                       />
+                      <button
+                        type="button"
+                        onClick={handleStampRemove}
+                        className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-white shadow-md border border-gomin-neutral-100 flex items-center justify-center text-gomin-neutral-500 hover:text-gomin-black hover:scale-105 transition-all cursor-pointer z-20"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div>
-                      <div className="flex gap-2 mt-1">
-                        <i
-                          className="w-[26px] h-[26px] rounded-lg border-2 border-white shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)]"
-                          style={{ background: "#5435EB" }}
-                        ></i>
-                        <i
-                          className="w-[26px] h-[26px] rounded-lg border-2 border-white shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)]"
-                          style={{ background: "#1FA971" }}
-                        ></i>
-                        <i
-                          className="w-[26px] h-[26px] rounded-lg border-2 border-white shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)]"
-                          style={{ background: "#E59A0E" }}
-                        ></i>
-                        <i
-                          className="w-[26px] h-[26px] rounded-lg border-2 border-white shadow-[0_1px_2px_rgba(17,17,17,0.04),0_1px_1px_rgba(17,17,17,0.03)]"
-                          style={{ background: "#E5484D" }}
-                        ></i>
+                  ) : (
+                    <div
+                      onClick={triggerFileInput}
+                      className="w-[150px] h-[150px] rounded-2xl border-2 border-dashed border-gomin-neutral-200 bg-gomin-neutral-50/50 hover:bg-gomin-neutral-50 hover:border-gomin-neutral-300 flex flex-col items-center justify-center gap-2.5 cursor-pointer transition-all p-3 text-center select-none"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-white border border-gomin-neutral-100 shadow-sm flex items-center justify-center text-gomin-neutral-400">
+                        <Plus className="w-4 h-4" />
                       </div>
-                      <span className="text-[11px] font-bold text-slate-400 mt-1 inline-block">
-                        브랜드 컬러 적용 가능
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col items-center gap-2.5 text-gomin-primary-400 max-lg:rotate-90 reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                <div className="text-[12.5px] font-bold text-gomin-primary-700 bg-gomin-primary-100 py-1.25 px-3 rounded-full">
-                  자동 생성
-                </div>
-                <ArrowRight className="inline w-[34px] h-[34px] stroke-[1.7]" />
-              </div>
-
-              <div className="flex justify-center reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                <div className="relative w-full aspect-[9/19.2] bg-[#0e0e12] rounded-[42px] p-[11px] shadow-[0_40px_80px_-24px_rgba(20,12,60,0.45),0_6px_16px_rgba(17,17,17,0.18)] max-w-[270px] max-xs:max-w-[240px]">
-                  <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-slate-50 flex flex-col">
-                    {/* Header */}
-                    <div className="h-10 bg-white border-b border-slate-100 flex items-center px-4 justify-between shrink-0">
-                      <span className="text-xs font-bold text-[#5435EB] tracking-wide font-logo">
-                        stamplo
-                      </span>
-                      <div className="flex gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
-                      </div>
-                    </div>
-
-                    {/* Result Page preview content */}
-                    <div className="relative aspect-[4/3] shrink-0 bg-[#5435EB] overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/landing/landing_poster.png"
-                        alt="Poster"
-                        fill
-                        sizes="(max-width: 768px) 100vw, 300px"
-                        className="object-cover opacity-90"
-                      />
-                      <div className="absolute inset-0 bg-black/50"></div>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 text-white">
-                        <h4 className="text-sm font-extrabold leading-tight">
-                          NEON TRACKS FESTIVAL
-                        </h4>
-                        <p className="text-[9px] opacity-80 mt-1">
-                          인사이드 스테이지 스탬프 랠리
+                      <div className="space-y-0.5">
+                        <p className="text-[13px] font-extrabold text-gomin-neutral-600">
+                          스탬프 이미지 업로드
+                        </p>
+                        <p className="text-[10px] font-bold text-gomin-neutral-400 leading-normal">
+                          1:1 비율 권장
+                          <br />
+                          투명 배경 PNG
                         </p>
                       </div>
                     </div>
+                  )}
 
-                    {/* Stamp collection container with the newly generated stamp */}
-                    <div className="p-3.5 flex-1 flex flex-col justify-between">
-                      <div className="bg-white rounded-xl p-3 border border-slate-100 shadow-sm flex-1 flex flex-col justify-between">
-                        <div>
-                          <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-[9px] text-slate-400 font-bold">
-                              MY ACHIEVEMENTS
-                            </span>
-                            <span className="text-[10px] font-extrabold text-[#5435EB]">
-                              2 / 4 collected
-                            </span>
-                          </div>
-
-                          {/* 4 slots grid for a customized look */}
-                          <div className="grid grid-cols-2 gap-3 py-1">
-                            <div className="aspect-[4/3] rounded-lg bg-[#F3F1FE] border border-[#D9D3F9] flex items-center justify-center p-1.5 relative overflow-hidden">
-                              <Image
-                                src="/images/landing/landing_stamp.png"
-                                alt="Stamp"
-                                fill
-                                sizes="120px"
-                                className="object-contain p-1.5"
-                              />
-                            </div>
-                            <div className="aspect-[4/3] rounded-lg bg-[#F3F1FE] border border-[#D9D3F9] flex items-center justify-center p-1.5 relative overflow-hidden">
-                              <Image
-                                src="/images/landing/landing_stamp.png"
-                                alt="Stamp"
-                                fill
-                                sizes="120px"
-                                className="object-contain p-1.5"
-                              />
-                            </div>
-                            <div className="aspect-[4/3] rounded-lg bg-slate-50 border border-dashed border-slate-200 flex items-center justify-center">
-                              <span className="text-slate-350 text-[10px] font-bold">
-                                3
-                              </span>
-                            </div>
-                            <div className="aspect-[4/3] rounded-lg bg-slate-50 border border-dashed border-slate-200 flex items-center justify-center">
-                              <span className="text-slate-350 text-[10px] font-bold">
-                                4
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="w-full bg-slate-100 rounded-full h-1 overflow-hidden mt-2">
-                          <div
-                            className="bg-[#5435EB] h-full rounded-full"
-                            style={{ width: "50%" }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2.5 p-4 rounded-2xl bg-gomin-primary-100/50 border border-gomin-primary-100 text-gomin-primary-700/90 text-left">
+                    <Info className="w-5 h-5 shrink-0" />
+                    <p className="text-xs font-bold leading-normal">
+                      스탬프 이미지를 따로 업로드하지 않으시면, 기본 제공되는
+                      Stamplo 스탬프 이미지가 자동으로 사용됩니다.
+                    </p>
                   </div>
                 </div>
+
+                <hr className="border-gomin-neutral-100" />
+
+                {/* 2. 테마 색상 설정 섹션 */}
+                <div className="space-y-5">
+                  <h3 className="text-base font-bold text-gomin-neutral-700 text-left">
+                    테마 색상
+                  </h3>
+
+                  {/* Hue 슬라이더 */}
+                  <div className="space-y-2">
+                    <input
+                      type="range"
+                      min="0"
+                      max="360"
+                      value={h}
+                      onChange={(e) => setH(Number(e.target.value))}
+                      className="theme-hue-slider w-full h-4.5 rounded-full appearance-none outline-none shadow-inner border border-black/5 cursor-pointer"
+                      style={
+                        {
+                          background:
+                            "linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)",
+                          "--slider-thumb-color": keyColor,
+                        } as React.CSSProperties
+                      }
+                    />
+                  </div>
+
+                  {/* 색상 칩 & Hex 입력 */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div
+                        className="w-12 h-12 rounded-xl border border-gomin-neutral-200 shadow-sm shrink-0"
+                        style={{ backgroundColor: keyColor }}
+                      />
+                      <input
+                        type="text"
+                        value={isFocused ? typingValue : keyColor}
+                        onFocus={() => {
+                          setIsFocused(true);
+                          setTypingValue(keyColor);
+                        }}
+                        onBlur={() => {
+                          setIsFocused(false);
+                        }}
+                        onChange={(e) => handleHexInputChange(e.target.value)}
+                        placeholder="#5435EB"
+                        className="h-12 w-32 bg-white border border-gomin-neutral-200 rounded-xl px-3 font-mono text-sm font-bold text-gomin-neutral-700 uppercase focus:outline-none focus:border-gomin-neutral-400 focus:ring-1 focus:ring-gomin-neutral-400 shadow-sm transition-all"
+                      />
+                      <span className="text-xs font-bold text-gomin-neutral-400 leading-normal max-w-[280px] text-left">
+                        ※ 입력하신 색상의 색조(Hue)만 추출하여 반영하며, 모바일
+                        화면 가독성을 보장하기 위해 채도와 명도는 고정된 최적의
+                        값으로 자동 조정됩니다.
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* InfoBanner */}
+                  <div className="flex items-center gap-2.5 p-4 rounded-2xl bg-gomin-primary-100/50 border border-gomin-primary-100 text-gomin-primary-700/90 text-left">
+                    <Info className="w-5 h-5 shrink-0" />
+                    <p className="text-xs font-bold leading-normal">
+                      선택한 테마 색상은 진입 페이지, 설문조사 등 행사의 모든
+                      페이지에 일괄 적용됩니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 오른쪽: 실시간 모바일 프리뷰 패널 이식 */}
+              <div className="reveal shrink-0">
+                <ThemePreviewPanel stampImage={stampImage} palette={palette} />
               </div>
             </div>
           </div>
@@ -894,38 +826,29 @@ export default function LandingPage() {
 
         {/* ===================== VALUE BAND / CTA ===================== */}
         <section
-          className="bg-gradient-to-br from-[#5f41ee] via-[#5435EB] to-[#4226c9] text-white text-center overflow-hidden relative before:content-[''] before:absolute before:-left-[140px] before:-top-[100px] before:w-[440px] before:h-[440px] before:rounded-full before:bg-[radial-gradient(circle,rgba(255,255,255,0.12)_0%,transparent_65%)] after:content-[''] after:absolute after:-right-[160px] after:-bottom-[160px] after:w-[480px] after:h-[480px] after:rounded-full after:bg-[radial-gradient(circle,rgba(255,255,255,0.10)_0%,transparent_65%)] py-0 px-0"
+          className="bg-linear-to-br from-[#5f41ee] via-[#5435EB] to-[#4226c9] text-white text-center overflow-hidden relative before:content-[''] before:absolute before:left-[-140px] before:top-[-100px] before:w-[440px] before:h-[440px] before:rounded-full before:bg-[radial-gradient(circle,rgba(255,255,255,0.12)_0%,transparent_65%)] after:content-[''] after:absolute after:right-[-160px] after:bottom-[-160px] after:w-[480px] after:h-[480px] after:rounded-full after:bg-[radial-gradient(circle,rgba(255,255,255,0.10)_0%,transparent_65%)] py-0 px-0"
           id="cta"
         >
           <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
             <div className="py-[clamp(80px,11vw,150px)] px-0 relative z-10 flex flex-col items-center gap-[30px]">
-              <Image
-                src="/images/landing/logo_stamplo_white.svg"
-                alt="Stamplo"
-                width={64}
-                height={64}
-                className="w-16 h-16 reveal transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]"
-                unoptimized
-              />
-              <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-white before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-white before:shadow-[0_0_0_4px_rgba(255,255,255,0.18)] reveal transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                핵심 가치
-              </span>
-              <h2 className="text-white font-extrabold text-[clamp(32px,4.6vw,60px)] leading-[1.18] font-nanum break-keep word-keep-all reveal delay-[80ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                누구나 쉽게, 무료로
+              <AnimatedIconStamplo className="w-28 h-28 text-white reveal" />
+
+              <h2 className="text-white font-extrabold text-[clamp(32px,4.6vw,60px)] leading-[1.18] font-nanum break-keep word-keep-all reveal">
+                누구나 쉽게
                 <br />
                 몰입감 있는 행사를 만들 수 있도록
               </h2>
-              <p className="text-white/86 text-[clamp(16px,1.6vw,20px)] max-w-[52ch] leading-normal break-keep word-keep-all reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
-                Stamplo는 스탬프 투어의 모든 마찰을 없앱니다.
+              <p className="text-white/86 text-[clamp(16px,1.6vw,20px)] max-w-[52ch] leading-normal break-keep word-keep-all reveal">
+                Stamplo는 쾌적한 스탬프 투어 경험을 디자인 합니다.
                 <br />
-                포스터 한 장으로 시작해, 데이터로 남기세요.
+                간편하게 모바일 스탬프 투어를 만들어 보세요.
               </p>
-              <div className="flex gap-3.5 flex-wrap justify-center reveal delay-[160ms] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] opacity-0 translate-y-6 [&.in]:opacity-100 [&.in]:translate-y-0 will-change-[transform,opacity]">
+              <div className="flex gap-3.5 flex-wrap justify-center reveal">
                 <a
-                  href="mailto:gominpeople26@gmail.com"
+                  href="/admin"
                   className="inline-flex items-center justify-center gap-2 font-sans font-bold border-0 cursor-pointer leading-none transition-all duration-120 ease-[cubic-bezier(.2,.7,.2,1)] whitespace-nowrap no-underline active:scale-[0.98] bg-white text-gomin-primary-700 hover:bg-[#f2efff] py-[17px] px-[30px] text-[17px] rounded-2xl"
                 >
-                  무료로 시작하기
+                  시작하기
                   <ArrowRight className="ml-1 inline" />
                 </a>
               </div>
@@ -947,13 +870,12 @@ export default function LandingPage() {
                   height={32}
                   unoptimized
                 />
-                <span className="font-[var(--font-monomaniac-one)] text-[25px] tracking-[0.01em] text-white leading-none pt-[3px]">
+                <span className="font-(--font-monomaniac-one) text-[25px] tracking-[0.01em] text-white leading-none pt-[3px]">
                   stamplo
                 </span>
               </a>
-              <p className="text-sm text-white/55 mt-3.5 max-w-[34ch] leading-1.6 break-keep word-keep-all">
-                누구나 무료로 쉽게 시작하는 스탬프 투어 플랫폼. 종이 없이, 줄
-                서지 않고, 데이터로 남기는 행사.
+              <p className="text-sm text-white/55 mt-3.5 max-w-[34ch] leading-[1.6] break-keep word-keep-all">
+                누구나 쉽게 시작하는 스탬프 투어 플랫폼.
               </p>
             </div>
             <div className="flex flex-col gap-3">
@@ -1004,10 +926,10 @@ export default function LandingPage() {
                 지금 시작하기
               </span>
               <a
-                href="mailto:gominpeople26@gmail.com"
+                href="/admin"
                 className="inline-flex items-center justify-center gap-2 font-sans font-bold text-base border-0 rounded-xl cursor-pointer py-3.5 px-6 leading-none transition-all duration-120 ease-[cubic-bezier(.2,.7,.2,1)] whitespace-nowrap no-underline active:scale-[0.98] bg-gomin-primary-700 text-white hover:bg-gomin-primary-600 shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)]"
               >
-                무료로 시작하기
+                시작하기
                 <ArrowRight className="ml-1 inline" />
               </a>
             </div>
