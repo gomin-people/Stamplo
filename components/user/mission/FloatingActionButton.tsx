@@ -2,6 +2,7 @@
 
 import { ScanLine } from "lucide-react";
 import ThemedButton from "@/components/user/common/ThemedButton";
+import { cn } from "@/utils";
 
 type FloatingActionButtonProps = {
   isAllCompleted?: boolean;
@@ -10,19 +11,25 @@ type FloatingActionButtonProps = {
   isPreview?: boolean;
   isRewardClaimed?: boolean;
   isLoading?: boolean;
+  className?: string;
 };
 
-export default function FloatingActionButton({
+const FloatingActionButton = ({
   isAllCompleted = false,
   onClick,
   label,
   isPreview = false,
   isRewardClaimed = false,
   isLoading = false,
-}: FloatingActionButtonProps) {
+  className,
+}: FloatingActionButtonProps) => {
   return (
     <div
-      className={`${isPreview ? "absolute" : "fixed"} bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-50`}
+      className={cn(
+        isPreview ? "absolute" : "fixed",
+        "bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-50",
+        className
+      )}
     >
       <ThemedButton
         onClick={onClick}
@@ -49,4 +56,6 @@ export default function FloatingActionButton({
       </ThemedButton>
     </div>
   );
-}
+};
+
+export default FloatingActionButton;

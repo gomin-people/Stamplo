@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import {
   badRequest,
   notFound,
@@ -198,6 +199,8 @@ export async function PATCH(
   if (!data) {
     return notFound("행사를 찾을 수 없습니다.");
   }
+
+  revalidateTag(`event-theme-${eventId}`, "default");
 
   return ok(data);
 }

@@ -178,7 +178,10 @@ export async function GET(
   }
 
   return NextResponse.redirect(
-    new URL(`/event/${missionCheckData.qrCode.events_id}/mission`, request.url)
+    new URL(
+      `/event/${missionCheckData.qrCode.events_id}/mission?newMission=${missionCheckData.qrCode.missions_id}`,
+      request.url
+    )
   );
 }
 

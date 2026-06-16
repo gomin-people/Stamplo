@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
@@ -16,6 +16,7 @@ import {
 import { cn } from "@/utils";
 import { buildInitialData } from "@/utils/participant-mission";
 import { type ParticipantModel } from "@/types/models";
+import { useCelebration } from "@/hooks/useCelebration";
 
 // Supabase의 event 테이블 타입 인터페이스 정의
 type EventData = {
@@ -39,6 +40,7 @@ type MissionPageClientProps = {
   initialMissions: InitialMission[];
   initialParticipant?: ParticipantModel;
   isPreview?: boolean;
+  newlyStampedId?: number | null;
 };
 
 type ViewMode = "list" | "grid";
@@ -56,6 +58,7 @@ const MissionPageClient = ({
   initialMissions,
   initialParticipant,
   isPreview = false,
+  newlyStampedId,
 }: MissionPageClientProps) => {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -113,6 +116,8 @@ const MissionPageClient = ({
   const isRewardClaimed =
     data && !isPreview ? data.participant.isRewardClaimed : false;
 
+  const { showCelebration, handleStampReady } = useCelebration();
+
   const hasError = isError && !isPreview;
   const isMissionsEmpty = missions.length === 0 && !isPreview;
   const isShowEmpty = hasError || isMissionsEmpty;
@@ -159,7 +164,12 @@ const MissionPageClient = ({
             {eventName}
           </h1>
           {/* 우측 별도 컴포넌트로 보여지는 브로슈어 버튼 */}
-          {showBrochureButton && <BrochureButton eventId={eventId} />}
+          {showBrochureButton && (
+            <BrochureButton
+              eventId={eventId}
+              className={cn(!newlyStampedId && "animate-bounce-once")}
+            />
+          )}
         </div>
 
         {/* 3. 진행 상황 안내 문구 */}
@@ -175,7 +185,12 @@ const MissionPageClient = ({
                 리워드를 받으세요
               </h2>
             ) : (
-              <h2 className="text-2xl font-nanum font-extrabold text-gomin-black leading-tight tracking-tight flex items-center gap-1.5 select-none">
+              <h2
+                className={cn(
+                  "text-2xl font-nanum font-extrabold text-gomin-black leading-tight tracking-tight select-none",
+                  showCelebration && "animate-shake-in"
+                )}
+              >
                 🎉 축하합니다!
                 <br />
                 모든 스탬프를 수집했어요!
@@ -210,6 +225,12 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
+                  isNewStamped={mission.id === newlyStampedId}
+                  onStampReady={
+                    mission.id === newlyStampedId && isAllCompleted
+                      ? handleStampReady
+                      : undefined
+                  }
                 />
               ))}
             </div>
@@ -221,6 +242,7 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
+                  isNewStamped={mission.id === newlyStampedId}
                 />
               ))}
             </div>
@@ -236,6 +258,7 @@ const MissionPageClient = ({
           isPreview={isPreview}
           isRewardClaimed={isRewardClaimed}
           isLoading={isFetching && !isPreview}
+          className={isPreview ? "" : "animate-fade-up"}
         />
       )}
 
@@ -249,4 +272,4 @@ const MissionPageClient = ({
   );
 };
 
-export default memo(MissionPageClient);
+export default MissionPageClient;

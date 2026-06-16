@@ -48,7 +48,7 @@ const BrochureClient = ({ images, showGuide }: Props) => {
         <motion.div
           key="brochure-content"
           className={cn(
-            "bg-gomin-white flex flex-col items-center pt-4 pb-[calc(2.5rem+env(safe-area-inset-bottom))]",
+            "bg-gomin-white flex flex-col items-center pt-18 pb-[calc(2.5rem+env(safe-area-inset-bottom))]",
             showGuide ? "" : "animate-fade-in"
           )}
           exit={{ opacity: 0, transition: { duration: 0.35, ease: "easeIn" } }}
