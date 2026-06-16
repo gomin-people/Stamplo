@@ -1,6 +1,7 @@
 import "server-only";
 
 const ADMIN_DASHBOARD_TIME_ZONE = "Asia/Seoul";
+const KST_UTC_OFFSET_HOURS = 9;
 const MAX_DASHBOARD_DATE_LABELS = 370;
 
 type DateParts = {
@@ -36,8 +37,8 @@ export function getAdminDashboardDateWindow(
   }
 
   return {
-    startsAt: `${formatDateOnly(start)} 00:00:00`,
-    endsBefore: `${formatDateOnly(addDays(cappedEnd, 1))} 00:00:00`,
+    startsAt: formatKstDateStartAsUtcTimestamp(start),
+    endsBefore: formatKstDateStartAsUtcTimestamp(addDays(cappedEnd, 1)),
   };
 }
 
@@ -129,7 +130,10 @@ const addDays = (date: DateParts, days: number): DateParts => {
   };
 };
 
-const formatDateOnly = (date: DateParts) =>
-  `${date.year}-${String(date.month).padStart(2, "0")}-${String(
-    date.day
-  ).padStart(2, "0")}`;
+const formatKstDateStartAsUtcTimestamp = (date: DateParts) => {
+  const utcDate = new Date(
+    Date.UTC(date.year, date.month - 1, date.day, -KST_UTC_OFFSET_HOURS)
+  );
+
+  return utcDate.toISOString().replace("T", " ").slice(0, 19);
+};

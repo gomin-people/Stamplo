@@ -171,7 +171,7 @@ const DashboardClient = ({ eventId }: Props) => {
             <ParticipantAnalysisChart
               daily={participantAnalysis?.daily ?? []}
               hourlyTotal={participantAnalysis?.hourlyTotal ?? []}
-              hourlyDateFactors={participantAnalysis?.hourlyDateFactors ?? []}
+              hourlyByDate={participantAnalysis?.hourlyByDate ?? []}
             />
           </section>
 

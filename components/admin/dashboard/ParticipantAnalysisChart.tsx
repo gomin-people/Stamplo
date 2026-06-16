@@ -39,15 +39,15 @@ type HourlyParticipantBarData = HourlyParticipantData & {
   fill: string;
 };
 
-type HourlyDateFactor = {
+type HourlyParticipantsByDate = {
   label: string;
-  factor: number;
+  hourly: HourlyParticipantData[];
 };
 
 type Props = {
   daily: DailyParticipantData[];
   hourlyTotal: HourlyParticipantData[];
-  hourlyDateFactors: HourlyDateFactor[];
+  hourlyByDate: HourlyParticipantsByDate[];
 };
 
 const analysisTabs: {
@@ -82,7 +82,7 @@ const hourlyChartConfig = {
 const ParticipantAnalysisChart = ({
   daily,
   hourlyTotal,
-  hourlyDateFactors,
+  hourlyByDate,
 }: Props) => {
   const [activeView, setActiveView] = useState<AnalysisView>("daily");
   const eventDateOptions = useMemo(
@@ -104,12 +104,12 @@ const ParticipantAnalysisChart = ({
     () =>
       selectedHourlyFilterValue === HOURLY_TOTAL_OPTION_VALUE
         ? hourlyTotalData
-        : getHourlyDataByDate(
-            selectedHourlyFilterValue,
-            hourlyTotal,
-            hourlyDateFactors
+        : withHourlyFill(
+            hourlyByDate.find(
+              (item) => item.label === selectedHourlyFilterValue
+            )?.hourly ?? []
           ),
-    [selectedHourlyFilterValue, hourlyTotalData, hourlyTotal, hourlyDateFactors]
+    [selectedHourlyFilterValue, hourlyTotalData, hourlyByDate]
   );
 
   return (
@@ -400,22 +400,6 @@ function formatChartTick(value: number) {
   return Number.isInteger(compactValue)
     ? `${compactValue}k`
     : `${compactValue.toFixed(1)}k`;
-}
-
-function getHourlyDataByDate(
-  date: string,
-  hourlyTotal: HourlyParticipantData[],
-  hourlyDateFactors: HourlyDateFactor[]
-): HourlyParticipantBarData[] {
-  const factor =
-    hourlyDateFactors.find((item) => item.label === date)?.factor ?? 1;
-
-  return withHourlyFill(
-    hourlyTotal.map((item) => ({
-      ...item,
-      count: Math.round(item.count * factor),
-    }))
-  );
 }
 
 function getTodayDateOption() {
