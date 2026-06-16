@@ -13,7 +13,7 @@ type QrCheckModalProps = {
   isOpen: boolean;
   onClose: () => void;
   eventId: string;
-  onMissionComplete?: () => void;
+  onMissionComplete?: (missionId: number) => void;
 };
 
 const QrCheckModal = ({
@@ -24,8 +24,8 @@ const QrCheckModal = ({
 }: QrCheckModalProps) => {
   useModalHistoryBack(isOpen, onClose);
 
-  const handleMissionComplete = () => {
-    onMissionComplete?.();
+  const handleMissionComplete = (missionId: number) => {
+    onMissionComplete?.(missionId);
     onClose();
   };
 

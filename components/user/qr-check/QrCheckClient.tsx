@@ -12,7 +12,7 @@ import { completeMissionFromQr } from "./completeMissionFromQr";
 type QrCheckClientProps = {
   eventId: string;
   onBack: () => void;
-  onMissionComplete: () => void;
+  onMissionComplete: (missionId: number) => void;
 };
 
 type HandleQrScanResultParams = {
@@ -20,7 +20,7 @@ type HandleQrScanResultParams = {
   hasScanned: boolean;
   currentEventId: string;
   markScanned: () => void;
-  navigateToMissionPage: () => void;
+  navigateToMissionPage: (missionId: number) => void;
   navigateToEvent: (path: string) => void;
   releaseScanLockAfterMessage: () => void;
   setMissionChecking: (isChecking: boolean) => void;
@@ -73,7 +73,7 @@ const handleQrScanResult = async ({
     const missionCheckResult = await completeMissionFromQr(scanTarget.path);
 
     if (missionCheckResult.type === "completed") {
-      navigateToMissionPage();
+      navigateToMissionPage(missionCheckResult.missionId);
       return;
     }
 
