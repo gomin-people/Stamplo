@@ -76,7 +76,7 @@ const DashboardKpiCard = ({
       return;
     }
 
-    if (countData.today === previousTodayCount + 1) {
+    if (countData.today > previousTodayCount) {
       animateIcon();
     }
 
