@@ -59,7 +59,6 @@ const analysisTabs: {
 ];
 
 const HOURLY_TOTAL_OPTION_VALUE = "total";
-const ADMIN_DASHBOARD_TIME_ZONE = "Asia/Seoul";
 
 const chartColor = "#5435EB";
 const chartSoftColor = "#C8BEFA";
@@ -403,13 +402,9 @@ function formatChartTick(value: number) {
 }
 
 function getTodayDateOption() {
-  const parts = new Intl.DateTimeFormat("ko-KR", {
-    timeZone: ADMIN_DASHBOARD_TIME_ZONE,
-    month: "numeric",
-    day: "numeric",
-  }).formatToParts(new Date());
-  const month = parts.find((part) => part.type === "month")?.value;
-  const day = parts.find((part) => part.type === "day")?.value;
+  const now = new Date();
+  const month = `${now.getMonth() + 1}`;
+  const day = `${now.getDate()}`;
 
   return month && day ? `${month}/${day}` : HOURLY_TOTAL_OPTION_VALUE;
 }

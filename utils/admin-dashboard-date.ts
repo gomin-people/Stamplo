@@ -1,6 +1,5 @@
 import "server-only";
 
-const ADMIN_DASHBOARD_TIME_ZONE = "Asia/Seoul";
 const KST_UTC_OFFSET_HOURS = 9;
 const MAX_DASHBOARD_DATE_LABELS = 370;
 
@@ -76,7 +75,7 @@ export function getAdminDashboardDateLabels(
 
 const getCappedEndDate = (startDate: string, endDate: string) => {
   const end = parseDateOnly(endDate);
-  const today = getTodayInTimeZone(ADMIN_DASHBOARD_TIME_ZONE);
+  const today = getToday();
 
   if (!parseDateOnly(startDate) || !end || !today) {
     return null;
@@ -95,16 +94,11 @@ const parseDateOnly = (value: string): DateParts | null => {
   return { year, month, day };
 };
 
-const getTodayInTimeZone = (timeZone: string): DateParts | null => {
-  const parts = new Intl.DateTimeFormat("ko-KR", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const year = Number(parts.find((part) => part.type === "year")?.value);
-  const month = Number(parts.find((part) => part.type === "month")?.value);
-  const day = Number(parts.find((part) => part.type === "day")?.value);
+const getToday = (): DateParts | null => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
 
   if (!year || !month || !day) {
     return null;

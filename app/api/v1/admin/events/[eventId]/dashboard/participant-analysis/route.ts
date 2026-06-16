@@ -14,7 +14,6 @@ import {
 import { supabase } from "@/utils/supabase/server";
 
 const PARTICIPANTS_PAGE_SIZE = 1000;
-const ADMIN_DASHBOARD_TIME_ZONE = "Asia/Seoul";
 
 // 어드민 대시보드 참여자 수 분석 route parameter 타입
 type AdminDashboardParticipantAnalysisRouteContext = {
@@ -190,16 +189,9 @@ const getTimestampDateTimeParts = (value: string) => {
     return null;
   }
 
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: ADMIN_DASHBOARD_TIME_ZONE,
-    month: "numeric",
-    day: "numeric",
-    hour: "numeric",
-    hour12: false,
-  }).formatToParts(timestamp);
-  const month = Number(parts.find((part) => part.type === "month")?.value);
-  const day = Number(parts.find((part) => part.type === "day")?.value);
-  const hour = Number(parts.find((part) => part.type === "hour")?.value);
+  const month = timestamp.getMonth() + 1;
+  const day = timestamp.getDate();
+  const hour = timestamp.getHours();
 
   if (!month || !day || !Number.isInteger(hour)) {
     return null;
