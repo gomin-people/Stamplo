@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loginSchema } from "@/types/schemas/adminLoginSchemas";
+import { getAdminLoginRedirectPath } from "@/utils/adminLoginRedirect";
 import { createSessionClient } from "@/utils/supabase/session-server";
 
 const SUPABASE_ERROR_MESSAGES: Record<string, string> = {
@@ -28,5 +29,7 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  return NextResponse.json({ success: true });
+  const redirectPath = await getAdminLoginRedirectPath(supabase);
+
+  return NextResponse.json({ success: true, redirectPath });
 };

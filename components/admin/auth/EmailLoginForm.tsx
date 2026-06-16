@@ -32,8 +32,8 @@ const EmailLoginForm = () => {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      await login(data);
-      router.refresh();
+      const result = await login(data);
+      router.replace(result.redirectPath);
     } catch (error) {
       const message =
         error instanceof ApiError

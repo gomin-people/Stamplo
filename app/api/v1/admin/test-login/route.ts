@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ADMIN_EVENT_REGISTER_PATH } from "@/constants/adminRoutes";
+import { getAdminLoginRedirectPath } from "@/utils/adminLoginRedirect";
 import { createSessionClient } from "@/utils/supabase/session-server";
 
 const redirectToAdmin = (request: NextRequest) => {
@@ -32,18 +32,7 @@ export const POST = async (request: NextRequest) => {
     return redirectToAdmin(request);
   }
 
-  const { data: eventId, error: eventsError } = await supabase.rpc(
-    "get_priority_admin_event_id"
-  );
-
-  let redirectPath = ADMIN_EVENT_REGISTER_PATH;
-
-  if (eventsError) {
-    console.error("Error fetching events after test login:", eventsError);
-    redirectPath = "/admin";
-  } else if (eventId != null) {
-    redirectPath = `/admin/events/${eventId}/dashboard`;
-  }
+  const redirectPath = await getAdminLoginRedirectPath(supabase);
 
   return NextResponse.redirect(`${request.nextUrl.origin}${redirectPath}`, {
     status: 303,

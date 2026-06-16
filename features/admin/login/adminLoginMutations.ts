@@ -8,9 +8,17 @@ type LoginPayload = {
   password: string;
 };
 
+type LoginResult = {
+  success: boolean;
+  redirectPath: string;
+};
+
 export function useAdminLoginMutation() {
   return useMutation({
     mutationFn: (payload: LoginPayload) =>
-      requestJson("/api/v1/admin/login", createJsonRequest("POST", payload)),
+      requestJson<LoginResult>(
+        "/api/v1/admin/login",
+        createJsonRequest("POST", payload)
+      ),
   });
 }
