@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
 import MissionStamp from "@/components/user/mission/MissionStamp";
 import MissionItem from "@/components/user/mission/MissionItem";
 import FloatingActionButton from "@/components/user/mission/FloatingActionButton";
 import SurveyModal from "@/components/user/mission/SurveyModal";
+import QrCheckModal from "@/components/user/mission/QrCheckModal";
 import {
   useParticipantMissionsQuery,
   type ParticipantMission,
@@ -17,6 +19,11 @@ import { cn } from "@/utils";
 import { buildInitialData } from "@/utils/participant-mission";
 import { type ParticipantModel } from "@/types/models";
 import { useCelebration } from "@/hooks/useCelebration";
+import {
+  useNewlyStampedMissionId,
+  useSetNewlyStampedMissionId,
+  useClearNewlyStampedMissionId,
+} from "@/stores/user";
 
 // Supabase의 event 테이블 타입 인터페이스 정의
 type EventData = {
@@ -62,8 +69,13 @@ const MissionPageClient = ({
   newlyStampedId,
 }: MissionPageClientProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
+  const [isQrCheckOpen, setIsQrCheckOpen] = useState(false);
+  const storeNewlyStampedId = useNewlyStampedMissionId();
+  const setNewlyStampedMissionId = useSetNewlyStampedMissionId();
+  const clearNewlyStampedMissionId = useClearNewlyStampedMissionId();
 
   const initialData: ParticipantMissions | undefined =
     !isPreview && initialMissions.length > 0
@@ -134,7 +146,7 @@ const MissionPageClient = ({
         setIsSurveyOpen(true);
       }
     } else {
-      window.location.assign(`/event/${eventId}/qr-check`);
+      setIsQrCheckOpen(true);
     }
   };
 
@@ -143,6 +155,21 @@ const MissionPageClient = ({
       router.push(`/event/${eventId}/complete`);
     }, 100);
   };
+
+  const handleMissionComplete = (missionId: number) => {
+    queryClient.invalidateQueries({ queryKey: ["participant", "missions"] });
+    setNewlyStampedMissionId(missionId);
+  };
+
+  // 네이티브 카메라로 QR 스캔 시 서버 리다이렉트(newMission)로 전달된 값을 스토어에 동기화
+  useEffect(() => {
+    if (newlyStampedId != null) setNewlyStampedMissionId(newlyStampedId);
+  }, [newlyStampedId, setNewlyStampedMissionId]);
+
+  // 컴포넌트가 언마운트되면 새 스탬프 애니메이션 표시 상태를 정리
+  useEffect(() => {
+    return () => clearNewlyStampedMissionId();
+  }, [clearNewlyStampedMissionId]);
 
   // DB에서 불러온 title (또는 name)을 1순위로 사용하며 예외 처리 제공
   const eventName = event?.title || event?.name || `이벤트 #${eventId}`;
@@ -169,7 +196,7 @@ const MissionPageClient = ({
             <BrochureButton
               eventId={eventId}
               hasBrochure={!!event.brochureImageUrl?.length}
-              className={cn(!newlyStampedId && "animate-bounce-once")}
+              className={cn(!storeNewlyStampedId && "animate-bounce-once")}
             />
           )}
         </div>
@@ -227,9 +254,9 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
-                  isNewStamped={mission.id === newlyStampedId}
+                  isNewStamped={mission.id === storeNewlyStampedId}
                   onStampReady={
-                    mission.id === newlyStampedId && isAllCompleted
+                    mission.id === storeNewlyStampedId && isAllCompleted
                       ? handleStampReady
                       : undefined
                   }
@@ -244,7 +271,7 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
-                  isNewStamped={mission.id === newlyStampedId}
+                  isNewStamped={mission.id === storeNewlyStampedId}
                 />
               ))}
             </div>
@@ -263,6 +290,14 @@ const MissionPageClient = ({
           className={isPreview ? "" : "animate-fade-up"}
         />
       )}
+
+      {/* QR 체크 모달 */}
+      <QrCheckModal
+        isOpen={isQrCheckOpen}
+        onClose={() => setIsQrCheckOpen(false)}
+        eventId={eventId}
+        onMissionComplete={handleMissionComplete}
+      />
 
       {/* 설문조사 모달 */}
       <SurveyModal
