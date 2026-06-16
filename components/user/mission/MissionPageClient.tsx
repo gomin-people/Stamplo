@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
