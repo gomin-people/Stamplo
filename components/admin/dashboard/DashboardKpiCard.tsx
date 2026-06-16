@@ -154,7 +154,9 @@ const DashboardKpiCard = ({
               )}
               title={`${todayCount}명`}
             >
-              <AnimatedNumber value={countData.today} ready={ready} />
+              <span className="inline-block translate-y-0.5">
+                <AnimatedNumber value={countData.today} ready={ready} />
+              </span>
             </div>
             {!shouldStackTotalCount && (
               <div
