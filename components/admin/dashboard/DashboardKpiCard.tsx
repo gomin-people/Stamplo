@@ -1,9 +1,21 @@
+"use client";
+
+import { useCallback, useEffect, useRef } from "react";
 import { Info } from "lucide-react";
+import AnimatedNumber from "@/components/admin/common/AnimatedNumber";
+import type {
+  AnimatedIconComponent,
+  AnimatedIconHandle,
+} from "@/types/animated-icon";
 import { cn, formatNumber } from "@/utils";
+
+const KPI_ICON_ANIMATION_DURATION_MS = 900;
+
+export type KpiIconComponent = AnimatedIconComponent;
 
 type Props = {
   title: string;
-  icon: React.ReactNode;
+  icon: KpiIconComponent;
   countData: {
     today: number;
     total: number;
@@ -13,6 +25,7 @@ type Props = {
     value: string;
   };
   info: string;
+  ready?: boolean;
 };
 
 const DashboardKpiCard = ({
@@ -21,12 +34,62 @@ const DashboardKpiCard = ({
   countData,
   colorClassNames,
   info,
+  ready = true,
 }: Props) => {
+  const Icon = icon;
+  const iconRef = useRef<AnimatedIconHandle>(null);
+  const previousTodayCountRef = useRef(countData.today);
+  const hasSeenReadyValueRef = useRef(false);
+  const resetIconAnimationTimeoutRef = useRef<number | null>(null);
   const todayCount = formatNumber(countData.today);
   const totalCount = formatNumber(countData.total);
   const shouldStackTotalCount = `${todayCount} / ${totalCount}`.length > 22;
   const tooltipParenthesisIndex = info.indexOf("(");
   const hasTooltipParenthesis = tooltipParenthesisIndex !== -1;
+
+  const animateIcon = useCallback(() => {
+    if (resetIconAnimationTimeoutRef.current !== null) {
+      window.clearTimeout(resetIconAnimationTimeoutRef.current);
+    }
+
+    iconRef.current?.stopAnimation();
+    window.requestAnimationFrame(() => {
+      iconRef.current?.startAnimation();
+    });
+
+    resetIconAnimationTimeoutRef.current = window.setTimeout(() => {
+      iconRef.current?.stopAnimation();
+      resetIconAnimationTimeoutRef.current = null;
+    }, KPI_ICON_ANIMATION_DURATION_MS);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) {
+      return;
+    }
+
+    const previousTodayCount = previousTodayCountRef.current;
+
+    if (!hasSeenReadyValueRef.current) {
+      previousTodayCountRef.current = countData.today;
+      hasSeenReadyValueRef.current = true;
+      return;
+    }
+
+    if (countData.today > previousTodayCount) {
+      animateIcon();
+    }
+
+    previousTodayCountRef.current = countData.today;
+  }, [animateIcon, countData.today, ready]);
+
+  useEffect(() => {
+    return () => {
+      if (resetIconAnimationTimeoutRef.current !== null) {
+        window.clearTimeout(resetIconAnimationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <section
@@ -62,7 +125,13 @@ const DashboardKpiCard = ({
           colorClassNames.icon
         )}
       >
-        {icon}
+        <Icon
+          ref={iconRef}
+          size={24}
+          animateOnHover={false}
+          aria-hidden="true"
+          className="flex size-6 shrink-0 items-center justify-center text-current [&_svg]:!h-6 [&_svg]:!w-6"
+        />
       </div>
       <div className="flex h-16 min-w-0 flex-1 translate-y-0.5 flex-col gap-2">
         <div
@@ -85,7 +154,9 @@ const DashboardKpiCard = ({
               )}
               title={`${todayCount}명`}
             >
-              {todayCount}
+              <span className="inline-block translate-y-0.5">
+                <AnimatedNumber value={countData.today} ready={ready} />
+              </span>
             </div>
             {!shouldStackTotalCount && (
               <div

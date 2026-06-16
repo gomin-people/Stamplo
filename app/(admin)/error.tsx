@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+
 export default function AdminError({
   reset,
 }: {
@@ -9,7 +11,7 @@ export default function AdminError({
   return (
     <div>
       <p>문제가 발생했습니다.</p>
-      <button onClick={reset}>다시 시도</button>
+      <Button onClick={reset}>다시 시도</Button>
     </div>
   );
 }
