@@ -30,17 +30,17 @@ export type AdminDashboardHourlyParticipant = {
   count: number;
 };
 
-// 날짜별 시간대 차트 mock 보정 계수
-export type AdminDashboardHourlyDateFactor = {
+// 날짜별 시간대 참여자 수 데이터
+export type AdminDashboardHourlyParticipantsByDate = {
   label: string;
-  factor: number;
+  hourly: AdminDashboardHourlyParticipant[];
 };
 
 // 참여자 수 분석 차트 응답 타입
 export type AdminDashboardParticipantAnalysisResponse = {
   daily: AdminDashboardDailyParticipant[];
   hourlyTotal: AdminDashboardHourlyParticipant[];
-  hourlyDateFactors: AdminDashboardHourlyDateFactor[];
+  hourlyByDate: AdminDashboardHourlyParticipantsByDate[];
 };
 
 // 달성자 성별 통계 데이터

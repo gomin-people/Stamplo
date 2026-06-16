@@ -39,15 +39,15 @@ type HourlyParticipantBarData = HourlyParticipantData & {
   fill: string;
 };
 
-type HourlyDateFactor = {
+type HourlyParticipantsByDate = {
   label: string;
-  factor: number;
+  hourly: HourlyParticipantData[];
 };
 
 type Props = {
   daily: DailyParticipantData[];
   hourlyTotal: HourlyParticipantData[];
-  hourlyDateFactors: HourlyDateFactor[];
+  hourlyByDate: HourlyParticipantsByDate[];
 };
 
 const analysisTabs: {
@@ -59,7 +59,6 @@ const analysisTabs: {
 ];
 
 const HOURLY_TOTAL_OPTION_VALUE = "total";
-const ADMIN_DASHBOARD_TIME_ZONE = "Asia/Seoul";
 
 const chartColor = "#5435EB";
 const chartSoftColor = "#C8BEFA";
@@ -82,7 +81,7 @@ const hourlyChartConfig = {
 const ParticipantAnalysisChart = ({
   daily,
   hourlyTotal,
-  hourlyDateFactors,
+  hourlyByDate,
 }: Props) => {
   const [activeView, setActiveView] = useState<AnalysisView>("daily");
   const eventDateOptions = useMemo(
@@ -104,12 +103,12 @@ const ParticipantAnalysisChart = ({
     () =>
       selectedHourlyFilterValue === HOURLY_TOTAL_OPTION_VALUE
         ? hourlyTotalData
-        : getHourlyDataByDate(
-            selectedHourlyFilterValue,
-            hourlyTotal,
-            hourlyDateFactors
+        : withHourlyFill(
+            hourlyByDate.find(
+              (item) => item.label === selectedHourlyFilterValue
+            )?.hourly ?? []
           ),
-    [selectedHourlyFilterValue, hourlyTotalData, hourlyTotal, hourlyDateFactors]
+    [selectedHourlyFilterValue, hourlyTotalData, hourlyByDate]
   );
 
   return (
@@ -402,30 +401,10 @@ function formatChartTick(value: number) {
     : `${compactValue.toFixed(1)}k`;
 }
 
-function getHourlyDataByDate(
-  date: string,
-  hourlyTotal: HourlyParticipantData[],
-  hourlyDateFactors: HourlyDateFactor[]
-): HourlyParticipantBarData[] {
-  const factor =
-    hourlyDateFactors.find((item) => item.label === date)?.factor ?? 1;
-
-  return withHourlyFill(
-    hourlyTotal.map((item) => ({
-      ...item,
-      count: Math.round(item.count * factor),
-    }))
-  );
-}
-
 function getTodayDateOption() {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: ADMIN_DASHBOARD_TIME_ZONE,
-    month: "numeric",
-    day: "numeric",
-  }).formatToParts(new Date());
-  const month = parts.find((part) => part.type === "month")?.value;
-  const day = parts.find((part) => part.type === "day")?.value;
+  const now = new Date();
+  const month = `${now.getMonth() + 1}`;
+  const day = `${now.getDate()}`;
 
   return month && day ? `${month}/${day}` : HOURLY_TOTAL_OPTION_VALUE;
 }

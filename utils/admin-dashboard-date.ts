@@ -1,6 +1,6 @@
 import "server-only";
 
-const ADMIN_DASHBOARD_TIME_ZONE = "Asia/Seoul";
+const KST_UTC_OFFSET_HOURS = 9;
 const MAX_DASHBOARD_DATE_LABELS = 370;
 
 type DateParts = {
@@ -36,8 +36,8 @@ export function getAdminDashboardDateWindow(
   }
 
   return {
-    startsAt: `${formatDateOnly(start)} 00:00:00`,
-    endsBefore: `${formatDateOnly(addDays(cappedEnd, 1))} 00:00:00`,
+    startsAt: formatKstDateStartAsUtcTimestamp(start),
+    endsBefore: formatKstDateStartAsUtcTimestamp(addDays(cappedEnd, 1)),
   };
 }
 
@@ -75,7 +75,7 @@ export function getAdminDashboardDateLabels(
 
 const getCappedEndDate = (startDate: string, endDate: string) => {
   const end = parseDateOnly(endDate);
-  const today = getTodayInTimeZone(ADMIN_DASHBOARD_TIME_ZONE);
+  const today = getToday();
 
   if (!parseDateOnly(startDate) || !end || !today) {
     return null;
@@ -94,16 +94,11 @@ const parseDateOnly = (value: string): DateParts | null => {
   return { year, month, day };
 };
 
-const getTodayInTimeZone = (timeZone: string): DateParts | null => {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const year = Number(parts.find((part) => part.type === "year")?.value);
-  const month = Number(parts.find((part) => part.type === "month")?.value);
-  const day = Number(parts.find((part) => part.type === "day")?.value);
+const getToday = (): DateParts | null => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
 
   if (!year || !month || !day) {
     return null;
@@ -129,7 +124,10 @@ const addDays = (date: DateParts, days: number): DateParts => {
   };
 };
 
-const formatDateOnly = (date: DateParts) =>
-  `${date.year}-${String(date.month).padStart(2, "0")}-${String(
-    date.day
-  ).padStart(2, "0")}`;
+const formatKstDateStartAsUtcTimestamp = (date: DateParts) => {
+  const utcDate = new Date(
+    Date.UTC(date.year, date.month - 1, date.day, -KST_UTC_OFFSET_HOURS)
+  );
+
+  return utcDate.toISOString().replace("T", " ").slice(0, 19);
+};
