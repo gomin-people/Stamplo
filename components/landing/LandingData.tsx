@@ -31,7 +31,7 @@ export const LandingData = () => {
                   <div className="text-base font-bold font-nanum break-keep word-keep-all">
                     시간대별 · 연령별 데이터
                   </div>
-                  <div className="text-[13.5px] text-gomin-neutral-500 mt-0.75 leading-[1.5] break-keep word-keep-all">
+                  <div className="text-[13.5px] text-gomin-neutral-500 mt-0.75 leading-normal break-keep word-keep-all">
                     언제, 누가 가장 활발히 참여했는지 한눈에 파악하세요.
                   </div>
                 </div>
@@ -44,7 +44,7 @@ export const LandingData = () => {
                   <div className="text-base font-bold font-nanum break-keep word-keep-all">
                     미션별 참여율 데이터
                   </div>
-                  <div className="text-[13.5px] text-gomin-neutral-500 mt-0.75 leading-[1.5] break-keep word-keep-all">
+                  <div className="text-[13.5px] text-gomin-neutral-500 mt-0.75 leading-normal break-keep word-keep-all">
                     어떤 미션이 잘 통했는지, 어디서 이탈했는지 미션 단위로
                     확인하세요.
                   </div>
