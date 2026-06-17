@@ -23,11 +23,7 @@ type Props = {
   eventEndDate: string | null;
 };
 
-const MissionClient = ({ eventId }: Props) => {
-  eventId,
-  eventStartDate,
-  eventEndDate,
-}: Props) => {
+const MissionClient = ({ eventId, eventStartDate, eventEndDate }: Props) => {
   const [filter, setFilter] = useState("all");
 
   const {

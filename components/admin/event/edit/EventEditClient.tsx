@@ -30,7 +30,6 @@ import {
 
 const TOTAL_STEPS = 3;
 
-const EventEditClient = () => {
 type Props = {
   initialEvent: AdminEventDetail;
 };
