@@ -3,6 +3,7 @@
 import type QrScanner from "qr-scanner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/utils";
 import { useQrGuideMessage } from "@/hooks/useQrGuideMessage";
 import { useQrScanner } from "@/hooks/useQrScanner";
 import { type CameraStatus, type QrGuideMessageState } from "@/types/qr-check";
@@ -254,9 +255,10 @@ const QrCheckClient = ({
       {/* 카메라 영상 */}
       <video
         ref={setVideoRef}
-        className={`absolute inset-0 h-full w-full bg-gomin-black object-cover transition-opacity duration-200 ${
+        className={cn(
+          "absolute inset-0 h-full w-full bg-gomin-black object-cover transition-opacity duration-200",
           isCameraActive ? "opacity-100" : "opacity-0"
-        }`}
+        )}
         muted
         playsInline
         onLoadedMetadata={handleVideoLoadedMetadata}
