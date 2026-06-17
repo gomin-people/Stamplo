@@ -1,4 +1,4 @@
-import { LandingBuilderDemo } from "./LandingBuilderDemo";
+import { LandingBuilderDemo } from "@/components/landing/LandingBuilderDemo";
 
 export const LandingBuilderSection = () => {
   return (
