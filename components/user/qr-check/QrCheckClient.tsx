@@ -262,7 +262,7 @@ const QrCheckClient = ({
         className={cn(
           "absolute inset-0 bg-gomin-black transition-opacity duration-200",
           isIOS
-            ? "min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
+            ? "h-full w-full -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
             : "h-full w-full object-cover",
           isCameraActive ? "opacity-100" : "opacity-0"
         )}
