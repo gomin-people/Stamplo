@@ -7,8 +7,17 @@ import { LandingData } from "@/components/landing/LandingData";
 import { LandingBuilderSection } from "@/components/landing/LandingBuilderSection";
 import { LandingCTA } from "@/components/landing/LandingCTA";
 import { LandingFooter } from "@/components/landing/LandingFooter";
+import ReactDOM from "react-dom";
 
 export default function LandingPage() {
+  if (typeof window === "undefined") {
+    ReactDOM.preload("/images/landing/missionPage.webp", {
+      as: "image",
+      fetchPriority: "high",
+      type: "image/webp",
+    });
+  }
+
   return (
     <>
       <RevealObserver />
