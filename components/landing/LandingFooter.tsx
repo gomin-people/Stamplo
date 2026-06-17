@@ -3,7 +3,7 @@ import GithubIcon from "@/components/icons/GithubIcon";
 
 export const LandingFooter = () => {
   return (
-    <footer className="bg-[#0e0d14] text-white/70 py-[60px] px-0 pb-10">
+    <footer className="bg-[#0e0d14] text-white/70 py-[60px] px-0 pb-20">
       <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
         <div className="flex justify-between items-start gap-10 flex-wrap max-md:flex-col max-md:gap-8">
           <div className="flex flex-col max-w-[320px]">
@@ -54,12 +54,6 @@ export const LandingFooter = () => {
               </a>
             </div>
           </div>
-        </div>
-        <div className="mt-11 pt-6 border-t border-white/10 flex justify-between gap-4 flex-wrap text-xs text-white/45">
-          <span>
-            © 2026 고민하는 사람들 (Gomin People). All rights reserved.
-          </span>
-          <span>Stamplo</span>
         </div>
       </div>
     </footer>
