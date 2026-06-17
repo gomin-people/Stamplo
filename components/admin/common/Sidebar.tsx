@@ -15,14 +15,15 @@ import { Button } from "@/components/ui/button";
 import { ScanTextIcon, type ScanTextIconHandle } from "lucide-animated";
 import { X } from "lucide-react";
 import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
-import type { EventModel } from "@/types/models";
+import type { AdminUserModel, EventModel } from "@/types/models";
 
 type Props = {
   events: EventModel[];
+  user: AdminUserModel;
 };
 
 // 관리자 이벤트 화면의 사이드바와 행사 등록 취소 이동 버튼 렌더링
-const Sidebar = ({ events }: Props) => {
+const Sidebar = ({ events, user }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const { eventId } = useParams<{ eventId?: string }>();
@@ -108,7 +109,7 @@ const Sidebar = ({ events }: Props) => {
             리워드 QR 확인
           </Button>
         )}
-        <AdminUserInfo />
+        <AdminUserInfo user={user} />
       </div>
       {eventId && isRewardQrOpen && (
         <RewardQrScannerClient
