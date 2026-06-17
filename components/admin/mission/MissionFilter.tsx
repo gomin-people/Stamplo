@@ -8,11 +8,11 @@ type Props = {
   toggleValue: (value: MissionFilter) => void;
 };
 
-export default function MissionFilter({
+const MissionFilter = ({
   defaultValue = "all",
   disabled = false,
   toggleValue,
-}: Props) {
+}: Props) => {
   return (
     <ToggleGroup
       type="single"
@@ -43,4 +43,6 @@ export default function MissionFilter({
       </ToggleGroupItem>
     </ToggleGroup>
   );
-}
+};
+
+export default MissionFilter;

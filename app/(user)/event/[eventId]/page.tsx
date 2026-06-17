@@ -5,7 +5,7 @@ type EventEntryPageProps = {
   params: Promise<{ eventId: string }>;
 };
 
-const EventEntryPage = async ({ params }: EventEntryPageProps) => {
+export default async function EventEntryPage({ params }: EventEntryPageProps) {
   const { eventId } = await params;
   const event = await getEntryEvent(eventId);
 
@@ -16,6 +16,4 @@ const EventEntryPage = async ({ params }: EventEntryPageProps) => {
       hasBrochure={!!event.brochureImageUrl?.length}
     />
   );
-};
-
-export default EventEntryPage;
+}

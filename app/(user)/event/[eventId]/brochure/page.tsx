@@ -9,7 +9,7 @@ type Props = {
   searchParams: Promise<{ from?: string }>;
 };
 
-const BrochurePage = async ({ params, searchParams }: Props) => {
+export default async function BrochurePage({ params, searchParams }: Props) {
   const { eventId } = await params;
   const { from } = await searchParams;
 
@@ -29,6 +29,4 @@ const BrochurePage = async ({ params, searchParams }: Props) => {
   return (
     <BrochureClient images={event.brochureImageUrl} showGuide={showGuide} />
   );
-};
-
-export default BrochurePage;
+}

@@ -22,7 +22,7 @@ type Props = {
   eventId: number;
 };
 
-export default function MissionClient({ eventId }: Props) {
+const MissionClient = ({ eventId }: Props) => {
   const [filter, setFilter] = useState("all");
 
   const {
@@ -100,4 +100,6 @@ export default function MissionClient({ eventId }: Props) {
       </div>
     </div>
   );
-}
+};
+
+export default MissionClient;

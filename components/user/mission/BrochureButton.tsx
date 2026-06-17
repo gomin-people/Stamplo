@@ -11,11 +11,11 @@ type BrochureButtonProps = {
   className?: string;
 };
 
-export default function BrochureButton({
+const BrochureButton = ({
   eventId,
   hasBrochure,
   className,
-}: BrochureButtonProps) {
+}: BrochureButtonProps) => {
   return (
     <Link
       href={
@@ -32,4 +32,6 @@ export default function BrochureButton({
       <Newspaper className="w-6 h-6" />
     </Link>
   );
-}
+};
+
+export default BrochureButton;

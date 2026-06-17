@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function StamploLogo() {
+const StamploLogo = () => {
   return (
     <Image
       src="/images/textLogo.svg"
@@ -10,4 +10,6 @@ export default function StamploLogo() {
       priority
     />
   );
-}
+};
+
+export default StamploLogo;

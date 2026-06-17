@@ -34,7 +34,7 @@ import {
 
 const TOTAL_STEPS = 3;
 
-export default function EventEditClient() {
+const EventEditClient = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const eventIdNum = Number(eventId);
   const router = useRouter();
@@ -259,4 +259,6 @@ export default function EventEditClient() {
       </Dialog>
     </div>
   );
-}
+};
+
+export default EventEditClient;

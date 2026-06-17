@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import LogoutButton from "@/components/admin/common/LogoutButton";
 
-export default function AdminUserInfo() {
+const AdminUserInfo = () => {
   const router = useRouter();
   const { data: user, isLoading, isError } = useAdminUserQuery();
 
@@ -39,4 +39,6 @@ export default function AdminUserInfo() {
       </div>
     </div>
   );
-}
+};
+
+export default AdminUserInfo;

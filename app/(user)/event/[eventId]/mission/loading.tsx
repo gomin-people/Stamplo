@@ -1,4 +1,4 @@
-const MissionLoading = () => {
+export default function MissionLoading() {
   return (
     <div className="flex flex-col relative bg-gomin-white h-full pb-21.5">
       <main className="flex-1 max-w-md w-full mx-auto px-6 pt-18 pb-1.5 overflow-x-hidden">
@@ -36,6 +36,4 @@ const MissionLoading = () => {
       </div>
     </div>
   );
-};
-
-export default MissionLoading;
+}

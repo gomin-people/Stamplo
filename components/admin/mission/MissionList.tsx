@@ -35,11 +35,7 @@ type Props = {
   filter?: string;
 };
 
-export default function MissionList({
-  missions,
-  disabled = false,
-  filter = "all",
-}: Props) {
+const MissionList = ({ missions, disabled = false, filter = "all" }: Props) => {
   const sortedMissions = useMemo(
     () => [...missions].sort((a, b) => a.sortOrder - b.sortOrder),
     [missions]
@@ -193,4 +189,6 @@ export default function MissionList({
       </Dialog>
     </>
   );
-}
+};
+
+export default MissionList;

@@ -1,4 +1,4 @@
-const QrRequiredPage = () => {
+export default function QrRequiredPage() {
   return (
     <main className="min-h-screen bg-white flex justify-center pt-14">
       <div className="w-full max-w-100.5 flex flex-col items-center justify-center px-12 -translate-y-25">
@@ -8,6 +8,4 @@ const QrRequiredPage = () => {
       </div>
     </main>
   );
-};
-
-export default QrRequiredPage;
+}
