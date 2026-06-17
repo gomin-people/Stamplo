@@ -24,6 +24,7 @@ import {
   useSetNewlyStampedMissionId,
   useClearNewlyStampedMissionId,
 } from "@/stores/user";
+import { getUserRoutes } from "@/constants/userRoutes";
 
 // Supabase의 event 테이블 타입 인터페이스 정의
 type EventData = {
@@ -119,7 +120,7 @@ const MissionPageClient = ({
   useEffect(() => {
     if (isSurveyCompleted && isSurveyOpen) {
       const timer = setTimeout(() => {
-        router.push(`/event/${eventId}/complete`);
+        router.push(getUserRoutes(eventId).complete);
       }, 100);
       return () => clearTimeout(timer);
     }
@@ -141,7 +142,7 @@ const MissionPageClient = ({
   const handleAction = () => {
     if (isAllCompleted) {
       if (isSurveyCompleted) {
-        router.push(`/event/${eventId}/complete`);
+        router.push(getUserRoutes(eventId).complete);
       } else {
         setIsSurveyOpen(true);
       }
@@ -152,7 +153,7 @@ const MissionPageClient = ({
 
   const handleSurveySubmitSuccess = () => {
     setTimeout(() => {
-      router.push(`/event/${eventId}/complete`);
+      router.push(getUserRoutes(eventId).complete);
     }, 100);
   };
 

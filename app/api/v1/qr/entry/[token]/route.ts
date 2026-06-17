@@ -9,6 +9,7 @@ import {
 } from "@/utils/api";
 import { supabase } from "@/utils/supabase/server";
 import { getEventOperationStatus } from "@/utils/event-status";
+import { USER_ROUTES, getUserRoutes } from "@/constants/userRoutes";
 
 // 입장 QR route parameter 타입
 type EntryRouteContext = {
@@ -38,10 +39,9 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
     return badRequest("올바른 userId가 필요합니다.");
   }
 
-  // qr_codes 테이블에서 token과 type ENTRY 기준 QR 전체 컬럼 조회
   const { data: qrCode, error: qrCodeError } = await supabase
     .from("qr_codes")
-    .select("*")
+    .select("*, events(*)")
     .eq("token", token)
     .eq("type", "ENTRY")
     .maybeSingle();
@@ -54,16 +54,7 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
     return notFound("입장 QR을 찾을 수 없습니다.");
   }
 
-  // events 테이블에서 ENTRY QR의 events_id와 id가 일치하는 행사 전체 컬럼 조회
-  const { data: event, error: eventError } = await supabase
-    .from("events")
-    .select("*")
-    .eq("id", qrCode.events_id)
-    .maybeSingle();
-
-  if (eventError) {
-    return serverError("입장 행사 조회 실패", eventError);
-  }
+  const event = qrCode.events;
 
   if (!event) {
     return notFound("행사를 찾을 수 없습니다.");
@@ -76,13 +67,16 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
 
   if (isBefore) {
     return NextResponse.redirect(
-      new URL("/user-unavailable?reason=event-not-started", request.url)
+      new URL(
+        `${USER_ROUTES.USER_UNAVAILABLE}?reason=event-not-started`,
+        request.url
+      )
     );
   }
 
   if (isAfter) {
     return NextResponse.redirect(
-      new URL("/user-unavailable?reason=event-ended", request.url)
+      new URL(`${USER_ROUTES.USER_UNAVAILABLE}?reason=event-ended`, request.url)
     );
   }
 
@@ -105,7 +99,7 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
 
     if (currentParticipant) {
       const response = NextResponse.redirect(
-        new URL(`/event/${event.id}`, request.url)
+        new URL(getUserRoutes(event.id).root, request.url)
       );
       setParticipantCookie(response, currentParticipant.event_user_id);
       return response;
@@ -120,7 +114,7 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
       user_id: userId,
       created_at: new Date().toISOString(),
     })
-    .select("*")
+    .select("event_user_id")
     .single();
 
   if (participantError) {
@@ -128,7 +122,7 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
   }
 
   const response = NextResponse.redirect(
-    new URL(`/event/${event.id}`, request.url)
+    new URL(getUserRoutes(event.id).root, request.url)
   );
   setParticipantCookie(response, participant.event_user_id);
   return response;

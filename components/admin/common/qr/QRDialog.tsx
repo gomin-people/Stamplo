@@ -23,7 +23,7 @@ type Props = {
 const QR_SIZE = 240;
 const QR_PADDING = 16;
 
-export default function QRDialog({ title, url, filename, description }: Props) {
+const QRDialog = ({ title, url, filename, description }: Props) => {
   const svgRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = async () => {
@@ -115,4 +115,6 @@ export default function QRDialog({ title, url, filename, description }: Props) {
       </DialogFooter>
     </DialogContent>
   );
-}
+};
+
+export default QRDialog;

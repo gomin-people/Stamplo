@@ -29,9 +29,9 @@ const getUserUnavailableMessage = (reason?: string | string[]) => {
   return USER_UNAVAILABLE_MESSAGES.missionInactive;
 };
 
-const UserUnavailablePage = async ({
+export default async function UserUnavailablePage({
   searchParams,
-}: UserUnavailablePageProps) => {
+}: UserUnavailablePageProps) {
   const params = await searchParams;
   const message = getUserUnavailableMessage(params?.reason);
 
@@ -44,6 +44,4 @@ const UserUnavailablePage = async ({
       </div>
     </main>
   );
-};
-
-export default UserUnavailablePage;
+}

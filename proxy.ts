@@ -11,7 +11,7 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  if (pathname.match(/^\/event\/[^/]+\/(brochure|detail)/)) {
+  if (pathname.match(/^\/event\/[^/]+($|\/(brochure|detail))/)) {
     const participantCookie = request.cookies.get(PARTICIPANT_COOKIE_NAME);
     if (!participantCookie) {
       return NextResponse.redirect(new URL("/qr-required", request.url));
@@ -25,6 +25,7 @@ export const config = {
   matcher: [
     "/admin",
     "/admin/:path*",
+    "/event/:eventId",
     "/event/:eventId/brochure",
     "/event/:eventId/detail",
   ],

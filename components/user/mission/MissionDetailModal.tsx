@@ -23,11 +23,11 @@ type MissionDetailModalProps = {
   mission: Mission;
 };
 
-export default function MissionDetailModal({
+const MissionDetailModal = ({
   isOpen,
   onClose,
   mission,
-}: MissionDetailModalProps) {
+}: MissionDetailModalProps) => {
   useModalHistoryBack(isOpen, onClose);
 
   return (
@@ -70,4 +70,6 @@ export default function MissionDetailModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default MissionDetailModal;

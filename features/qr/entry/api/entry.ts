@@ -4,6 +4,7 @@ import { PARTICIPANT_COOKIE_NAME, parsePositiveInteger } from "@/utils/api";
 import { type EventModel, type Gender } from "@/types/models";
 import { supabase } from "@/utils/supabase/server";
 import { toCamelKeys } from "@/utils/case";
+import { USER_ROUTES } from "@/constants/userRoutes";
 
 export type ParticipantUser = {
   id: number;
@@ -23,12 +24,12 @@ export const getEntryEventAndParticipant = async (
   const participantCookie = cookieStore.get(PARTICIPANT_COOKIE_NAME);
 
   if (!participantCookie) {
-    redirect("/qr-required");
+    redirect(USER_ROUTES.QR_REQUIRED);
   }
 
   const eventId = parsePositiveInteger(eventIdParam);
   if (eventId === null) {
-    redirect("/qr-required");
+    redirect(USER_ROUTES.QR_REQUIRED);
   }
 
   // 1. 참여자 정보 및 이벤트 정보 단일 쿼리 조인 조회
@@ -39,16 +40,16 @@ export const getEntryEventAndParticipant = async (
     .maybeSingle();
 
   if (participantError || !participant) {
-    redirect("/qr-required");
+    redirect(USER_ROUTES.QR_REQUIRED);
   }
 
   if (participant.events_id !== eventId) {
-    redirect("/qr-required");
+    redirect(USER_ROUTES.QR_REQUIRED);
   }
 
   const event = participant.events;
   if (!event) {
-    redirect("/qr-required");
+    redirect(USER_ROUTES.QR_REQUIRED);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

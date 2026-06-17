@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSelectedEventId } from "@/stores/admin";
 import { ADMIN_EVENT_REGISTER_PATH } from "@/constants/adminRoutes";
 
-export default function AuthRedirect() {
+const AuthRedirect = () => {
   const router = useRouter();
   const selectedEventId = useSelectedEventId();
 
@@ -18,4 +18,6 @@ export default function AuthRedirect() {
   }, [router, selectedEventId]);
 
   return null;
-}
+};
+
+export default AuthRedirect;

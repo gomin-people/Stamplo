@@ -24,7 +24,7 @@ type Props = {
   onDelete: (mission: Mission) => void;
 };
 
-export default function MissionItem({
+const MissionItem = ({
   mission,
   index,
   disabled = false,
@@ -33,7 +33,7 @@ export default function MissionItem({
   onViewQR,
   onEdit,
   onDelete,
-}: Props) {
+}: Props) => {
   const {
     attributes,
     listeners,
@@ -126,4 +126,6 @@ export default function MissionItem({
       </div>
     </div>
   );
-}
+};
+
+export default MissionItem;

@@ -5,11 +5,9 @@ type Props = {
   params: Promise<{ eventId: string }>;
 };
 
-const EventDetailPage = async ({ params }: Props) => {
+export default async function EventDetailPage({ params }: Props) {
   const { eventId } = await params;
   const event = await fetchParticipantEvent(Number(eventId));
 
   return <EventDetailClient event={event} />;
-};
-
-export default EventDetailPage;
+}

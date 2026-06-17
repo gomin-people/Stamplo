@@ -6,7 +6,7 @@ import TestLoginButton from "@/components/admin/auth/TestLoginButton";
 import StamploLogo from "@/components/admin/common/StamploLogo";
 import EmailLoginForm from "@/components/admin/auth/EmailLoginForm";
 
-const AdminHomePage = async () => {
+export default async function AdminHomePage() {
   const cookieStore = await cookies();
   const hasSession = cookieStore.getAll().some(({ name }) => {
     return name.startsWith("sb-");
@@ -47,6 +47,4 @@ const AdminHomePage = async () => {
       </div>
     </main>
   );
-};
-
-export default AdminHomePage;
+}

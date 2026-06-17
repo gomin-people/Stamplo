@@ -9,7 +9,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export default function Logout({ disabled = false }: Props) {
+const Logout = ({ disabled = false }: Props) => {
   const router = useRouter();
   const clearSelectedEventId = useClearSelectedEventId();
   const { mutate: logout } = useAdminLogoutMutation();
@@ -44,4 +44,6 @@ export default function Logout({ disabled = false }: Props) {
       />
     </Button>
   );
-}
+};
+
+export default Logout;

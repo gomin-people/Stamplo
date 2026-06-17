@@ -9,6 +9,7 @@ import BrochureIndicator from "@/components/user/brochure/BrochureIndicator";
 import BrochureEventButton from "@/components/user/brochure/BrochureEventButton";
 import BrochureGuideOverlay from "@/components/user/brochure/BrochureGuideOverlay";
 import FloatingActionButton from "@/components/user/mission/FloatingActionButton";
+import { getUserRoutes } from "@/constants/userRoutes";
 
 type Props = {
   images: string[];
@@ -33,14 +34,14 @@ const BrochureClient = ({ images, showGuide }: Props) => {
 
   useEffect(() => {
     if (isLastPage) {
-      router.prefetch(`/event/${eventId}/mission`);
+      router.prefetch(getUserRoutes(eventId).mission);
     }
   }, [isLastPage, eventId, router]);
 
   const handleGoMission = () =>
     !exiting &&
     (setExiting(true),
-    setTimeout(() => router.push(`/event/${eventId}/mission`), 300));
+    setTimeout(() => router.push(getUserRoutes(eventId).mission), 300));
 
   return (
     <AnimatePresence>

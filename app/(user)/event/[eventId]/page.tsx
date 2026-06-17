@@ -1,13 +1,13 @@
 import EntryClient from "@/components/user/entry/EntryClient";
-import { getEntryEvent } from "@/features/qr/entry/api/entry";
+import { fetchParticipantEvent } from "@/features/participant/events/participantEventApi";
 
 type EventEntryPageProps = {
   params: Promise<{ eventId: string }>;
 };
 
-const EventEntryPage = async ({ params }: EventEntryPageProps) => {
+export default async function EventEntryPage({ params }: EventEntryPageProps) {
   const { eventId } = await params;
-  const event = await getEntryEvent(eventId);
+  const event = await fetchParticipantEvent(Number(eventId));
 
   return (
     <EntryClient
@@ -16,6 +16,4 @@ const EventEntryPage = async ({ params }: EventEntryPageProps) => {
       hasBrochure={!!event.brochureImageUrl?.length}
     />
   );
-};
-
-export default EventEntryPage;
+}
