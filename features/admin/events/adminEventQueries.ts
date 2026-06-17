@@ -1,19 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { requestJson, resolveRequest } from "@/features/shared/api/http";
-import {
-  type MissionModel,
-  type QrCodeModel,
-  type EventModel,
-} from "@/types/models";
-
-// 어드민 행사 상세 응답 타입
-type AdminEventDetail = EventModel & {
-  missions: MissionModel[];
-  qrCodes: QrCodeModel[];
-  participantCount: number;
-};
+import { requestJson } from "@/features/shared/api/http";
+import { fetchAdminEvent } from "@/features/admin/events/adminEventApi";
+import { type MissionModel, type EventModel } from "@/types/models";
 
 // 행사 대시보드 응답 타입
 type EventDashboard = {
@@ -35,13 +25,6 @@ type EventDashboard = {
 
 function getAdminEvents() {
   return requestJson<EventModel[]>("/api/v1/admin/events");
-}
-
-export async function fetchAdminEvent(
-  eventId: number
-): Promise<AdminEventDetail> {
-  const { url, init } = await resolveRequest(`/api/v1/admin/events/${eventId}`);
-  return requestJson<AdminEventDetail>(url, init);
 }
 
 function getEventDashboard(eventId: number) {
