@@ -38,7 +38,7 @@ export default async function AdminHomePage() {
         <div className="flex w-full flex-col gap-3">
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-gomin-neutral-100" />
-            <span className="text-xs text-gomin-neutral-400">또는</span>
+            <span className="text-xs text-gomin-neutral-500">또는</span>
             <div className="h-px flex-1 bg-gomin-neutral-100" />
           </div>
           <KakaoLogin />
