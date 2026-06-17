@@ -18,6 +18,7 @@ type UseImageUploadOptions = {
   maxSizeBytes?: number;
   resizeWidth?: number;
   onUrlChange?: (url: string) => void;
+  uploadMode?: "storage" | "landing";
 };
 
 export default function useImageUpload({
@@ -28,6 +29,7 @@ export default function useImageUpload({
   maxSizeBytes = DEFAULT_MAX_SIZE_BYTES,
   resizeWidth,
   onUrlChange,
+  uploadMode = "storage",
 }: UseImageUploadOptions) {
   const [path, setPath] = useState<string | null>(initialPath);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -67,23 +69,36 @@ export default function useImageUpload({
     }
 
     setValidationError(null);
-    uploadImage(file, {
-      onSuccess: ({ url, path: uploadedPath }) => {
-        setPath(uploadedPath);
-        onUrlChange?.(url);
-      },
-      onError: (err) => {
-        console.error("이미지 업로드 에러:", err);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      },
-    });
+
+    if (uploadMode === "landing") {
+      const localUrl = URL.createObjectURL(file);
+      setPath(localUrl);
+      onUrlChange?.(localUrl);
+    } else {
+      uploadImage(file, {
+        onSuccess: ({ url, path: uploadedPath }) => {
+          setPath(uploadedPath);
+          onUrlChange?.(url);
+        },
+        onError: (err) => {
+          console.error("이미지 업로드 에러:", err);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        },
+      });
+    }
   };
 
   const handleRemove = () => {
     if (path) {
-      deleteImage(path, {
-        onError: (err) => console.error("이미지 삭제 에러:", err),
-      });
+      if (uploadMode === "landing") {
+        if (path.startsWith("blob:")) {
+          URL.revokeObjectURL(path);
+        }
+      } else {
+        deleteImage(path, {
+          onError: (err) => console.error("이미지 삭제 에러:", err),
+        });
+      }
     }
     setPath(null);
     setValidationError(null);

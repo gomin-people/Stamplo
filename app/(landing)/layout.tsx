@@ -3,5 +3,9 @@ export default function LandingLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div className="font-sans antialiased text-gomin-black bg-white">
+      {children}
+    </div>
+  );
 }

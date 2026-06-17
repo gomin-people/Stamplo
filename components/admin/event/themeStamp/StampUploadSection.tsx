@@ -12,6 +12,7 @@ type Props = {
   onRemove: () => void;
   onUploadingChange: (isUploading: boolean) => void;
   disabled?: boolean;
+  uploadMode?: "storage" | "landing";
 };
 
 const StampUploadSection = ({
@@ -20,6 +21,7 @@ const StampUploadSection = ({
   onRemove,
   onUploadingChange,
   disabled = false,
+  uploadMode = "storage",
 }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -32,6 +34,7 @@ const StampUploadSection = ({
   } = useImageUpload({
     fileInputRef,
     resizeWidth: 220,
+    uploadMode,
     onUrlChange: (url) => {
       onChange(url);
     },

@@ -1,12 +1,21 @@
 import Image from "next/image";
 
-const StamploLogo = () => {
+type Props = {
+  width?: number;
+  height?: number;
+  className?: string;
+  style?: React.CSSProperties;
+};
+
+const StamploLogo = ({ width = 144, height = 41, className, style }: Props) => {
   return (
     <Image
       src="/images/textLogo.svg"
       alt="Stamplo"
-      width={144}
-      height={41}
+      width={width}
+      height={height}
+      className={className}
+      style={style}
       priority
     />
   );
