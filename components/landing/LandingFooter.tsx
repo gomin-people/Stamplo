@@ -1,4 +1,5 @@
 import Image from "next/image";
+import GithubIcon from "@/components/icons/GithubIcon";
 
 export const LandingFooter = () => {
   return (
@@ -26,35 +27,6 @@ export const LandingFooter = () => {
           <div className="flex gap-[clamp(60px,10vw,120px)] flex-wrap max-sm:flex-col max-sm:gap-8">
             <div className="flex flex-col gap-3">
               <span className="text-[13px] font-bold text-white/45 tracking-wider">
-                바로가기
-              </span>
-              <a
-                href="#problem"
-                className="text-[14.5px] text-white/78 hover:text-white no-underline"
-              >
-                문제 해결
-              </a>
-              <a
-                href="#usage"
-                className="text-[14.5px] text-white/78 hover:text-white no-underline"
-              >
-                사용 방법
-              </a>
-              <a
-                href="#data"
-                className="text-[14.5px] text-white/78 hover:text-white no-underline"
-              >
-                데이터 분석
-              </a>
-              <a
-                href="#builder"
-                className="text-[14.5px] text-white/78 hover:text-white no-underline"
-              >
-                페이지 만들기
-              </a>
-            </div>
-            <div className="flex flex-col gap-3">
-              <span className="text-[13px] font-bold text-white/45 tracking-wider">
                 문의
               </span>
               <span className="text-[14.5px] text-white/78">
@@ -65,6 +37,20 @@ export const LandingFooter = () => {
                 className="text-[14.5px] text-white/78 hover:text-white no-underline"
               >
                 gominpeople26@gmail.com
+              </a>
+            </div>
+            <div className="flex flex-col gap-3">
+              <span className="text-[13px] font-bold text-white/45 tracking-wider">
+                Github
+              </span>
+              <a
+                href="https://github.com/gomin-people/Stamplo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[14.5px] text-white/78 hover:text-white no-underline flex items-center gap-1.5"
+              >
+                <GithubIcon width={16} height={16} />
+                <span>Stamplo 프로젝트</span>
               </a>
             </div>
           </div>
