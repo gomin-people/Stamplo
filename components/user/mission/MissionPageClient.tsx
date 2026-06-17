@@ -272,6 +272,11 @@ const MissionPageClient = ({
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
                   isNewStamped={mission.id === storeNewlyStampedId}
+                  onStampReady={
+                    mission.id === storeNewlyStampedId && isAllCompleted
+                      ? handleStampReady
+                      : undefined
+                  }
                 />
               ))}
             </div>
