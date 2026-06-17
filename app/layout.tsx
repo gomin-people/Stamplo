@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     title: "Stamplo - 모바일 스탬프 투어 플랫폼",
     description:
       "종이 브로슈어와 도장 대신 웹서비스와 QR코드로 간편하게 즐기는 모바일 스탬프 투어 플랫폼, Stamplo",
-    url: "https://stamplo.com",
+    url: "https://go-stamplo.vercel.app",
     siteName: "Stamplo",
     images: [
       {

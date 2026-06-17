@@ -6,9 +6,6 @@ export const LandingUsage = () => {
     <section className="py-[clamp(72px,9vw,120px)] px-0 relative" id="usage">
       <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
         <div className="max-w-[720px] mx-auto mb-14 text-center flex flex-col items-center gap-4">
-          <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal">
-            간편한 유저 사용법
-          </span>
           <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal">
             미션하고, 스캔하고, 보상받기
           </h2>

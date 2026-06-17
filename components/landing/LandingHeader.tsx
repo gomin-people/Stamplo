@@ -55,7 +55,7 @@ export const LandingHeader = () => {
             href="#builder"
             className="text-[15px] font-semibold text-gomin-neutral-600 hover:text-gomin-primary-700 transition-colors duration-120 no-underline"
           >
-            페이지 만들기
+            행사 제작
           </a>
         </nav>
         <div className="flex items-center gap-3">

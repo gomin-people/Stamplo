@@ -10,9 +10,6 @@ export const LandingData = () => {
       <div className="max-w-[1200px] mx-auto px-8 max-md:px-5 max-sm:px-4">
         <div className="grid grid-cols-[0.86fr_1.14fr] gap-14 items-center max-lg:grid-cols-1 max-lg:gap-10">
           <div className="flex flex-col gap-[22px]">
-            <span className="inline-flex items-center gap-2.25 text-[13px] font-bold tracking-wider text-gomin-primary-700 before:content-[''] before:w-1.75 before:h-1.75 before:rounded-full before:bg-gomin-primary-700 before:shadow-[0_0_0_4px_var(--primary-100)] reveal">
-              디테일한 데이터 분석
-            </span>
             <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal">
               행사가 끝나면
               <br />
@@ -63,7 +60,7 @@ export const LandingData = () => {
                 </div>
                 <div className="flex-1 max-w-[360px] h-[26px] rounded-full bg-white border border-gomin-neutral-100 flex items-center gap-1.75 px-3.5 text-[12.5px] text-gomin-neutral-500 font-mono">
                   <Lock className="w-[13px] h-[13px] text-emerald-500" />
-                  stamplo.com/admin
+                  dashboard
                 </div>
               </div>
               <div className="aspect-16/10 bg-slate-50 relative overflow-hidden">
