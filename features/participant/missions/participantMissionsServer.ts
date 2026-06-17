@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { PARTICIPANT_COOKIE_NAME } from "@/utils/api";
 import { supabase } from "@/utils/supabase/server";
+import { USER_ROUTES } from "@/constants/userRoutes";
 
 export type ParticipantMissionServerData = {
   id: number;
@@ -27,7 +28,7 @@ export const getParticipantMissionsServer = async (prefetchedParticipant?: {
     const participantCookie = cookieStore.get(PARTICIPANT_COOKIE_NAME);
 
     if (!participantCookie) {
-      redirect("/qr-required");
+      redirect(USER_ROUTES.QR_REQUIRED);
     }
 
     // 1. 참여자 정보 조회
@@ -38,7 +39,7 @@ export const getParticipantMissionsServer = async (prefetchedParticipant?: {
       .maybeSingle();
 
     if (participantError || !dbParticipant) {
-      redirect("/qr-required");
+      redirect(USER_ROUTES.QR_REQUIRED);
     }
     participant = dbParticipant;
   }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Newspaper } from "lucide-react";
 import { cn } from "@/utils";
+import { getUserRoutes } from "@/constants/userRoutes";
 
 type BrochureButtonProps = {
   eventId: string;
@@ -19,8 +20,8 @@ export default function BrochureButton({
     <Link
       href={
         hasBrochure
-          ? `/event/${eventId}/brochure?from=mission`
-          : `/event/${eventId}/detail`
+          ? getUserRoutes(eventId).brochure("mission")
+          : getUserRoutes(eventId).detail
       }
       className={cn(
         "flex items-center justify-center w-13 h-13 shrink-0 rounded-full border-2 border-gomin-primary-700 bg-gomin-white text-gomin-primary-700 hover:bg-gomin-primary-100/50 active:scale-95 transition-all duration-200 shadow-md",

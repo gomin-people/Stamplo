@@ -4,6 +4,7 @@ import { getEntryEventAndParticipant } from "@/features/qr/entry/api/entry";
 import { getParticipantMissionsServer } from "@/features/participant/missions/participantMissionsServer";
 import { toCamelKeys } from "@/utils/case";
 import { type ParticipantModel } from "@/types/models";
+import { USER_ROUTES } from "@/constants/userRoutes";
 
 type PageProps = {
   params: Promise<{ eventId: string }>;
@@ -35,7 +36,7 @@ export default async function MissionPage({ params, searchParams }: PageProps) {
     }));
   } catch (error) {
     console.error("Failed to load missions:", error);
-    redirect("/qr-required");
+    redirect(USER_ROUTES.QR_REQUIRED);
   }
 
   return (

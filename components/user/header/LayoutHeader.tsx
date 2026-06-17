@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Header from "@/components/user/header/Header";
+import { USER_ROUTES } from "@/constants/userRoutes";
 
 const shouldHideHeader = (pathname: string) => {
   // 1. 최상위 루트(/)인 경우 숨김
@@ -38,7 +39,7 @@ const LayoutHeader = () => {
   }
 
   // qr-required 페이지에서는 백버튼을 노출하지 않습니다.
-  const showBackButton = pathname !== "/qr-required";
+  const showBackButton = pathname !== USER_ROUTES.QR_REQUIRED;
 
   return <Header showBackButton={showBackButton} />;
 };

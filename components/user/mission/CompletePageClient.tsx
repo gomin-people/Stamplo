@@ -12,6 +12,7 @@ import RewardQrModal from "./RewardQrModal";
 import { toast } from "sonner";
 import { ApiError } from "@/features/shared/api/http";
 import { getRewardQrUrl } from "@/utils/qr";
+import { getUserRoutes } from "@/constants/userRoutes";
 
 const CompletePageClient = () => {
   const router = useRouter();
@@ -76,7 +77,7 @@ const CompletePageClient = () => {
   const handleSuccessConfirm = () => {
     setIsQrModalOpen(false);
     setTimeout(() => {
-      router.push(`/event/${eventId}`);
+      router.push(getUserRoutes(eventId).root);
     }, 100);
   };
 
