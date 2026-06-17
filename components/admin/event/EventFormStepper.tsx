@@ -83,7 +83,7 @@ const EventFormStepper = ({ currentStep }: Props) => {
               "text-xs font-semibold uppercase tracking-widest",
               isActive || isCompleted
                 ? "text-gomin-primary-700"
-                : "text-gomin-neutral-400 opacity-70"
+                : "text-gomin-neutral-600 opacity-80"
             )}
           >
             {step.label}
@@ -93,7 +93,7 @@ const EventFormStepper = ({ currentStep }: Props) => {
               "text-sm font-semibold",
               isActive || isCompleted
                 ? "text-gomin-black"
-                : "text-gomin-neutral-400"
+                : "text-gomin-neutral-600"
             )}
           >
             {step.sublabel}

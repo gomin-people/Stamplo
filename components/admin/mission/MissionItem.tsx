@@ -78,8 +78,10 @@ const MissionItem = ({
       <div className="flex justify-center">
         <Switch
           defaultChecked={mission.isActive}
+          size="md"
           className="data-checked:bg-gomin-primary-600"
           disabled={disabled}
+          aria-label={`'${mission.title}' 미션 ${mission.isActive ? "비활성화" : "활성화"}`}
           onCheckedChange={(checked) => onToggleActive(mission.id, checked)}
         />
       </div>
@@ -91,6 +93,7 @@ const MissionItem = ({
             variant="outline"
             size="icon-sm"
             disabled={disabled}
+            aria-label={`${mission.title} 미션 QR 코드 확인`}
             onClick={() =>
               onViewQR({
                 title: mission.title,
@@ -108,6 +111,7 @@ const MissionItem = ({
       <div className="flex justify-center gap-1">
         <Button
           variant="outline"
+          aria-label={`${mission.title} 미션 수정`}
           size="icon-sm"
           disabled={disabled}
           onClick={() => onEdit(mission)}
@@ -116,6 +120,7 @@ const MissionItem = ({
         </Button>
         <Button
           variant="outline"
+          aria-label={`${mission.title} 미션 삭제`}
           size="icon-sm"
           className="hover:text-destructive"
           disabled={disabled}
