@@ -9,6 +9,7 @@ import {
 } from "@/utils/api";
 import { supabase } from "@/utils/supabase/server";
 import { getEventOperationStatus } from "@/utils/event-status";
+import { USER_ROUTES, getUserRoutes } from "@/constants/userRoutes";
 
 // 입장 QR route parameter 타입
 type EntryRouteContext = {
@@ -76,13 +77,16 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
 
   if (isBefore) {
     return NextResponse.redirect(
-      new URL("/user-unavailable?reason=event-not-started", request.url)
+      new URL(
+        `${USER_ROUTES.USER_UNAVAILABLE}?reason=event-not-started`,
+        request.url
+      )
     );
   }
 
   if (isAfter) {
     return NextResponse.redirect(
-      new URL("/user-unavailable?reason=event-ended", request.url)
+      new URL(`${USER_ROUTES.USER_UNAVAILABLE}?reason=event-ended`, request.url)
     );
   }
 
@@ -105,7 +109,7 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
 
     if (currentParticipant) {
       const response = NextResponse.redirect(
-        new URL(`/event/${event.id}`, request.url)
+        new URL(getUserRoutes(event.id).root, request.url)
       );
       setParticipantCookie(response, currentParticipant.event_user_id);
       return response;
@@ -128,7 +132,7 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
   }
 
   const response = NextResponse.redirect(
-    new URL(`/event/${event.id}`, request.url)
+    new URL(getUserRoutes(event.id).root, request.url)
   );
   setParticipantCookie(response, participant.event_user_id);
   return response;
