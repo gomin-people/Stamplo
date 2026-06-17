@@ -67,7 +67,6 @@ export const LandingHero = () => {
                       src={src}
                       alt={`mockup ${index}`}
                       fill
-                      priority={index === 0}
                       fetchPriority={index === 0 ? "high" : "auto"}
                       loading={index === 0 ? "eager" : "lazy"}
                       unoptimized={index === 0}
