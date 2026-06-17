@@ -70,8 +70,8 @@ export const LandingProblem = () => {
           </div>
 
           <div className="flex flex-col gap-4 reveal">
-            <div className="flex items-center gap-2.25 text-sm font-bold text-emerald-500 mb-0.5">
-              <CheckCircle2 className="inline text-emerald-500" />
+            <div className="flex items-center gap-2.25 text-sm font-bold text-gomin-primary-700 mb-0.5">
+              <CheckCircle2 className="inline text-gomin-primary-700" />
               Stamplo의 해결
             </div>
             <div className="bg-linear-to-br from-[#5f41ee] to-[#5435EB] text-white rounded-[18px] p-7 shadow-[0_10px_24px_rgba(84,53,235,0.24),0_2px_4px_rgba(84,53,235,0.12)] flex flex-col gap-3.5 h-full justify-center relative overflow-hidden after:content-[''] after:absolute after:right-[-50px] after:bottom-[-50px] after:w-[170px] after:h-[170px] after:rounded-full after:bg-white/10">
