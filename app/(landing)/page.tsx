@@ -7,17 +7,20 @@ import { LandingData } from "@/components/landing/LandingData";
 import { LandingBuilderSection } from "@/components/landing/LandingBuilderSection";
 import { LandingCTA } from "@/components/landing/LandingCTA";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import ReactDOM from "react-dom";
 
 export default function LandingPage() {
   return (
     <>
+      <div
+        id="top"
+        className="absolute top-0 left-0 w-0 h-0 pointer-events-none"
+      />
       <RevealObserver />
 
       {/* ===================== NAV ===================== */}
       <LandingHeader />
 
-      <main id="top">
+      <main>
         {/* ===================== HERO ===================== */}
         <LandingHero />
 
