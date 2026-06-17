@@ -229,8 +229,6 @@ const QrCheckClient = ({
     ]
   );
 
-  const iosVideoRef = useRef<HTMLVideoElement | null>(null);
-
   const {
     cameraStatus,
     handleVideoLoadedMetadata,
@@ -242,41 +240,6 @@ const QrCheckClient = ({
     preferredCamera: "environment",
   });
   const isCameraActive = cameraStatus === "active";
-
-  // iOS Safari는 object-fit: cover 첫 프레임 버그가 있어 ResizeObserver로 직접 구현
-  useEffect(() => {
-    if (!isIOS) return;
-
-    const video = iosVideoRef.current;
-    if (!video) return;
-
-    const applyTransform = () => {
-      const { videoWidth, videoHeight, clientWidth, clientHeight } = video;
-      if (!videoWidth || !videoHeight) return;
-
-      const videoRatio = videoWidth / videoHeight;
-      const containerRatio = clientWidth / clientHeight;
-      let scale: number;
-
-      if (containerRatio > videoRatio) {
-        scale = clientWidth / videoWidth;
-      } else {
-        scale = clientHeight / videoHeight;
-      }
-
-      video.style.transform = `scale(${scale})`;
-      video.style.transformOrigin = "center center";
-    };
-
-    const observer = new ResizeObserver(applyTransform);
-    observer.observe(video);
-    video.addEventListener("loadedmetadata", applyTransform);
-
-    return () => {
-      observer.disconnect();
-      video.removeEventListener("loadedmetadata", applyTransform);
-    };
-  }, []);
 
   useEffect(() => {
     if (cameraStatus !== "loading" && !isMissionChecking) return;
@@ -295,13 +258,12 @@ const QrCheckClient = ({
     <div className="relative h-full overflow-hidden bg-gomin-black text-gomin-white">
       {/* 카메라 영상 */}
       <video
-        ref={(node) => {
-          setVideoRef(node);
-          iosVideoRef.current = node;
-        }}
+        ref={setVideoRef}
         className={cn(
-          "absolute inset-0 h-full w-full bg-gomin-black transition-opacity duration-200",
-          !isIOS && "object-cover",
+          "absolute inset-0 bg-gomin-black transition-opacity duration-200",
+          isIOS
+            ? "min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
+            : "h-full w-full object-cover",
           isCameraActive ? "opacity-100" : "opacity-0"
         )}
         muted
