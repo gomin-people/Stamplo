@@ -68,6 +68,7 @@ export const LandingHero = () => {
                       alt={`mockup ${index}`}
                       fill
                       priority={index === 0}
+                      fetchPriority={index === 0 ? "high" : "auto"}
                       sizes="(max-width: 640px) 240px, (max-width: 768px) 280px, 332px"
                       className={`object-cover transition-opacity duration-700 ease-in-out ${
                         currentIndex === index ? "opacity-100" : "opacity-0"
