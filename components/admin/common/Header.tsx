@@ -26,7 +26,7 @@ const Header = () => {
     <header className="flex flex-col pt-6 pr-4 pl-8">
       <h1 className="text-xl font-semibold text-gomin-black">{route.title}</h1>
       {route.description && (
-        <p className="mt-2 text-sm text-gomin-neutral-500">
+        <p className="mt-2 text-sm text-gomin-neutral-600">
           {route.description.map((segment, index) => {
             if (segment.type === "eventTitle") {
               return (
@@ -39,7 +39,14 @@ const Header = () => {
               );
             }
 
-            return <span key={`${segment.type}-${index}`}>{segment.text}</span>;
+            return (
+              <span
+                key={`${segment.type}-${index}`}
+                className="text-gomin-neutral-600"
+              >
+                {segment.text}
+              </span>
+            );
           })}
         </p>
       )}
