@@ -3,11 +3,16 @@
 import type QrScanner from "qr-scanner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/utils";
 import { useQrGuideMessage } from "@/hooks/useQrGuideMessage";
 import { useQrScanner } from "@/hooks/useQrScanner";
 import { type CameraStatus, type QrGuideMessageState } from "@/types/qr-check";
 import { getQrScanTarget } from "@/utils/qr";
 import { completeMissionFromQr } from "./completeMissionFromQr";
+
+const isIOS =
+  typeof navigator !== "undefined" &&
+  /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 type QrCheckClientProps = {
   eventId: string;
@@ -224,6 +229,8 @@ const QrCheckClient = ({
     ]
   );
 
+  const iosVideoRef = useRef<HTMLVideoElement | null>(null);
+
   const {
     cameraStatus,
     handleVideoLoadedMetadata,
@@ -235,6 +242,41 @@ const QrCheckClient = ({
     preferredCamera: "environment",
   });
   const isCameraActive = cameraStatus === "active";
+
+  // iOS Safari는 object-fit: cover 첫 프레임 버그가 있어 ResizeObserver로 직접 구현
+  useEffect(() => {
+    if (!isIOS) return;
+
+    const video = iosVideoRef.current;
+    if (!video) return;
+
+    const applyTransform = () => {
+      const { videoWidth, videoHeight, clientWidth, clientHeight } = video;
+      if (!videoWidth || !videoHeight) return;
+
+      const videoRatio = videoWidth / videoHeight;
+      const containerRatio = clientWidth / clientHeight;
+      let scale: number;
+
+      if (containerRatio > videoRatio) {
+        scale = clientWidth / videoWidth;
+      } else {
+        scale = clientHeight / videoHeight;
+      }
+
+      video.style.transform = `scale(${scale})`;
+      video.style.transformOrigin = "center center";
+    };
+
+    const observer = new ResizeObserver(applyTransform);
+    observer.observe(video);
+    video.addEventListener("loadedmetadata", applyTransform);
+
+    return () => {
+      observer.disconnect();
+      video.removeEventListener("loadedmetadata", applyTransform);
+    };
+  }, []);
 
   useEffect(() => {
     if (cameraStatus !== "loading" && !isMissionChecking) return;
@@ -253,10 +295,15 @@ const QrCheckClient = ({
     <div className="relative h-full overflow-hidden bg-gomin-black text-gomin-white">
       {/* 카메라 영상 */}
       <video
-        ref={setVideoRef}
-        className={`absolute inset-0 h-full w-full bg-gomin-black object-cover transition-opacity duration-200 ${
+        ref={(node) => {
+          setVideoRef(node);
+          iosVideoRef.current = node;
+        }}
+        className={cn(
+          "absolute inset-0 h-full w-full bg-gomin-black transition-opacity duration-200",
+          !isIOS && "object-cover",
           isCameraActive ? "opacity-100" : "opacity-0"
-        }`}
+        )}
         muted
         playsInline
         onLoadedMetadata={handleVideoLoadedMetadata}

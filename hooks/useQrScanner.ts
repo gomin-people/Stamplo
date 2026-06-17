@@ -92,23 +92,6 @@ export const useQrScanner = ({
   }, []);
 
   const handleVideoPlaying = useCallback(() => {
-    const video = videoRef.current;
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-    // iOS Safari는 onPlaying 직후 videoWidth가 아직 작은 값으로 잡혀 있어
-    // 해상도가 안정될 때까지 폴링 후 active로 전환한다
-    if (isIOS && video) {
-      const waitForStableResolution = () => {
-        if (video.videoWidth > 0 && video.videoHeight > 0) {
-          setCameraStatus("active");
-          return;
-        }
-        requestAnimationFrame(waitForStableResolution);
-      };
-      requestAnimationFrame(waitForStableResolution);
-      return;
-    }
-
     setCameraStatus("active");
   }, []);
 
@@ -143,8 +126,7 @@ export const useQrScanner = ({
 
       try {
         await scanner.start();
-        // iOS Safari는 onPlaying에서 해상도 안정화 후 active로 전환하므로 여기선 생략
-        if (isMounted && !/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        if (isMounted) {
           setCameraStatus("active");
         }
       } catch (error) {
