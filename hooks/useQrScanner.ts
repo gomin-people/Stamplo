@@ -92,6 +92,15 @@ export const useQrScanner = ({
   }, []);
 
   const handleVideoPlaying = useCallback(() => {
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      // iOS Safari는 object-fit: cover 첫 프레임 버그로 카메라가 작게 보였다 커지는 현상이 있어
+      // 버그 프레임이 지나간 뒤 화면을 보이게 한다
+      window.setTimeout(() => setCameraStatus("active"), 300);
+      return;
+    }
+
     setCameraStatus("active");
   }, []);
 

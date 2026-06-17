@@ -10,10 +10,6 @@ import { type CameraStatus, type QrGuideMessageState } from "@/types/qr-check";
 import { getQrScanTarget } from "@/utils/qr";
 import { completeMissionFromQr } from "./completeMissionFromQr";
 
-const isIOS =
-  typeof navigator !== "undefined" &&
-  /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
 type QrCheckClientProps = {
   eventId: string;
   onBack: () => void;
@@ -260,10 +256,7 @@ const QrCheckClient = ({
       <video
         ref={setVideoRef}
         className={cn(
-          "absolute inset-0 bg-gomin-black transition-opacity duration-200",
-          isIOS
-            ? "h-full w-full -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
-            : "h-full w-full object-cover",
+          "absolute inset-0 h-full w-full bg-gomin-black object-cover transition-opacity duration-200",
           isCameraActive ? "opacity-100" : "opacity-0"
         )}
         muted
