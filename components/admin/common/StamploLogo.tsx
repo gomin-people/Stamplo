@@ -22,6 +22,3 @@ const StamploLogo = ({ width = 144, height = 41, className, style }: Props) => {
 };
 
 export default StamploLogo;
-};
-
-export default StamploLogo;
