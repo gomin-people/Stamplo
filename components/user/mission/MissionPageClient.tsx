@@ -197,7 +197,9 @@ const MissionPageClient = ({
             <BrochureButton
               eventId={eventId}
               hasBrochure={!!event.brochureImageUrl?.length}
-              className={cn(!storeNewlyStampedId && "animate-bounce-once")}
+              className={cn(
+                !isPreview && !storeNewlyStampedId && "animate-bounce-once"
+              )}
             />
           )}
         </div>
