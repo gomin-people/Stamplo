@@ -12,11 +12,11 @@ export const LandingBuilderSection = () => {
             행사 만들기 체험
           </span>
           <h2 className="font-extrabold text-[clamp(30px,3.6vw,46px)] leading-[1.18] font-nanum break-keep word-keep-all reveal">
-            스탬프 및 테마 디자인 설정
+            행사 페이지 디자인 체험하기
           </h2>
           <p className="text-[clamp(16px,1.5vw,18px)] text-gomin-neutral-600 max-w-[56ch] leading-[1.6] break-keep word-keep-all reveal">
             실제 서비스의 행사 생성 에디터 화면입니다. 스탬프 이미지를 등록하고
-            색상 슬라이더로 행사 고유의 테마 색상을 직접 설정해보세요.
+            색상 슬라이더로 직접 행사 데모 페이지 디자인을 경험해보세요.
           </p>
         </div>
 
