@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "knip": "knip"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,css}": [
@@ -69,6 +70,7 @@
     "husky": "^9.1.7",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
+    "knip": "^6.17.0",
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
     "tailwindcss": "^4",
