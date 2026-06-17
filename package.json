@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "knip": "knip"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,css}": [
@@ -62,7 +63,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/sharp": "^0.32.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
@@ -70,6 +70,7 @@
     "husky": "^9.1.7",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
+    "knip": "^6.17.0",
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
     "tailwindcss": "^4",
