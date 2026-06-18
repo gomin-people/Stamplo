@@ -192,11 +192,8 @@ const MissionPageClient = ({
       )}
     >
       {!isPreview && (
-        <div className="absolute top-0 right-0 z-50 h-14 flex items-center px-4">
-          <BrochureButton
-            onClick={() => setIsDetailOpen(true)}
-            className="mt-4"
-          />
+        <div className="absolute top-0 right-0 z-50 h-14 flex items-center pt-4 px-4">
+          <BrochureButton onClick={() => setIsDetailOpen(true)} />
         </div>
       )}
 

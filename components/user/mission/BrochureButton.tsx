@@ -1,7 +1,8 @@
 "use client";
 
-import { Newspaper } from "lucide-react";
+import { FileText } from "lucide-react";
 import { cn } from "@/utils";
+import { Button } from "@/components/ui/button";
 
 type BrochureButtonProps = {
   onClick: () => void;
@@ -10,17 +11,34 @@ type BrochureButtonProps = {
 
 const BrochureButton = ({ onClick, className }: BrochureButtonProps) => {
   return (
-    <button
+    <Button
       onClick={onClick}
+      variant="outline"
       className={cn(
-        "flex items-center justify-center w-11 h-11 shrink-0 rounded-full border-2 border-gomin-primary-700 bg-gomin-white text-gomin-primary-700 hover:bg-gomin-primary-100/50 active:scale-95 transition-all duration-200 shadow-md",
+        "gap-1.5 px-4 h-9 rounded-full border-2 border-gomin-primary-700 bg-gomin-white text-gomin-primary-700 hover:bg-gomin-primary-100/50 hover:text-gomin-primary-700 shadow-md",
         className
       )}
-      aria-label="행사 안내 보기"
+      aria-label="행사 정보"
     >
-      <Newspaper className="w-5 h-5" />
-    </button>
+      <FileText className="w-4 h-4" />
+      <span className="text-[13px] font-nanum font-extrabold">행사정보</span>
+    </Button>
   );
 };
+
+// const BrochureButton = ({ onClick, className }: BrochureButtonProps) => {
+//   return (
+//     <button
+//       onClick={onClick}
+//       className={cn(
+//         "flex items-center justify-center w-11 h-11 text-gomin-primary-700 active:scale-95 transition-all duration-200",
+//         className
+//       )}
+//       aria-label="행사 정보"
+//     >
+//       <Info className="w-8.5 h-8.5" />
+//     </button>
+//   );
+// };
 
 export default BrochureButton;
