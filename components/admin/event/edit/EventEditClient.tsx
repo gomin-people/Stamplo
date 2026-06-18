@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ADMIN_EVENT_REGISTER_PATH } from "@/constants/adminRoutes";
 import { Dialog } from "@/components/ui/dialog";
 import EventFormStepper from "@/components/admin/event/EventFormStepper";
 import StepNavButtons from "@/components/admin/event/StepNavButtons";
@@ -84,9 +85,13 @@ const EventEditClient = ({ initialEvent }: Props) => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteEvent(eventIdNum);
+      const { nextEventId } = await deleteEvent(eventIdNum);
       toast.success("행사가 삭제되었습니다.", { id: "event-delete-success" });
-      router.replace("/admin");
+      router.replace(
+        nextEventId != null
+          ? `/admin/events/${nextEventId}`
+          : ADMIN_EVENT_REGISTER_PATH
+      );
     } catch {
       toast.error("삭제에 실패했습니다. 다시 시도해주세요.", {
         id: "event-delete-error",

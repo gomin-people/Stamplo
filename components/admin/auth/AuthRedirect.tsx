@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { ADMIN_EVENT_REGISTER_PATH } from "@/constants/adminRoutes";
+import { getPriorityAdminEventId } from "@/utils/admin-event-redirect";
 import { createSessionClient } from "@/utils/supabase/session-server";
 
 export default async function AuthRedirect() {
@@ -14,14 +15,7 @@ export default async function AuthRedirect() {
     redirect("/admin");
   }
 
-  const { data: eventId, error: eventsError } = await supabase.rpc(
-    "get_priority_admin_event_id"
-  );
-
-  if (eventsError) {
-    console.error("Error fetching priority admin event:", eventsError);
-    redirect("/admin");
-  }
+  const eventId = await getPriorityAdminEventId(supabase);
 
   if (eventId != null) {
     redirect(`/admin/events/${eventId}/dashboard`);
