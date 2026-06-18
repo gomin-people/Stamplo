@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { DialogTitle } from "@/components/ui/dialog";
-import { type EventModel } from "@/types/models";
 import { fetchParticipantEvent } from "@/features/participant/events/participantEventApi";
 import InfoCard from "@/components/user/common/InfoCard";
 import EventDateTimeCard from "@/components/user/event/EventDateTimeCard";
@@ -26,11 +25,12 @@ type DetailProps = {
 };
 
 const EventDetailModal = ({ eventId, isOpen, onClose }: DetailProps) => {
-  const [event, setEvent] = useState<EventModel | null>(null);
-
-  useEffect(() => {
-    if (isOpen) void fetchParticipantEvent(Number(eventId)).then(setEvent);
-  }, [isOpen, eventId]);
+  const { data: event } = useQuery({
+    queryKey: ["participant", "event", eventId],
+    queryFn: () => fetchParticipantEvent(Number(eventId)),
+    enabled: isOpen,
+    staleTime: 600_000,
+  });
 
   return (
     <Dialog
