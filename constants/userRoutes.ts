@@ -5,11 +5,7 @@ export const USER_ROUTES = {
 
 export const getUserRoutes = (eventId: string | number) => ({
   root: `/event/${eventId}`,
-  brochure: (from?: string) =>
-    from
-      ? `/event/${eventId}/brochure?from=${from}`
-      : `/event/${eventId}/brochure`,
-  detail: `/event/${eventId}/detail`,
+  brochure: `/event/${eventId}/brochure`,
   mission: `/event/${eventId}/mission`,
   complete: `/event/${eventId}/complete`,
 });
