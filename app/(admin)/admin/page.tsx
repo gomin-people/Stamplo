@@ -1,18 +1,18 @@
-import { cookies } from "next/headers";
 import Link from "next/link";
 import AuthRedirect from "@/components/admin/auth/AuthRedirect";
 import KakaoLogin from "@/components/admin/auth/KakaoLogin";
 import TestLoginButton from "@/components/admin/auth/TestLoginButton";
 import StamploLogo from "@/components/admin/common/StamploLogo";
 import EmailLoginForm from "@/components/admin/auth/EmailLoginForm";
+import { createSessionClient } from "@/utils/supabase/session-server";
 
 export default async function AdminHomePage() {
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.getAll().some(({ name }) => {
-    return name.startsWith("sb-");
-  });
+  const supabase = await createSessionClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (hasSession) {
+  if (user) {
     return <AuthRedirect />;
   }
 

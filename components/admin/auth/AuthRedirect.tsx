@@ -11,7 +11,6 @@ export default async function AuthRedirect() {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    await supabase.auth.signOut();
     redirect("/admin");
   }
 
