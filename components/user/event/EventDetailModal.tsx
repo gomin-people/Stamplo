@@ -19,13 +19,13 @@ import EventHostCard from "@/components/user/event/EventHostCard";
 import EventDetailModalSkeleton from "@/components/user/event/EventDetailModalSkeleton";
 import { cn } from "@/utils";
 
-type Props = {
+type DetailProps = {
   eventId: string;
   isOpen: boolean;
   onClose: () => void;
 };
 
-const EventDetailModal = ({ eventId, isOpen, onClose }: Props) => {
+const EventDetailModal = ({ eventId, isOpen, onClose }: DetailProps) => {
   const [event, setEvent] = useState<EventModel | null>(null);
 
   useEffect(() => {

@@ -24,6 +24,7 @@ import {
   useClearNewlyStampedMissionId,
 } from "@/stores/user";
 import { getUserRoutes } from "@/constants/userRoutes";
+import { splitEventTitle } from "@/utils/event-title";
 
 // Supabase의 event 테이블 타입 인터페이스 정의
 type EventData = {
@@ -176,6 +177,7 @@ const MissionPageClient = ({
 
   // DB에서 불러온 title (또는 name)을 1순위로 사용하며 예외 처리 제공
   const eventName = event?.title || event?.name || `이벤트 #${eventId}`;
+  const titleLines = splitEventTitle(eventName);
 
   return (
     <div
@@ -191,8 +193,17 @@ const MissionPageClient = ({
       <main className="flex-1 max-w-md w-full mx-auto px-6 pt-4 pb-1.5 overflow-x-hidden">
         {/* 2. 타이틀 레이아웃 */}
         <div className="mb-5">
-          <h1 className="text-4xl font-nanum font-extrabold leading-11.25 text-gomin-primary-700 tracking-tight select-none">
-            {eventName}
+          <h1 className="text-4xl font-nanum font-extrabold leading-11.25 text-gomin-primary-700 tracking-tight select-none max-h-22.5 overflow-hidden">
+            {titleLines ? (
+              titleLines.map((line, i) => (
+                <span key={i} className="break-all">
+                  {line}
+                  {i < titleLines.length - 1 && <br />}
+                </span>
+              ))
+            ) : (
+              <span className="break-keep">{eventName}</span>
+            )}
           </h1>
         </div>
 
