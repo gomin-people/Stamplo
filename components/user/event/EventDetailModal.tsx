@@ -22,13 +22,22 @@ const EventDetailModal = ({ eventId, isOpen, onClose }: Props) => {
     if (isOpen) void fetchParticipantEvent(Number(eventId)).then(setEvent);
   }, [isOpen, eventId]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [isOpen]);
+
   return isOpen ? (
     <div
-      className="fixed inset-0 z-50 bg-[rgba(17,17,17,0.4)]"
+      className="fixed inset-0 z-100 bg-[rgba(17,17,17,0.4)]"
       onClick={onClose}
     >
       <div
-        className="absolute top-15 left-0 right-0 mx-auto w-[calc(100%-3rem)] max-w-sm max-h-[85vh] rounded-[24px] bg-gomin-white flex flex-col overflow-hidden animate-slide-down shadow-xl"
+        className="absolute top-14 left-0 right-0 mx-auto w-[calc(100%-3rem)] max-w-sm max-h-[85vh] rounded-[24px] bg-gomin-primary-100 flex flex-col overflow-hidden animate-slide-down shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -39,7 +48,7 @@ const EventDetailModal = ({ eventId, isOpen, onClose }: Props) => {
           <X className="w-5 h-5 text-gomin-neutral-700" />
         </button>
 
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto scrollbar-hide">
           {event ? (
             <div className="bg-gomin-primary-100 pt-13 px-4 pb-6 flex flex-col gap-3">
               <InfoCard label="행사명">
