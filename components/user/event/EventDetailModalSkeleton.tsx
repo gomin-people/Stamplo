@@ -1,6 +1,6 @@
 const EventDetailModalSkeleton = () => {
   return (
-    <div className="bg-gomin-primary-100 p-4 flex flex-col gap-3">
+    <div className="bg-gomin-primary-100 pt-13 px-4 pb-4 flex flex-col gap-3">
       {/* 행사명 */}
       <div className="bg-white border border-gomin-primary-200 rounded-[20px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
         <div className="h-3 w-16 rounded-full bg-gomin-neutral-100 animate-pulse mb-3" />
