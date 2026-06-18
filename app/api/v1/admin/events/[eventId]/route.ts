@@ -10,6 +10,7 @@ import {
   toInteger,
   unauthorized,
 } from "@/utils/api";
+import { getPriorityAdminEventId } from "@/utils/admin-event-redirect";
 import { supabase } from "@/utils/supabase/server";
 import { createSessionClient } from "@/utils/supabase/session-server";
 
@@ -210,7 +211,7 @@ export async function PATCH(
  *
  * @param request - Route Handler 요청 객체
  * @param context - 행사 ID route parameter
- * @returns 삭제된 행사 ID
+ * @returns 삭제된 행사 ID와 다음 우선순위 행사 ID
  */
 export async function DELETE(
   request: Request,
@@ -279,5 +280,7 @@ export async function DELETE(
     return serverError("행사 삭제 실패", deleteEventError);
   }
 
-  return ok({ id: eventId });
+  const nextEventId = await getPriorityAdminEventId(sessionSupabase);
+
+  return ok({ id: eventId, next_event_id: nextEventId });
 }

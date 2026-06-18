@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ADMIN_EVENT_REGISTER_PATH } from "@/constants/adminRoutes";
 import { Dialog } from "@/components/ui/dialog";
 import EventFormStepper from "@/components/admin/event/EventFormStepper";
 import StepNavButtons from "@/components/admin/event/StepNavButtons";
@@ -15,16 +16,12 @@ import EventEditCancelDialog from "@/components/admin/event/edit/EventEditCancel
 import EventDeleteDialog from "@/components/admin/event/edit/EventDeleteDialog";
 import EventDeleteContactDialog from "@/components/admin/event/edit/EventDeleteContactDialog";
 import { type StepFormHandle } from "@/types";
-import {
-  useAdminEventQuery,
-  useAdminEventsQuery,
-} from "@/features/admin/events/adminEventQueries";
+import { type AdminEventDetail } from "@/features/admin/events/adminEventApi";
 import {
   useUpdateEventMutation,
   useDeleteEventMutation,
 } from "@/features/admin/events/adminEventMutations";
 import type { EventUpdatePayloadModel } from "@/types/models";
-import LoadingSpinner from "@/components/ui/loading-spinner";
 import { getEventOperationStatus } from "@/utils/event-status";
 import {
   useSetIsEditMode,
@@ -34,9 +31,12 @@ import {
 
 const TOTAL_STEPS = 3;
 
-const EventEditClient = () => {
-  const { eventId } = useParams<{ eventId: string }>();
-  const eventIdNum = Number(eventId);
+type Props = {
+  initialEvent: AdminEventDetail;
+};
+
+const EventEditClient = ({ initialEvent }: Props) => {
+  const eventIdNum = initialEvent.id;
   const router = useRouter();
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -57,14 +57,13 @@ const EventEditClient = () => {
     };
   }, [mode, setIsEditMode]);
 
-  const { data: event, isLoading } = useAdminEventQuery(eventIdNum);
-  const { data: events = [] } = useAdminEventsQuery();
   const { mutateAsync: updateEvent, isPending } = useUpdateEventMutation();
   const { mutateAsync: deleteEvent } = useDeleteEventMutation();
 
-  const { isAfter, isDuring } = event
-    ? getEventOperationStatus(event.startDate, event.endDate)
-    : { isAfter: false, isDuring: false };
+  const { isAfter, isDuring } = getEventOperationStatus(
+    initialEvent.startDate,
+    initialEvent.endDate
+  );
 
   const step1Ref = useRef<StepFormHandle>(null);
   const step2Ref = useRef<StepFormHandle>(null);
@@ -86,11 +85,12 @@ const EventEditClient = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteEvent(eventIdNum);
+      const { nextEventId } = await deleteEvent(eventIdNum);
       toast.success("행사가 삭제되었습니다.", { id: "event-delete-success" });
-      const nextEvent = events.find((e) => e.id !== eventIdNum);
       router.replace(
-        nextEvent ? `/admin/events/${nextEvent.id}` : "/admin/events/register"
+        nextEventId != null
+          ? `/admin/events/${nextEventId}`
+          : ADMIN_EVENT_REGISTER_PATH
       );
     } catch {
       toast.error("삭제에 실패했습니다. 다시 시도해주세요.", {
@@ -134,6 +134,7 @@ const EventEditClient = () => {
       await updateEvent({ eventId: eventIdNum, payload });
       toast.success("변경사항이 저장되었습니다.", { id: "event-save-success" });
       setMode("view");
+      router.refresh();
     } catch {
       toast.error("저장에 실패했습니다. 다시 시도해주세요.", {
         id: "event-save-error",
@@ -141,11 +142,7 @@ const EventEditClient = () => {
     }
   };
 
-  const entryQr = event?.qrCodes?.find((qr) => qr.type === "ENTRY");
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  const entryQr = initialEvent.qrCodes?.find((qr) => qr.type === "ENTRY");
 
   return (
     <div className="mx-auto w-full max-w-7xl px-10 py-8">
@@ -178,13 +175,14 @@ const EventEditClient = () => {
                 key={formKey}
                 ref={step1Ref}
                 initialData={
-                  event
+                  initialEvent
                     ? {
-                        ...event,
-                        locationUrl: event.locationUrl ?? undefined,
-                        operatingRemarks: event.operatingRemarks ?? undefined,
-                        contactPhone: event.contactPhone ?? undefined,
-                        contactEmail: event.contactEmail ?? undefined,
+                        ...initialEvent,
+                        locationUrl: initialEvent.locationUrl ?? undefined,
+                        operatingRemarks:
+                          initialEvent.operatingRemarks ?? undefined,
+                        contactPhone: initialEvent.contactPhone ?? undefined,
+                        contactEmail: initialEvent.contactEmail ?? undefined,
                       }
                     : undefined
                 }
@@ -203,8 +201,8 @@ const EventEditClient = () => {
                 ref={step2Ref}
                 disabled={mode === "view" || isAfter || isDuring}
                 initialData={
-                  event?.brochureImageUrl
-                    ? { brochureImageUrl: event.brochureImageUrl }
+                  initialEvent.brochureImageUrl
+                    ? { brochureImageUrl: initialEvent.brochureImageUrl }
                     : undefined
                 }
               />
@@ -215,10 +213,10 @@ const EventEditClient = () => {
                 ref={step3Ref}
                 disabled={mode === "view" || isAfter || isDuring}
                 initialData={
-                  event
+                  initialEvent
                     ? {
-                        stampImageUrl: event.stampImageUrl,
-                        primaryColor: event.primaryColor,
+                        stampImageUrl: initialEvent.stampImageUrl,
+                        primaryColor: initialEvent.primaryColor,
                       }
                     : undefined
                 }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse, userAgent } from "next/server";
 import { PARTICIPANT_COOKIE_NAME } from "@/utils/api";
+import { updateAdminSession } from "@/utils/supabase/proxy-session";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/admin")) {
@@ -9,6 +10,8 @@ export function proxy(request: NextRequest) {
     if (device.type === "mobile" || device.type === "tablet") {
       return NextResponse.redirect(new URL("/admin-unavailable", request.url));
     }
+
+    return updateAdminSession(request);
   }
 
   if (pathname.match(/^\/event\/[^/]+($|\/(brochure|detail))/)) {

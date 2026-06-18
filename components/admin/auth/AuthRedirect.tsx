@@ -1,23 +1,26 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSelectedEventId } from "@/stores/admin";
+import { redirect } from "next/navigation";
 import { ADMIN_EVENT_REGISTER_PATH } from "@/constants/adminRoutes";
+import { getPriorityAdminEventId } from "@/utils/admin-event-redirect";
+import { createSessionClient } from "@/utils/supabase/session-server";
 
-const AuthRedirect = () => {
-  const router = useRouter();
-  const selectedEventId = useSelectedEventId();
+export default async function AuthRedirect() {
+  const supabase = await createSessionClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    if (selectedEventId) {
-      router.replace(`/admin/events/${selectedEventId}/dashboard`);
-    } else {
-      router.replace(ADMIN_EVENT_REGISTER_PATH);
-    }
-  }, [router, selectedEventId]);
+  if (userError || !user) {
+    redirect("/admin");
+  }
+
+  const eventId = await getPriorityAdminEventId(supabase);
+
+  if (eventId != null) {
+    redirect(`/admin/events/${eventId}/dashboard`);
+  }
+
+  redirect(ADMIN_EVENT_REGISTER_PATH);
 
   return null;
-};
-
-export default AuthRedirect;
+}

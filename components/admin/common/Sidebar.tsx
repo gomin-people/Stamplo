@@ -14,40 +14,30 @@ import RewardQrScannerClient from "@/components/admin/reward/RewardQrScannerClie
 import { Button } from "@/components/ui/button";
 import { ScanTextIcon, type ScanTextIconHandle } from "lucide-animated";
 import { X } from "lucide-react";
-import { useAdminEventsQuery } from "@/features/admin/events/adminEventQueries";
-import {
-  useSelectedEventId,
-  useSetSelectedEventId,
-  useIsEditMode,
-  useSetPendingHref,
-} from "@/stores/admin";
+import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
+import type { AdminUserModel, EventModel } from "@/types/models";
+
+type Props = {
+  events: EventModel[];
+  user: AdminUserModel;
+};
 
 // 관리자 이벤트 화면의 사이드바와 행사 등록 취소 이동 버튼 렌더링
-const Sidebar = () => {
+const Sidebar = ({ events, user }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const { eventId } = useParams<{ eventId?: string }>();
   const route = getAdminRouteConfig(pathname);
-  const selectedEventId = useSelectedEventId();
-  const setSelectedEventId = useSetSelectedEventId();
   const isEditMode = useIsEditMode();
   const setPendingHref = useSetPendingHref();
   const [isRewardQrOpen, setIsRewardQrOpen] = useState(false);
   const rewardQrIconRef = useRef<ScanTextIconHandle>(null);
-  const { data: events = [] } = useAdminEventsQuery({ enabled: !eventId });
   const firstEvent = useMemo(
     () => [...events].sort(compareEventsByDisplayPriority)[0],
     [events]
   );
-  const selectedEvent = events.find(
-    (event) => String(event.id) === selectedEventId
-  );
-  const cancelTargetEventId =
-    selectedEvent !== undefined
-      ? String(selectedEvent.id)
-      : firstEvent
-        ? String(firstEvent.id)
-        : null;
+
+  const cancelTargetEventId = firstEvent ? String(firstEvent.id) : null;
 
   if (!route) {
     return null;
@@ -62,7 +52,6 @@ const Sidebar = () => {
     if (isEditMode) {
       setPendingHref(href);
     } else {
-      setSelectedEventId(cancelTargetEventId);
       router.push(href);
     }
   };
@@ -84,7 +73,7 @@ const Sidebar = () => {
 
       {eventId ? (
         <>
-          <EventSelector key={eventId} eventId={eventId} />
+          <EventSelector key={eventId} eventId={eventId} events={events} />
           <SidebarNav items={items} pathname={pathname} />
         </>
       ) : cancelTargetEventId ? (
@@ -120,7 +109,7 @@ const Sidebar = () => {
             리워드 QR 확인
           </Button>
         )}
-        <AdminUserInfo />
+        <AdminUserInfo user={user} />
       </div>
       {eventId && isRewardQrOpen && (
         <RewardQrScannerClient
