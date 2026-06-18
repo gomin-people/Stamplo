@@ -6,21 +6,15 @@ import { getUserRoutes } from "@/constants/userRoutes";
 
 type Props = {
   params: Promise<{ eventId: string }>;
-  searchParams: Promise<{ from?: string }>;
 };
 
-export default async function BrochurePage({ params, searchParams }: Props) {
+export default async function BrochurePage({ params }: Props) {
   const { eventId } = await params;
-  const { from } = await searchParams;
 
   const event = await fetchParticipantEventBrochure(Number(eventId));
 
   if (!event.brochureImageUrl?.length) {
-    redirect(
-      from === "mission"
-        ? getUserRoutes(eventId).detail
-        : getUserRoutes(eventId).mission
-    );
+    redirect(getUserRoutes(eventId).mission);
   }
 
   const cookieStore = await cookies();

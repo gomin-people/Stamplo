@@ -1,36 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { Newspaper } from "lucide-react";
 import { cn } from "@/utils";
-import { getUserRoutes } from "@/constants/userRoutes";
 
 type BrochureButtonProps = {
-  eventId: string;
-  hasBrochure: boolean;
+  onClick: () => void;
   className?: string;
 };
 
-const BrochureButton = ({
-  eventId,
-  hasBrochure,
-  className,
-}: BrochureButtonProps) => {
+const BrochureButton = ({ onClick, className }: BrochureButtonProps) => {
   return (
-    <Link
-      href={
-        hasBrochure
-          ? getUserRoutes(eventId).brochure("mission")
-          : getUserRoutes(eventId).detail
-      }
+    <button
+      onClick={onClick}
       className={cn(
-        "flex items-center justify-center w-13 h-13 shrink-0 rounded-full border-2 border-gomin-primary-700 bg-gomin-white text-gomin-primary-700 hover:bg-gomin-primary-100/50 active:scale-95 transition-all duration-200 shadow-md",
+        "flex items-center justify-center w-11 h-11 shrink-0 rounded-full border-2 border-gomin-primary-700 bg-gomin-white text-gomin-primary-700 hover:bg-gomin-primary-100/50 active:scale-95 transition-all duration-200 shadow-md",
         className
       )}
-      aria-label="브로슈어 안내장 보기"
+      aria-label="행사 안내 보기"
     >
-      <Newspaper className="w-6 h-6" />
-    </Link>
+      <Newspaper className="w-5 h-5" />
+    </button>
   );
 };
 
