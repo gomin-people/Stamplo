@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import OverlayCircleIcon from "@/components/icons/OverlayCircleIcon";
 
-const BrochureGuideOverlay = ({ eventId }: { eventId: string }) => {
+const BrochureGuideOverlay = ({
+  eventId,
+  onDismiss,
+}: {
+  eventId: string;
+  onDismiss?: () => void;
+}) => {
   const [visible, setVisible] = useState(
     () =>
       typeof window === "undefined" ||
@@ -25,11 +31,10 @@ const BrochureGuideOverlay = ({ eventId }: { eventId: string }) => {
   const handleDismiss = () => {
     document.cookie = `brochure-guide-seen-${eventId}=1; path=/; max-age=31536000`;
     setVisible(false);
+    onDismiss?.();
   };
 
-  if (!visible) return null;
-
-  return (
+  return visible ? (
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[rgba(17,17,17,0.5)]"
       onClick={handleDismiss}
@@ -44,7 +49,7 @@ const BrochureGuideOverlay = ({ eventId }: { eventId: string }) => {
         </div>
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default BrochureGuideOverlay;

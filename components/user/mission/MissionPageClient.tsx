@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
 import MissionStamp from "@/components/user/mission/MissionStamp";
 import MissionItem from "@/components/user/mission/MissionItem";
@@ -137,8 +136,7 @@ const MissionPageClient = ({
   const hasError = isError && !isPreview;
   const isMissionsEmpty = missions.length === 0 && !isPreview;
   const isShowEmpty = hasError || isMissionsEmpty;
-  const showBrochureButton = isPreview || !hasError;
-  const showMissionUI = isPreview || (showBrochureButton && !isMissionsEmpty);
+  const showMissionUI = isPreview || (!hasError && !isMissionsEmpty);
 
   // QR 체크 안내 또는 완료 페이지 이동
   const handleAction = () => {
@@ -191,21 +189,11 @@ const MissionPageClient = ({
       )}
     >
       <main className="flex-1 max-w-md w-full mx-auto px-6 pt-4 pb-1.5 overflow-x-hidden">
-        {/* 2. 타이틀 & 브로슈어 안내장 버튼 레이아웃 */}
-        <div className="flex items-center justify-between gap-4 mb-5">
+        {/* 2. 타이틀 레이아웃 */}
+        <div className="mb-5">
           <h1 className="text-4xl font-nanum font-extrabold leading-11.25 text-gomin-primary-700 tracking-tight select-none">
             {eventName}
           </h1>
-          {/* 우측 별도 컴포넌트로 보여지는 브로슈어 버튼 */}
-          {showBrochureButton && (
-            <BrochureButton
-              eventId={eventId}
-              hasBrochure={!!event.brochureImageUrl?.length}
-              className={cn(
-                !isPreview && !storeNewlyStampedId && "animate-bounce-once"
-              )}
-            />
-          )}
         </div>
 
         {/* 3. 진행 상황 안내 문구 */}
