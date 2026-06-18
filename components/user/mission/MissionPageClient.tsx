@@ -7,10 +7,8 @@ import ViewToggle from "@/components/user/mission/ViewToggle";
 import MissionStamp from "@/components/user/mission/MissionStamp";
 import MissionItem from "@/components/user/mission/MissionItem";
 import FloatingActionButton from "@/components/user/mission/FloatingActionButton";
-import BrochureButton from "@/components/user/mission/BrochureButton";
 import SurveyModal from "@/components/user/mission/SurveyModal";
 import QrCheckModal from "@/components/user/mission/QrCheckModal";
-import EventDetailModal from "@/components/user/event/EventDetailModal";
 import {
   participantMissionQueries,
   type ParticipantMission,
@@ -75,7 +73,6 @@ const MissionPageClient = ({
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
   const [isQrCheckOpen, setIsQrCheckOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const storeNewlyStampedId = useNewlyStampedMissionId();
   const setNewlyStampedMissionId = useSetNewlyStampedMissionId();
   const clearNewlyStampedMissionId = useClearNewlyStampedMissionId();
@@ -191,12 +188,6 @@ const MissionPageClient = ({
             : "pb-21.5 pt-14"
       )}
     >
-      {!isPreview && (
-        <div className="absolute top-0 right-0 z-50 h-14 flex items-center pt-4 px-4">
-          <BrochureButton onClick={() => setIsDetailOpen(true)} />
-        </div>
-      )}
-
       <main className="flex-1 max-w-md w-full mx-auto px-6 pt-4 pb-1.5 overflow-x-hidden">
         {/* 2. 타이틀 레이아웃 */}
         <div className="mb-5">
@@ -299,13 +290,6 @@ const MissionPageClient = ({
           className={isPreview ? "" : "animate-fade-up"}
         />
       )}
-
-      {/* 행사 상세 모달 */}
-      <EventDetailModal
-        eventId={eventId}
-        isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
-      />
 
       {/* QR 체크 모달 */}
       <QrCheckModal

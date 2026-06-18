@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/user/header/Header";
+import BrochureButton from "@/components/user/mission/BrochureButton";
+import EventDetailModal from "@/components/user/event/EventDetailModal";
 import { USER_ROUTES } from "@/constants/userRoutes";
 
 const shouldHideHeader = (pathname: string) => {
@@ -32,6 +35,7 @@ const shouldHideHeader = (pathname: string) => {
 
 const LayoutHeader = () => {
   const pathname = usePathname();
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // 헤더를 숨겨야 하는 페이지이면 아무것도 렌더링하지 않습니다.
   if (shouldHideHeader(pathname)) {
@@ -41,7 +45,29 @@ const LayoutHeader = () => {
   // qr-required 페이지에서는 백버튼을 노출하지 않습니다.
   const showBackButton = pathname !== USER_ROUTES.QR_REQUIRED;
 
-  return <Header showBackButton={showBackButton} />;
+  const segments = pathname.split("/").filter(Boolean);
+  const isMission = segments[0] === "event" && segments[2] === "mission";
+  const eventId = isMission ? segments[1] : null;
+
+  return (
+    <>
+      <Header
+        showBackButton={showBackButton}
+        rightSlot={
+          isMission && eventId ? (
+            <BrochureButton onClick={() => setIsDetailOpen(true)} />
+          ) : undefined
+        }
+      />
+      {isMission && eventId && (
+        <EventDetailModal
+          eventId={eventId}
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+        />
+      )}
+    </>
+  );
 };
 
 export default LayoutHeader;
