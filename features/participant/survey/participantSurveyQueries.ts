@@ -1,10 +1,7 @@
-"use client";
-
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { requestJson } from "@/features/shared/api/http";
 import { type ParticipantModel } from "@/types/models";
 
-// 참여자 설문 상태 응답 타입
 type ParticipantSurvey = Pick<
   ParticipantModel,
   "gender" | "ageRange" | "isRewardClaimed"
@@ -22,12 +19,3 @@ export const participantSurveyQueries = {
       queryFn: getParticipantSurvey,
     }),
 };
-
-/**
- * 현재 참여자의 설문 상태를 조회합니다.
- *
- * @returns React Query 참여자 설문
- */
-export function useParticipantSurveyQuery() {
-  return useQuery(participantSurveyQueries.survey());
-}

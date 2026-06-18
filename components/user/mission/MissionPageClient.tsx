@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import BrochureButton from "@/components/user/mission/BrochureButton";
 import ViewToggle from "@/components/user/mission/ViewToggle";
 import MissionStamp from "@/components/user/mission/MissionStamp";
@@ -11,7 +11,7 @@ import FloatingActionButton from "@/components/user/mission/FloatingActionButton
 import SurveyModal from "@/components/user/mission/SurveyModal";
 import QrCheckModal from "@/components/user/mission/QrCheckModal";
 import {
-  useParticipantMissionsQuery,
+  participantMissionQueries,
   type ParticipantMission,
   type ParticipantMissions,
 } from "@/features/participant/missions/participantMissionQueries";
@@ -84,7 +84,9 @@ const MissionPageClient = ({
       : undefined;
 
   // React Query를 통해 DB에서 참여자의 실시간 완료 스탬프 현황 데이터를 가져옴
-  const { data, isError, isFetching } = useParticipantMissionsQuery({
+  // 어드민 미리보기 환경에서는 세션 없이 쿼리가 실행되어 401 오류가 발생하므로 enabled로 차단한다.
+  const { data, isError, isFetching } = useQuery({
+    ...participantMissionQueries.list(),
     enabled: !isPreview,
     initialData,
   });
@@ -158,7 +160,9 @@ const MissionPageClient = ({
   };
 
   const handleMissionComplete = (missionId: number) => {
-    queryClient.invalidateQueries({ queryKey: ["participant", "missions"] });
+    queryClient.invalidateQueries({
+      queryKey: participantMissionQueries.all(),
+    });
     setNewlyStampedMissionId(missionId);
   };
 

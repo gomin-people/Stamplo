@@ -1,7 +1,5 @@
-"use client";
-
 import { queryOptions } from "@tanstack/react-query";
-import { fetchAdminMissions } from "./adminMissionApi";
+import { fetchAdminMissions } from "@/features/admin/missions/adminMissionApi";
 
 export const adminMissionQueryOptions = {
   list: (eventId: number) =>

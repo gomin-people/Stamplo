@@ -1,10 +1,7 @@
-"use client";
-
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { requestJson } from "@/features/shared/api/http";
 import { type ParticipantModel } from "@/types/models";
 
-// 현재 참여자 조회 응답 타입
 type ParticipantState = {
   participant: ParticipantModel;
 };
@@ -13,14 +10,11 @@ function getParticipant() {
   return requestJson<ParticipantState>("/api/v1/participant");
 }
 
-/**
- * 현재 참여자 상태를 조회합니다.
- *
- * @returns React Query 참여자 상태
- */
-export function useParticipantQuery() {
-  return useQuery({
-    queryKey: ["participant", "state"],
-    queryFn: getParticipant,
-  });
-}
+export const participantQueries = {
+  all: () => ["participant"] as const,
+  state: () =>
+    queryOptions({
+      queryKey: [...participantQueries.all(), "state"] as const,
+      queryFn: getParticipant,
+    }),
+};

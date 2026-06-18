@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminDashboardQueryKeys } from "@/constants/adminDashboardQueryKeys";
+import { adminDashboardQueries } from "@/features/admin/dashboard/adminDashboardQueries";
 import {
   ApiError,
   createJsonRequest,
@@ -55,7 +55,7 @@ export function useClaimAdminRewardQrMutation() {
     mutationFn: claimAdminRewardQr,
     onSuccess: async (_, { eventId }) => {
       await queryClient.invalidateQueries({
-        queryKey: adminDashboardQueryKeys.kpis(eventId),
+        queryKey: adminDashboardQueries.kpis(eventId).queryKey,
       });
     },
   });

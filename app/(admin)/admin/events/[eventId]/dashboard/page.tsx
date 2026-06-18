@@ -4,13 +4,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import DashboardClient from "@/components/admin/dashboard/DashboardClient";
-import {
-  fetchAdminDashboardAchieverStatistics,
-  fetchAdminDashboardKpis,
-  fetchAdminDashboardMissions,
-  fetchAdminDashboardParticipantAnalysis,
-} from "@/features/admin/dashboard/adminDashboardApi";
-import { adminDashboardQueryKeys } from "@/constants/adminDashboardQueryKeys";
+import { adminDashboardQueries } from "@/features/admin/dashboard/adminDashboardQueries";
 
 export default async function DashboardPage({
   params,
@@ -21,22 +15,14 @@ export default async function DashboardPage({
   const queryClient = new QueryClient();
 
   await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: adminDashboardQueryKeys.kpis(eventId),
-      queryFn: () => fetchAdminDashboardKpis(eventId),
-    }),
-    queryClient.prefetchQuery({
-      queryKey: adminDashboardQueryKeys.participantAnalysis(eventId),
-      queryFn: () => fetchAdminDashboardParticipantAnalysis(eventId),
-    }),
-    queryClient.prefetchQuery({
-      queryKey: adminDashboardQueryKeys.achieverStatistics(eventId),
-      queryFn: () => fetchAdminDashboardAchieverStatistics(eventId),
-    }),
-    queryClient.prefetchQuery({
-      queryKey: adminDashboardQueryKeys.missions(eventId),
-      queryFn: () => fetchAdminDashboardMissions(eventId),
-    }),
+    queryClient.prefetchQuery(adminDashboardQueries.kpis(eventId)),
+    queryClient.prefetchQuery(
+      adminDashboardQueries.participantAnalysis(eventId)
+    ),
+    queryClient.prefetchQuery(
+      adminDashboardQueries.achieverStatistics(eventId)
+    ),
+    queryClient.prefetchQuery(adminDashboardQueries.missions(eventId)),
   ]);
 
   return (
