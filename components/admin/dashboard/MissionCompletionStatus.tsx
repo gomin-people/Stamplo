@@ -67,7 +67,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
                   missionItems.length === 10 &&
                     index === missionItems.length - 1 &&
                     "border-b-0",
-                  isInactive && "bg-gomin-neutral-100/30"
+                  isInactive && "bg-gomin-neutral-100/40"
                 )}
               >
                 <span
