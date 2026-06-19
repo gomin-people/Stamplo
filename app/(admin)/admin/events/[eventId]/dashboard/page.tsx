@@ -3,6 +3,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
+import { notFound } from "next/navigation";
 import DashboardClient from "@/components/admin/dashboard/DashboardClient";
 import DashboardUpcomingState from "@/components/admin/dashboard/DashboardUpcomingState";
 import { adminDashboardQueries } from "@/features/admin/dashboard/adminDashboardQueries";
@@ -20,6 +21,10 @@ const getDashboardEventMeta = async (eventId: number) => {
   if (error) {
     console.error("Error loading dashboard page event meta:", error);
     throw new Error("대시보드 행사 정보를 불러오지 못했습니다.");
+  }
+
+  if (!event) {
+    notFound();
   }
 
   return event;
@@ -48,11 +53,10 @@ const DashboardPage = async ({
 }) => {
   const eventId = await params.then(({ eventId }) => Number(eventId));
   const event = await getDashboardEventMeta(eventId);
-
-  const isUpcoming =
-    typeof event?.start_date === "string" &&
-    typeof event?.end_date === "string" &&
-    getEventOperationStatus(event.start_date, event.end_date).isBefore;
+  const isUpcoming = getEventOperationStatus(
+    event.start_date,
+    event.end_date
+  ).isBefore;
 
   if (isUpcoming) {
     return <DashboardUpcomingState />;
