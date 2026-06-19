@@ -17,6 +17,7 @@ import EventDateTimeCard from "@/components/user/event/EventDateTimeCard";
 import EventHostCard from "@/components/user/event/EventHostCard";
 import EventDetailModalSkeleton from "@/components/user/event/EventDetailModalSkeleton";
 import { cn } from "@/utils";
+import { useModalHistoryBack } from "@/hooks/useModalHistoryBack";
 
 type DetailProps = {
   eventId: string;
@@ -25,6 +26,7 @@ type DetailProps = {
 };
 
 const EventDetailModal = ({ eventId, isOpen, onClose }: DetailProps) => {
+  useModalHistoryBack(isOpen, onClose);
   const { data: event } = useQuery({
     ...participantEventQueries.detail(Number(eventId)),
     enabled: isOpen,
@@ -59,7 +61,7 @@ const EventDetailModal = ({ eventId, isOpen, onClose }: DetailProps) => {
             </Button>
           </DialogClose>
 
-          <div className="overflow-y-auto scrollbar-hide">
+          <div className="overflow-y-auto scrollbar-hide flex-1 min-h-0">
             {event ? (
               <div className="bg-gomin-primary-100 pt-13 px-4 pb-6 flex flex-col gap-3">
                 <InfoCard label="행사명">
