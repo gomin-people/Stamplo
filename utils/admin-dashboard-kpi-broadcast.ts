@@ -31,6 +31,8 @@ export const sendDashboardKpiInvalidate = async (
         sentAt: new Date().toISOString(),
       },
     });
+  } catch (error) {
+    console.error("Failed to send dashboard KPI invalidate broadcast:", error);
   } finally {
     await supabase.removeChannel(channel);
   }
