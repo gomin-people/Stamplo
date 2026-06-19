@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { DialogTitle } from "@/components/ui/dialog";
-import { fetchParticipantEvent } from "@/features/participant/events/participantEventApi";
+import { participantEventQueries } from "@/features/participant/events/participantEventQueries";
 import InfoCard from "@/components/user/common/InfoCard";
 import EventDateTimeCard from "@/components/user/event/EventDateTimeCard";
 import EventHostCard from "@/components/user/event/EventHostCard";
@@ -26,10 +26,9 @@ type DetailProps = {
 
 const EventDetailModal = ({ eventId, isOpen, onClose }: DetailProps) => {
   const { data: event } = useQuery({
-    queryKey: ["participant", "event", eventId],
-    queryFn: () => fetchParticipantEvent(Number(eventId)),
+    ...participantEventQueries.detail(Number(eventId)),
     enabled: isOpen,
-    staleTime: 600_000,
+    staleTime: 300_000,
   });
 
   return (
