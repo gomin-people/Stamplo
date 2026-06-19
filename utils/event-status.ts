@@ -4,7 +4,7 @@ export type EventOperationStatus = {
   isAfter: boolean; // 행사 종료
 };
 
-const getLocalDateKey = () => {
+export const getLocalDateKey = () => {
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000);
   const year = kst.getUTCFullYear();
   const month = String(kst.getUTCMonth() + 1).padStart(2, "0");
@@ -12,7 +12,7 @@ const getLocalDateKey = () => {
   return `${year}-${month}-${day}`;
 };
 
-const getDateKey = (value: string) => value.slice(0, 10);
+export const getDateKey = (value: string) => value.slice(0, 10);
 
 export function getEventOperationStatus(
   startDate: string,
