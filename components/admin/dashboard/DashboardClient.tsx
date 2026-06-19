@@ -156,7 +156,7 @@ const DashboardClient = ({ eventId }: Props) => {
                   <h2 className="text-lg font-semibold text-gomin-black">
                     {section.title}
                   </h2>
-                  <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-400">
+                  <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-500">
                     {section.subtitle}
                   </p>
                 </div>

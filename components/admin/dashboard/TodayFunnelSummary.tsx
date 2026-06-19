@@ -183,7 +183,7 @@ const TodayFunnelSummary = ({ funnel, ready = true }: Props) => {
           <h2 className="text-lg font-semibold text-gomin-black">
             참여 상태 분포
           </h2>
-          <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-400">
+          <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-500">
             오늘 참여자 중 각 참여자의 상태별 분포
           </p>
         </div>
@@ -209,7 +209,7 @@ const TodayFunnelSummary = ({ funnel, ready = true }: Props) => {
             <span className="translate-y-[0.05rem] text-sm leading-none font-semibold text-[#2563EB]">
               <AnimatedNumber value={funnel.participants} />
             </span>
-            <span className="text-sm leading-none font-medium text-gomin-neutral-400">
+            <span className="text-sm leading-none font-medium text-gomin-neutral-500">
               명
             </span>
           </div>
@@ -270,7 +270,7 @@ const TodayFunnelSummary = ({ funnel, ready = true }: Props) => {
                           <AnimatedNumber value={value.count} ready={ready} />
                         </span>
                       </span>
-                      <span className="text-base leading-none font-medium text-gomin-neutral-400">
+                      <span className="text-base leading-none font-medium text-gomin-neutral-500">
                         명
                       </span>
                     </div>

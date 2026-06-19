@@ -32,7 +32,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
         <h2 className="text-lg font-semibold text-gomin-black">
           미션별 완료 현황
         </h2>
-        <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-400">
+        <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-500">
           미션 참여 및 완료 정보
         </p>
       </div>
@@ -40,7 +40,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
       <div
         className={cn(
           missionCompletionGridClassName,
-          "mt-5.5 items-center gap-x-2 border-b border-gomin-neutral-100 pb-3 text-sm font-semibold text-gomin-neutral-400"
+          "mt-5.5 items-center gap-x-2 border-b border-gomin-neutral-100 pb-3 text-sm font-semibold text-gomin-neutral-500"
         )}
       >
         <span className="min-w-0 truncate">미션명</span>
@@ -83,7 +83,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
                   className={cn(
                     "flex min-w-0 justify-end text-sm",
                     isInactive
-                      ? "text-gomin-neutral-400"
+                      ? "text-gomin-neutral-500"
                       : "text-gomin-neutral-600"
                   )}
                   aria-label={`${completedCountText}명`}
@@ -139,7 +139,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
           })}
         </ul>
       ) : (
-        <div className="flex min-h-72 flex-1 items-center justify-center rounded-xl border border-dashed border-gomin-neutral-100 text-sm font-medium text-gomin-neutral-400">
+        <div className="flex min-h-72 flex-1 items-center justify-center rounded-xl border border-dashed border-gomin-neutral-100 text-sm font-medium text-gomin-neutral-500">
           등록된 미션 데이터가 없습니다.
         </div>
       )}

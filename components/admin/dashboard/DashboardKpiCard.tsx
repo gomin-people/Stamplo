@@ -138,7 +138,7 @@ const DashboardKpiCard = ({
               <AnimatedNumber value={value} ready={ready} />
             </span>
           </div>
-          <span className="text-base leading-none font-medium text-gomin-neutral-400">
+          <span className="text-base leading-none font-medium text-gomin-neutral-500">
             명
           </span>
         </div>
