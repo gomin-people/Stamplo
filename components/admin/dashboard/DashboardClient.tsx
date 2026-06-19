@@ -11,6 +11,7 @@ import { adminDashboardQueries } from "@/features/admin/dashboard/adminDashboard
 import { useDashboardKpiBroadcast } from "@/hooks/useDashboardKpiBroadcast";
 import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/utils";
 
 const ParticipantAnalysisChart = dynamic(
   () => import("@/components/admin/dashboard/ParticipantAnalysisChart")
@@ -145,11 +146,12 @@ const DashboardClient = ({ eventId }: Props) => {
           return (
             <section
               key={section.key}
-              className={`rounded-xl border border-gomin-neutral-100 bg-white px-4 pt-3 pb-2 shadow-[0_8px_32px_rgba(15,23,42,0.06)] ${
+              className={cn(
+                "rounded-xl border border-gomin-neutral-100 bg-white px-4 pt-3 pb-2 shadow-[0_8px_32px_rgba(15,23,42,0.06)]",
                 section.key === "overall"
                   ? "col-span-7 overflow-hidden"
                   : "col-span-5"
-              }`}
+              )}
             >
               {isTodaySection ? null : (
                 <div className="flex min-w-0 flex-wrap items-end gap-x-4 gap-y-1">
@@ -175,11 +177,11 @@ const DashboardClient = ({ eventId }: Props) => {
                     return (
                       <div
                         key={`${eventId}-${card.key}`}
-                        className={
+                        className={cn(
                           index === 0
                             ? "relative pr-4 after:absolute after:top-[calc(50%+0.5rem)] after:right-0 after:h-12 after:-translate-y-1/2 after:border-r after:border-gomin-neutral-100 after:content-['']"
                             : "pl-4"
-                        }
+                        )}
                       >
                         <DashboardKpiCard
                           title={card.title}
@@ -202,7 +204,7 @@ const DashboardClient = ({ eventId }: Props) => {
         <div className="col-span-8 flex min-w-0 flex-col gap-4">
           <section
             aria-label="참여자 수 분석"
-            className={`${dashboardPanelClassName} overflow-hidden`}
+            className={cn(dashboardPanelClassName, "overflow-hidden")}
           >
             <ParticipantAnalysisChart
               daily={participantAnalysis?.daily ?? []}
@@ -213,7 +215,7 @@ const DashboardClient = ({ eventId }: Props) => {
 
           <section
             aria-label="달성자 통계"
-            className={`${dashboardPanelClassName} overflow-hidden`}
+            className={cn(dashboardPanelClassName, "overflow-hidden")}
           >
             <ParticipantDemographicsChart
               totalRespondents={achieverStatistics?.totalRespondents ?? 0}
@@ -226,7 +228,7 @@ const DashboardClient = ({ eventId }: Props) => {
         <div className="col-span-4 flex min-w-0 flex-col gap-4">
           <section
             aria-label="미션별 완료 현황"
-            className={`${dashboardPanelClassName} overflow-visible`}
+            className={cn(dashboardPanelClassName, "overflow-visible")}
           >
             <MissionCompletionStatus missions={missions?.missions ?? []} />
           </section>

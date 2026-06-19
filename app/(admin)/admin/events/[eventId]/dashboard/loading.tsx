@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/utils";
 
 export default function Loading() {
   return (
@@ -21,11 +22,11 @@ export default function Loading() {
                 {Array.from({ length: 3 }, (_, index) => (
                   <div
                     key={index}
-                    className={
+                    className={cn(
                       index === 0
                         ? "px-3"
                         : "relative px-3 before:absolute before:top-1/2 before:left-0 before:h-12 before:-translate-y-1/2 before:border-l before:border-gomin-neutral-100 before:content-['']"
-                    }
+                    )}
                   >
                     <div className="flex min-h-[5rem] min-w-0 items-center gap-3">
                       <Skeleton className="mx-1 size-12 rounded-xl bg-gomin-neutral-100" />
@@ -52,11 +53,11 @@ export default function Loading() {
             {Array.from({ length: 2 }, (_, index) => (
               <div
                 key={index}
-                className={
+                className={cn(
                   index === 0
                     ? "relative pr-4 after:absolute after:top-1/2 after:right-0 after:h-12 after:-translate-y-1/2 after:border-r after:border-gomin-neutral-100 after:content-['']"
                     : "pl-4"
-                }
+                )}
               >
                 <div className="flex min-h-[5rem] min-w-0 translate-y-1 items-center gap-3">
                   <Skeleton className="mx-1 size-12 rounded-xl bg-gomin-neutral-100" />
