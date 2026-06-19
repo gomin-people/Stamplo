@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 type HeaderProps = {
   showBackButton?: boolean;
   onBackClick?: () => void;
-  showLogoutButton?: boolean;
+  showEventInfoButton?: boolean;
 };
 
 const Header = ({
   showBackButton = true,
   onBackClick,
-  showLogoutButton = false,
+  showEventInfoButton = false,
 }: HeaderProps) => {
   const router = useRouter();
 
@@ -38,7 +38,7 @@ const Header = ({
           </Button>
         )}
       </div>
-      {showLogoutButton && (
+      {showEventInfoButton && (
         <Button className="pointer-events-auto mt-4 h-11 bg-gomin-primary-700 text-white">
           행사 안내
         </Button>
