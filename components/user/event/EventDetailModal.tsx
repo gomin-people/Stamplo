@@ -46,7 +46,7 @@ const EventDetailModal = ({ eventId, isOpen, onClose }: DetailProps) => {
         <DialogPrimitive.Content
           data-slot="dialog-content"
           className={cn(
-            "fixed top-14 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-3rem)] max-w-sm h-[85vh] rounded-[24px] bg-gomin-primary-100 overflow-hidden shadow-xl outline-none",
+            "fixed top-14 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-3rem)] max-w-sm h-[70vh] rounded-[24px] bg-gomin-primary-100 overflow-hidden shadow-xl outline-none",
             "animate-slide-down"
           )}
         >
