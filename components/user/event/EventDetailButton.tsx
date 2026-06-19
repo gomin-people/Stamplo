@@ -4,12 +4,12 @@ import { FileText } from "lucide-react";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";
 
-type BrochureButtonProps = {
+type EventDetailButtonProps = {
   onClick: () => void;
   className?: string;
 };
 
-const BrochureButton = ({ onClick, className }: BrochureButtonProps) => {
+const EventDetailButton = ({ onClick, className }: EventDetailButtonProps) => {
   return (
     <Button
       onClick={onClick}
@@ -26,4 +26,4 @@ const BrochureButton = ({ onClick, className }: BrochureButtonProps) => {
   );
 };
 
-export default BrochureButton;
+export default EventDetailButton;

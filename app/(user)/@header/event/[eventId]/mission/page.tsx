@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import Header from "@/components/user/header/Header";
-import BrochureButton from "@/components/user/mission/BrochureButton";
+import EventDetailButton from "@/components/user/event/EventDetailButton";
 import EventDetailModal from "@/components/user/event/EventDetailModal";
 
 export default function MissionHeader() {
@@ -14,7 +14,7 @@ export default function MissionHeader() {
     <>
       <Header
         showBackButton={true}
-        rightSlot={<BrochureButton onClick={() => setIsDetailOpen(true)} />}
+        rightSlot={<EventDetailButton onClick={() => setIsDetailOpen(true)} />}
       />
       <EventDetailModal
         eventId={eventId}
