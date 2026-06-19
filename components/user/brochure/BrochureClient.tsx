@@ -21,6 +21,7 @@ const BrochureClient = ({ images, showGuide }: Props) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [guideVisible, setGuideVisible] = useState(
     () =>
+      images.length > 1 &&
       showGuide &&
       (typeof window === "undefined" ||
         !document.cookie
