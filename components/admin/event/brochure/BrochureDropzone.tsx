@@ -107,7 +107,8 @@ const BrochureDropzone = ({
                 disabled ? "text-gomin-neutral-300" : "text-gomin-primary-700"
               )}
             >
-              JPG · PNG 파일을 드래그하거나 클릭해 업로드하세요
+              JPG · PNG 파일을 드래그하거나 클릭해 업로드하세요 ( 8 : 17 비율
+              권장)
             </span>
           </div>
           <div className="ml-auto shrink-0">

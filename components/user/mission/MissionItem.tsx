@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import IconStamplo from "@/components/icons/IconStamplo";
 import IconDashedCircle from "@/components/icons/IconDashedCircle";
@@ -29,6 +29,18 @@ const MissionItem = ({
 }: MissionItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [stampReady, setStampReady] = useState(!isNewStamped || !stampImageUrl);
+  const onStampReadyRef = useRef(onStampReady);
+
+  useEffect(() => {
+    onStampReadyRef.current = onStampReady;
+  }, [onStampReady]);
+
+  const handleImgRef = (el: HTMLImageElement | null) => {
+    if (el?.complete) {
+      setStampReady(true);
+      onStampReadyRef.current?.();
+    }
+  };
 
   return (
     <>
@@ -48,6 +60,7 @@ const MissionItem = ({
             <IconDashedCircle className="w-full h-full text-gomin-neutral-300" />
           ) : stampImageUrl ? (
             <Image
+              ref={handleImgRef}
               src={stampImageUrl}
               alt="Stamp"
               fill
@@ -70,6 +83,7 @@ const MissionItem = ({
                 "w-full h-full text-gomin-primary-700",
                 isNewStamped && "animate-stamp-press"
               )}
+              onAnimationEnd={isNewStamped ? onStampReady : undefined}
             />
           )}
         </div>

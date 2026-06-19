@@ -14,7 +14,7 @@ export async function proxy(request: NextRequest) {
     return updateAdminSession(request);
   }
 
-  if (pathname.match(/^\/event\/[^/]+($|\/(brochure|detail))/)) {
+  if (pathname.match(/^\/event\/[^/]+($|\/brochure)/)) {
     const participantCookie = request.cookies.get(PARTICIPANT_COOKIE_NAME);
     if (!participantCookie) {
       return NextResponse.redirect(new URL("/qr-required", request.url));
@@ -30,6 +30,5 @@ export const config = {
     "/admin/:path*",
     "/event/:eventId",
     "/event/:eventId/brochure",
-    "/event/:eventId/detail",
   ],
 };

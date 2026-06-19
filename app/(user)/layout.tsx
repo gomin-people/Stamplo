@@ -1,5 +1,5 @@
-import LayoutHeader from "@/components/user/header/LayoutHeader";
 import { Toaster } from "@/components/ui/sonner";
+import LayoutHeader from "@/components/user/header/LayoutHeader";
 
 export default function UserLayout({
   children,
