@@ -4,6 +4,11 @@ export type EventOperationStatus = {
   isAfter: boolean; // 행사 종료
 };
 
+export type AdminEventStatusLabel =
+  | "현재 운영 중인 행사"
+  | "준비 중인 행사"
+  | "종료된 행사";
+
 export const getLocalDateKey = () => {
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000);
   const year = kst.getUTCFullYear();
@@ -28,3 +33,20 @@ export function getEventOperationStatus(
     isAfter: today > end,
   };
 }
+
+export const getAdminEventStatusLabel = (
+  startDate: string,
+  endDate: string
+): AdminEventStatusLabel => {
+  const { isBefore, isDuring } = getEventOperationStatus(startDate, endDate);
+
+  if (isDuring) {
+    return "현재 운영 중인 행사";
+  }
+
+  if (isBefore) {
+    return "준비 중인 행사";
+  }
+
+  return "종료된 행사";
+};
