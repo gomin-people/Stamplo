@@ -44,7 +44,7 @@ export default async function AdminEventsLayout({
   return (
     <div className="flex h-screen overflow-hidden bg-gomin-neutral-100">
       <Sidebar events={normalizedEvents} user={adminUser} />
-      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto bg-gomin-admin-surface">
         <Header events={normalizedEvents} />
         <main>{children}</main>
         <Footer />
