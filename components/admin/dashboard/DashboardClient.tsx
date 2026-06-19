@@ -19,12 +19,8 @@ const ParticipantAnalysisChart = dynamic(
 const ParticipantDemographicsChart = dynamic(
   () => import("@/components/admin/dashboard/ParticipantDemographicsChart")
 );
-import {
-  useAdminDashboardAchieverStatisticsQuery,
-  useAdminDashboardKpisQuery,
-  useAdminDashboardMissionsQuery,
-  useAdminDashboardParticipantAnalysisQuery,
-} from "@/features/admin/dashboard/adminDashboardQueries";
+import { useQuery } from "@tanstack/react-query";
+import { adminDashboardQueries } from "@/features/admin/dashboard/adminDashboardQueries";
 import { useDashboardKpiBroadcast } from "@/hooks/useDashboardKpiBroadcast";
 import type {
   AdminDashboardKpiKey,
@@ -98,12 +94,14 @@ const dashboardCardMeta: {
 ];
 
 const DashboardClient = ({ eventId }: Props) => {
-  const kpisQuery = useAdminDashboardKpisQuery(eventId);
-  const participantAnalysisQuery =
-    useAdminDashboardParticipantAnalysisQuery(eventId);
-  const achieverStatisticsQuery =
-    useAdminDashboardAchieverStatisticsQuery(eventId);
-  const missionsQuery = useAdminDashboardMissionsQuery(eventId);
+  const kpisQuery = useQuery(adminDashboardQueries.kpis(eventId));
+  const participantAnalysisQuery = useQuery(
+    adminDashboardQueries.participantAnalysis(eventId)
+  );
+  const achieverStatisticsQuery = useQuery(
+    adminDashboardQueries.achieverStatistics(eventId)
+  );
+  const missionsQuery = useQuery(adminDashboardQueries.missions(eventId));
   const { data: kpisData, refetch: refetchKpisQuery } = kpisQuery;
   const { data: participantAnalysis, refetch: refetchParticipantAnalysis } =
     participantAnalysisQuery;
