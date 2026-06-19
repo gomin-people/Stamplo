@@ -73,7 +73,7 @@ const dashboardCardMeta: Record<
 > = {
   totalParticipants: {
     key: "totalParticipants",
-    title: "총 참여자수",
+    title: "총 참여자 수",
     icon: UsersIcon,
     colorClassNames: {
       icon: "bg-[#EEF4FF] text-[#4D7CFE]",
@@ -82,7 +82,7 @@ const dashboardCardMeta: Record<
   },
   totalRewardClaimed: {
     key: "totalRewardClaimed",
-    title: "총 굿즈 수령수",
+    title: "총 굿즈 수령자 수",
     icon: PartyPopperIcon,
     colorClassNames: {
       icon: "bg-[#F3F1FE] text-[#5435EB]",

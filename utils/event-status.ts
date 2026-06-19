@@ -1,5 +1,5 @@
 export type EventOperationStatus = {
-  isBefore: boolean; // 행사 시작전
+  isBefore: boolean; // 행사 시작 전
   isDuring: boolean; // 행사 진행 중
   isAfter: boolean; // 행사 종료
 };

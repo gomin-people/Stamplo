@@ -32,7 +32,7 @@ const funnelStages: {
 }[] = [
   {
     key: "inProgress",
-    label: "진행중",
+    label: "진행 중",
     icon: StampIcon,
     colorClassNames: {
       badge: "bg-[#FFF3DB] text-[#F59E0B]",
