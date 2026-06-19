@@ -83,7 +83,7 @@ const DashboardKpiCard = ({
   return (
     <section
       aria-label={title}
-      className="flex min-h-[5.5rem] min-w-0 items-center gap-3"
+      className="flex min-h-[5.5rem] min-w-0 translate-y-[0.5rem] items-center gap-3"
     >
       <div
         className={cn(

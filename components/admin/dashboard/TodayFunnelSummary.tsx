@@ -203,7 +203,7 @@ const TodayFunnelSummary = ({ funnel, ready = true }: Props) => {
                     "before:absolute before:top-1/2 before:left-0 before:h-12 before:-translate-y-1/2 before:border-l before:border-gomin-neutral-100 before:content-['']"
                 )}
               >
-                <div className="flex min-h-[5.5rem] min-w-0 items-center gap-3">
+                <div className="flex min-h-[5.5rem] min-w-0 translate-y-1 items-center gap-3">
                   <div
                     className={cn(
                       "mx-1 flex size-12 shrink-0 items-center justify-center rounded-xl",

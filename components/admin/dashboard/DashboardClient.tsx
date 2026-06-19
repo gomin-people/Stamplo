@@ -53,8 +53,8 @@ const dashboardKpiSections: {
   },
   {
     key: "today",
-    title: "전체 정보",
-    subtitle: "행사 누적 기준",
+    title: "누적 현황",
+    subtitle: "전체 행사 기준",
     cardKeys: ["totalParticipants", "totalRewardClaimed"],
   },
 ];
