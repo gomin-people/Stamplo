@@ -46,7 +46,7 @@ const EventDetailModal = ({ eventId, isOpen, onClose }: DetailProps) => {
         <DialogPrimitive.Content
           data-slot="dialog-content"
           className={cn(
-            "fixed top-14 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-3rem)] max-w-sm max-h-[85vh] rounded-[24px] bg-gomin-primary-100 overflow-y-auto scrollbar-hide shadow-xl outline-none",
+            "fixed top-14 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-3rem)] max-w-sm h-[85vh] rounded-[24px] bg-gomin-primary-100 overflow-hidden shadow-xl outline-none",
             "animate-slide-down"
           )}
         >
@@ -61,54 +61,56 @@ const EventDetailModal = ({ eventId, isOpen, onClose }: DetailProps) => {
             </Button>
           </DialogClose>
 
-          {event ? (
-            <div className="bg-gomin-primary-100 pt-13 px-4 pb-6 flex flex-col gap-3">
-              <InfoCard label="행사명">
-                <h2 className="text-[17px] font-nanum font-extrabold text-gomin-primary-700">
-                  {event.title}
-                </h2>
-              </InfoCard>
+          <div className="h-full overflow-y-auto scrollbar-hide">
+            {event ? (
+              <div className="bg-gomin-primary-100 pt-13 px-4 pb-6 flex flex-col gap-3">
+                <InfoCard label="행사명">
+                  <h2 className="text-[17px] font-nanum font-extrabold text-gomin-primary-700">
+                    {event.title}
+                  </h2>
+                </InfoCard>
 
-              <EventDateTimeCard
-                startDate={event.startDate || ""}
-                endDate={event.endDate || ""}
-                startTime={event.startTime}
-                endTime={event.endTime}
-              />
+                <EventDateTimeCard
+                  startDate={event.startDate || ""}
+                  endDate={event.endDate || ""}
+                  startTime={event.startTime}
+                  endTime={event.endTime}
+                />
 
-              <InfoCard label="행사 장소">
-                <div className="flex justify-between items-center">
-                  <span className="text-[15px] font-bold text-gomin-neutral-700">
-                    {event.location}
-                  </span>
-                  {event.locationUrl && (
-                    <a
-                      href={event.locationUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[13px] font-nanum font-extrabold text-gomin-primary-700 hover:underline cursor-pointer"
-                    >
-                      지도보기
-                    </a>
-                  )}
-                </div>
-              </InfoCard>
+                <InfoCard label="행사 장소">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[15px] font-bold text-gomin-neutral-700">
+                      {event.location}
+                    </span>
+                    {event.locationUrl && (
+                      <a
+                        href={event.locationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[13px] font-nanum font-extrabold text-gomin-primary-700 hover:underline cursor-pointer"
+                      >
+                        지도보기
+                      </a>
+                    )}
+                  </div>
+                </InfoCard>
 
-              <EventHostCard
-                production={event.production}
-                contactPhone={event.contactPhone}
-                contactEmail={event.contactEmail}
-              />
+                <EventHostCard
+                  production={event.production}
+                  contactPhone={event.contactPhone}
+                  contactEmail={event.contactEmail}
+                />
 
-              <InfoCard label="비고">
-                <p className="text-[14px] text-gomin-neutral-700 font-semibold whitespace-pre-line leading-relaxed">
-                  {event.operatingRemarks || "특이사항이 없습니다."}
-                </p>
-              </InfoCard>
-            </div>
-          ) : (
-            <EventDetailModalSkeleton />
-          )}
+                <InfoCard label="비고">
+                  <p className="text-[14px] text-gomin-neutral-700 font-semibold whitespace-pre-line leading-relaxed">
+                    {event.operatingRemarks || "특이사항이 없습니다."}
+                  </p>
+                </InfoCard>
+              </div>
+            ) : (
+              <EventDetailModalSkeleton />
+            )}
+          </div>
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
