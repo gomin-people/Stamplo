@@ -15,7 +15,7 @@ const BrochureButton = ({ onClick, className }: BrochureButtonProps) => {
       onClick={onClick}
       variant="outline"
       className={cn(
-        "gap-1.5 px-4 h-9 rounded-full border-2 border-black/20 bg-white/80 backdrop-blur-md text-gray-700 hover:bg-white hover:text-gray-900 shadow-[0_4px_12px_rgba(0,0,0,0.08)]",
+        "gap-1.5 px-4 h-9 rounded-full border-2 bg-white/80 backdrop-blur-md hover:bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] border-gomin-primary-700 text-gomin-primary-700 hover:text-gomin-primary-600",
         className
       )}
       aria-label="행사 정보"
