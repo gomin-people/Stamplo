@@ -175,14 +175,7 @@ const MissionPageClient = ({
   }, [clearNewlyStampedMissionId]);
 
   // DB에서 불러온 title (또는 name)을 1순위로 사용하며 예외 처리 제공
-  const testTitles = [
-    "짧은제목",
-    "고민하지말고스탬플리",
-    "starlight미지의세계전시회",
-    "2025 봄 특별 전시 고민의 세계",
-    "띄어쓰기없는아주긴제목이라면어떻게될까요테스트",
-  ];
-  const eventName = testTitles[3];
+  const eventName = event?.title || event?.name || `이벤트 #${eventId}`;
   return (
     <div
       className={cn(
