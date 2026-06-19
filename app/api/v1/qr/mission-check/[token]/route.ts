@@ -13,6 +13,7 @@ import {
 } from "@/utils/api";
 import { supabase } from "@/utils/supabase/server";
 import { USER_ROUTES, getUserRoutes } from "@/constants/userRoutes";
+import { sendDashboardKpiInvalidate } from "@/utils/admin-dashboard-kpi-broadcast";
 const INACTIVE_MISSION_MESSAGE = "비활성화된 미션입니다.";
 const MISSION_NOT_FOUND_MESSAGE = "존재하지 않는 미션입니다.";
 
@@ -176,6 +177,13 @@ export async function GET(
     return serverError("미션 완료 저장 실패", completionError);
   }
 
+  if (!completionError) {
+    await sendDashboardKpiInvalidate(
+      missionCheckData.qrCode.events_id,
+      "mission_completed"
+    ).catch(() => undefined);
+  }
+
   return NextResponse.redirect(
     new URL(
       `${getUserRoutes(missionCheckData.qrCode.events_id).mission}?newMission=${missionCheckData.qrCode.missions_id}`,
@@ -240,6 +248,11 @@ export async function POST(
 
     return serverError("미션 완료 저장 실패", completionError);
   }
+
+  await sendDashboardKpiInvalidate(
+    missionCheckData.qrCode.events_id,
+    "mission_completed"
+  ).catch(() => undefined);
 
   return created({
     mission: missionCheckData.mission,

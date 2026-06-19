@@ -11,6 +11,7 @@ import {
 } from "@/utils/api";
 import { supabase } from "@/utils/supabase/server";
 import { createSessionClient } from "@/utils/supabase/session-server";
+import { sendDashboardKpiInvalidate } from "@/utils/admin-dashboard-kpi-broadcast";
 
 type QrRewardRouteContext = {
   params: Promise<{
@@ -154,6 +155,11 @@ export async function POST(request: Request, { params }: QrRewardRouteContext) {
   if (updateError) {
     return serverError("리워드 수령 상태 업데이트 실패", updateError);
   }
+
+  await sendDashboardKpiInvalidate(
+    participant.events.id,
+    "reward_claimed"
+  ).catch(() => undefined);
 
   // 6. Supabase Realtime Broadcast 채널로 성공 이벤트 전송
   const channel = supabase.channel(`reward-claim:${eventUserId}`);

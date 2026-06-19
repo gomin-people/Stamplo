@@ -12,7 +12,7 @@ type UseDashboardKpiBroadcastParams = {
 /**
  * 관리자 대시보드 KPI 갱신 신호를 Realtime private Broadcast로 구독합니다.
  *
- * 실제 데이터는 조회하지 않고 invalidate 신호만 받아 KPI route refetch를 호출합니다.
+ * 실제 데이터는 조회하지 않고 invalidate 신호만 받아 대시보드 refetch를 호출합니다.
  */
 export const useDashboardKpiBroadcast = ({
   eventId,
@@ -58,7 +58,7 @@ export const useDashboardKpiBroadcast = ({
     };
 
     void subscribe().catch(() => {
-      // Realtime 실패 시에도 매 분 00초 fallback polling이 KPI를 보정합니다.
+      // Realtime 실패 시에도 매 분 00초 fallback polling이 대시보드를 보정합니다.
     });
 
     return () => {
