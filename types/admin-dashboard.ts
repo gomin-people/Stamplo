@@ -80,6 +80,7 @@ export type AdminDashboardAchieverStatisticsResponse = {
 export type AdminDashboardMissionStatus = {
   id: number;
   title: string;
+  isActive: boolean;
   completedCount: number;
   completionRate: number;
 };

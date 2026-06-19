@@ -104,6 +104,28 @@ const TodayFunnelSummary = ({ funnel, ready = true }: Props) => {
     resetAnimationTimeoutsRef.current.push(timeoutId);
   }, []);
 
+  const startHoverAnimation = useCallback(
+    (iconHandle: AnimatedIconHandle | null) => {
+      if (!iconHandle) {
+        return;
+      }
+
+      iconHandle.startAnimation();
+    },
+    []
+  );
+
+  const stopHoverAnimation = useCallback(
+    (iconHandle: AnimatedIconHandle | null) => {
+      if (!iconHandle) {
+        return;
+      }
+
+      iconHandle.stopAnimation();
+    },
+    []
+  );
+
   useEffect(() => {
     if (!ready) {
       return;
@@ -167,13 +189,19 @@ const TodayFunnelSummary = ({ funnel, ready = true }: Props) => {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 rounded-full bg-[#EEF4FF] px-3 py-1.5">
-          <UsersIcon
-            ref={topIconRef}
-            size={20}
-            animateOnHover={false}
-            aria-hidden="true"
-            className="flex size-5 shrink-0 items-center justify-center text-[#2563EB] [&_svg]:!h-5 [&_svg]:!w-5"
-          />
+          <div
+            className="flex shrink-0 items-center"
+            onMouseEnter={() => startHoverAnimation(topIconRef.current)}
+            onMouseLeave={() => stopHoverAnimation(topIconRef.current)}
+          >
+            <UsersIcon
+              ref={topIconRef}
+              size={20}
+              animateOnHover={false}
+              aria-hidden="true"
+              className="flex size-5 shrink-0 items-center justify-center text-[#2563EB] [&_svg]:!h-5 [&_svg]:!w-5"
+            />
+          </div>
           <span className="text-sm font-medium text-gomin-neutral-500">
             오늘 참여자
           </span>
@@ -200,7 +228,7 @@ const TodayFunnelSummary = ({ funnel, ready = true }: Props) => {
                 className={cn(
                   "relative min-w-0 px-3",
                   index !== 0 &&
-                    "before:absolute before:top-1/2 before:left-0 before:h-12 before:-translate-y-1/2 before:border-l before:border-gomin-neutral-100 before:content-['']"
+                    "before:absolute before:top-[calc(50%+0.25rem)] before:left-0 before:h-12 before:-translate-y-1/2 before:border-l before:border-gomin-neutral-100 before:content-['']"
                 )}
               >
                 <div className="flex min-h-[5.5rem] min-w-0 translate-y-1 items-center gap-3">
@@ -209,6 +237,12 @@ const TodayFunnelSummary = ({ funnel, ready = true }: Props) => {
                       "mx-1 flex size-12 shrink-0 items-center justify-center rounded-xl",
                       stage.colorClassNames.badge
                     )}
+                    onMouseEnter={() =>
+                      startHoverAnimation(stageIconRefs.current[stage.key])
+                    }
+                    onMouseLeave={() =>
+                      stopHoverAnimation(stageIconRefs.current[stage.key])
+                    }
                   >
                     <Icon
                       ref={(iconHandle) => {

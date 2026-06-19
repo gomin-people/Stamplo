@@ -177,7 +177,7 @@ const DashboardClient = ({ eventId }: Props) => {
                         key={`${eventId}-${card.key}`}
                         className={
                           index === 0
-                            ? "relative pr-4 after:absolute after:top-1/2 after:right-0 after:h-12 after:-translate-y-1/2 after:border-r after:border-gomin-neutral-100 after:content-['']"
+                            ? "relative pr-4 after:absolute after:top-[calc(50%+0.5rem)] after:right-0 after:h-12 after:-translate-y-1/2 after:border-r after:border-gomin-neutral-100 after:content-['']"
                             : "pl-4"
                         }
                       >

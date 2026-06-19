@@ -52,6 +52,24 @@ const DashboardKpiCard = ({
     }, KPI_ICON_ANIMATION_DURATION_MS);
   }, []);
 
+  const startHoverAnimation = useCallback(() => {
+    if (resetIconAnimationTimeoutRef.current !== null) {
+      window.clearTimeout(resetIconAnimationTimeoutRef.current);
+      resetIconAnimationTimeoutRef.current = null;
+    }
+
+    iconRef.current?.startAnimation();
+  }, []);
+
+  const stopHoverAnimation = useCallback(() => {
+    if (resetIconAnimationTimeoutRef.current !== null) {
+      window.clearTimeout(resetIconAnimationTimeoutRef.current);
+      resetIconAnimationTimeoutRef.current = null;
+    }
+
+    iconRef.current?.stopAnimation();
+  }, []);
+
   useEffect(() => {
     if (!ready) {
       return;
@@ -90,6 +108,8 @@ const DashboardKpiCard = ({
           "mx-1 flex size-12 shrink-0 items-center justify-center rounded-xl",
           colorClassNames.icon
         )}
+        onMouseEnter={startHoverAnimation}
+        onMouseLeave={stopHoverAnimation}
       >
         <Icon
           ref={iconRef}

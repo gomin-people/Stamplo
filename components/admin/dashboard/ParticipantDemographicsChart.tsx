@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import {
   Bar,
   BarChart,
@@ -111,9 +112,21 @@ const GenderDonutChart = ({
               content={
                 <ChartTooltipContent
                   hideLabel
-                  formatter={(value) => (
-                    <span className="font-semibold">{Number(value)}%</span>
-                  )}
+                  formatter={(value) => {
+                    const percent = Number(value);
+                    const count = Math.round(
+                      (totalRespondents * percent) / 100
+                    );
+
+                    return (
+                      <div className="grid gap-1">
+                        <span className="font-semibold">
+                          {count.toLocaleString("ko-KR")}명
+                        </span>
+                        <span className="font-semibold">{percent}%</span>
+                      </div>
+                    );
+                  }}
                 />
               }
             />
@@ -134,17 +147,22 @@ const GenderDonutChart = ({
           </PieChart>
         </ChartContainer>
 
-        <div className="pointer-events-none absolute inset-0">
+        <motion.div
+          className="pointer-events-none absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
           <div
-            className="absolute top-1/2 left-0 w-full -translate-y-1/2 truncate px-2 text-center text-2xl text-gomin-black"
+            className="absolute top-1/2 left-0 w-full -translate-y-1/2 truncate px-2 text-center text-2xl text-gomin-black font-semibold"
             title={`${totalRespondents.toLocaleString("ko-KR")}명`}
           >
             {totalRespondents.toLocaleString("ko-KR")}
           </div>
-          <div className="absolute top-[calc(50%+1.25rem)] left-0 w-full truncate px-2 text-center text-xs text-gomin-black">
+          <div className="absolute top-[calc(50%+1rem)] left-0 w-full truncate px-2 text-center text-xs text-gomin-black">
             (명)
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs font-medium text-gomin-neutral-600">
