@@ -21,7 +21,7 @@ const EventDetailButton = ({ className }: EventDetailButtonProps) => {
         onClick={() => setIsOpen(true)}
         variant="outline"
         className={cn(
-          "gap-1.5 px-4 h-9 rounded-full border-2 bg-white/80 backdrop-blur-md hover:bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] border-gomin-primary-700 text-gomin-primary-700 hover:text-gomin-primary-600",
+          "gap-1.5 px-4 h-9 rounded-full border-2 border-gomin-neutral-200 bg-gomin-white/70 backdrop-blur-md text-gomin-neutral-700 hover:bg-gomin-white hover:text-gomin-neutral-600 shadow-[0_4px_12px_rgba(0,0,0,0.08)]",
           className
         )}
         aria-label="행사 정보"
