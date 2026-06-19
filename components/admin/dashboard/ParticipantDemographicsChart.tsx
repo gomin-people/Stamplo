@@ -66,7 +66,7 @@ const ParticipantDemographicsChart = ({
   ageData,
 }: Props) => {
   return (
-    <div className="flex h-full min-h-74 min-w-0 flex-col px-4 py-4">
+    <div className="flex h-full min-h-74 min-w-0 flex-col px-4 pt-3 pb-4">
       <div className="flex min-w-0 flex-wrap items-end gap-x-3 gap-y-1">
         <h2 className="text-lg font-semibold text-gomin-black">달성자 통계</h2>
         <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-400">

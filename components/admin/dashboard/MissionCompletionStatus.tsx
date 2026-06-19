@@ -26,7 +26,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
   const missionItems = missions.slice(0, 10);
 
   return (
-    <div className="flex h-full min-h-168 min-w-0 flex-col px-4 pt-4">
+    <div className="flex h-full min-h-[41rem] min-w-0 flex-col px-4 pt-3">
       <div className="flex min-w-0 flex-wrap items-end gap-x-3 gap-y-1">
         <h2 className="text-lg font-semibold text-gomin-black">
           미션별 완료 현황
@@ -39,7 +39,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
       <div
         className={cn(
           missionCompletionGridClassName,
-          "mt-4 items-center gap-x-2 border-b border-gomin-neutral-100 pb-2 text-sm font-semibold text-gomin-neutral-400"
+          "mt-5 items-center gap-x-2 border-b border-gomin-neutral-100 pb-3 text-sm font-semibold text-gomin-neutral-400"
         )}
       >
         <span className="min-w-0 truncate">미션명</span>
@@ -61,7 +61,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
                 key={mission.id}
                 className={cn(
                   missionCompletionGridClassName,
-                  "min-h-14.5 min-w-0 items-center gap-x-2 overflow-hidden border-b border-dashed border-gomin-neutral-100 last:border-b-0"
+                  "min-h-14 min-w-0 items-center gap-x-2 overflow-hidden border-b border-dashed border-gomin-neutral-100 last:border-b-0"
                 )}
               >
                 <span

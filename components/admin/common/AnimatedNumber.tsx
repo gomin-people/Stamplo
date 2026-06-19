@@ -256,7 +256,7 @@ const DigitSlot = ({
       {hasChanged ? (
         <motion.span
           key={slotState.transitionId}
-          className="absolute inset-x-0 top-0 flex flex-col text-center"
+          className="absolute inset-x-0 top-[-0.04em] flex flex-col text-center"
           initial={{ y: "0%" }}
           animate={{ y: "-50%" }}
           transition={{ duration: rollDuration, ease: "easeOut" }}
@@ -266,7 +266,7 @@ const DigitSlot = ({
           <span className="h-[1em] leading-none">{slotState.currentChar}</span>
         </motion.span>
       ) : (
-        <span className="absolute inset-x-0 top-0 text-center">
+        <span className="absolute inset-x-0 top-[-0.04em] text-center">
           {slotState.currentChar}
         </span>
       )}
