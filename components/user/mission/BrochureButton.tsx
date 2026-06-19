@@ -26,19 +26,4 @@ const BrochureButton = ({ onClick, className }: BrochureButtonProps) => {
   );
 };
 
-// const BrochureButton = ({ onClick, className }: BrochureButtonProps) => {
-//   return (
-//     <button
-//       onClick={onClick}
-//       className={cn(
-//         "flex items-center justify-center w-11 h-11 text-gomin-primary-700 active:scale-95 transition-all duration-200",
-//         className
-//       )}
-//       aria-label="행사 정보"
-//     >
-//       <Info className="w-8.5 h-8.5" />
-//     </button>
-//   );
-// };
-
 export default BrochureButton;
