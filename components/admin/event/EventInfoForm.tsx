@@ -23,6 +23,7 @@ type DisabledField = keyof FormState;
 type Props = {
   initialData?: Partial<FormState>;
   disabledFields?: "all" | DisabledField[];
+  deferDelete?: boolean;
 };
 
 const defaultForm: FormState = {
@@ -50,7 +51,7 @@ const buildDefaultValues = (initialData?: Partial<FormState>): FormState => ({
 const handleSetValueAs = (v: string) => stripInvisibleChars(v).trim();
 
 const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
-  { initialData, disabledFields },
+  { initialData, disabledFields, deferDelete = false },
   ref
 ) {
   const isDisabled = (field: DisabledField) =>
@@ -58,6 +59,9 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
     (Array.isArray(disabledFields) && disabledFields.includes(field));
 
   const [isUploading, setIsUploading] = useState(false);
+  const [pendingDeletePath, setPendingDeletePath] = useState<string | null>(
+    null
+  );
 
   const methods = useForm<FormState>({
     defaultValues: buildDefaultValues(initialData),
@@ -91,8 +95,10 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
         return true;
       },
       getData: () => getValues(),
+      getPendingDeletePaths: () =>
+        pendingDeletePath ? [pendingDeletePath] : [],
     }),
-    [isUploading, getValues, trigger]
+    [isUploading, getValues, trigger, pendingDeletePath]
   );
 
   const operatingHoursError =
@@ -105,7 +111,9 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
           <div className="flex min-h-166 gap-8">
             <PosterImageField
               onUploadingChange={setIsUploading}
+              onPendingDeletePath={setPendingDeletePath}
               disabled={isDisabled("posterImageUrl")}
+              deferDelete={deferDelete}
             />
 
             <div className="flex flex-1 flex-col gap-4">

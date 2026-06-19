@@ -5,6 +5,7 @@ import {
   useUploadAdminImageMutation,
   useDeleteAdminImageMutation,
 } from "@/features/admin/upload/adminUploadMutations";
+import { extractStoragePath } from "@/utils/storage";
 
 const DEFAULT_ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "webp"];
 const DEFAULT_ALLOWED_MIME_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -19,6 +20,7 @@ type UseImageUploadOptions = {
   resizeWidth?: number;
   onUrlChange?: (url: string) => void;
   uploadMode?: "storage" | "landing";
+  deferDelete?: boolean;
 };
 
 export default function useImageUpload({
@@ -30,8 +32,14 @@ export default function useImageUpload({
   resizeWidth,
   onUrlChange,
   uploadMode = "storage",
+  deferDelete = false,
 }: UseImageUploadOptions) {
-  const [path, setPath] = useState<string | null>(initialPath);
+  const [path, setPath] = useState<string | null>(
+    initialPath ? (extractStoragePath(initialPath) ?? initialPath) : null
+  );
+  const [pendingDeletePath, setPendingDeletePath] = useState<string | null>(
+    null
+  );
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const {
@@ -94,6 +102,8 @@ export default function useImageUpload({
         if (path.startsWith("blob:")) {
           URL.revokeObjectURL(path);
         }
+      } else if (deferDelete) {
+        setPendingDeletePath(path);
       } else {
         deleteImage(path, {
           onError: (err) => console.error("이미지 삭제 에러:", err),
@@ -113,6 +123,7 @@ export default function useImageUpload({
     isSuccess,
     isError,
     validationError,
+    pendingDeletePath,
     handleFileChange,
     handleRemove,
     triggerFileInput,

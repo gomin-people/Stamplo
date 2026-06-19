@@ -11,8 +11,10 @@ type Props = {
   onChange: (url: string) => void;
   onRemove: () => void;
   onUploadingChange: (isUploading: boolean) => void;
+  onPendingDeletePath?: (path: string | null) => void;
   disabled?: boolean;
   uploadMode?: "storage" | "landing";
+  deferDelete?: boolean;
 };
 
 const StampUploadSection = ({
@@ -20,21 +22,26 @@ const StampUploadSection = ({
   onChange,
   onRemove,
   onUploadingChange,
+  onPendingDeletePath,
   disabled = false,
   uploadMode = "storage",
+  deferDelete = false,
 }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     isUploading,
     validationError,
+    pendingDeletePath,
     handleFileChange,
     handleRemove,
     triggerFileInput,
   } = useImageUpload({
     fileInputRef,
+    initialPath: value,
     resizeWidth: 220,
     uploadMode,
+    deferDelete,
     onUrlChange: (url) => {
       onChange(url);
     },
@@ -43,6 +50,10 @@ const StampUploadSection = ({
   useEffect(() => {
     onUploadingChange(isUploading);
   }, [isUploading, onUploadingChange]);
+
+  useEffect(() => {
+    onPendingDeletePath?.(pendingDeletePath);
+  }, [pendingDeletePath, onPendingDeletePath]);
 
   const handleRemoveImage = (e: React.MouseEvent) => {
     e.stopPropagation();

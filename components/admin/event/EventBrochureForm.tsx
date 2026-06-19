@@ -13,12 +13,17 @@ import { toast } from "sonner";
 type Props = {
   initialData?: { brochureImageUrl?: string[] };
   disabled?: boolean;
+  deferDelete?: boolean;
 };
 
 const EventBrochureForm = forwardRef<StepFormHandle, Props>(
-  function EventBrochureForm({ initialData, disabled = false }, ref) {
+  function EventBrochureForm(
+    { initialData, disabled = false, deferDelete = false },
+    ref
+  ) {
     const {
       pages,
+      pendingDeletePaths,
       addFiles,
       replaceInputRef,
       handleUploadChange,
@@ -26,7 +31,7 @@ const EventBrochureForm = forwardRef<StepFormHandle, Props>(
       handleDelete,
       handleReplace,
       handleDragEnd,
-    } = usePageUpload(initialData?.brochureImageUrl, 624);
+    } = usePageUpload(initialData?.brochureImageUrl, 624, deferDelete);
 
     useImperativeHandle(
       ref,
@@ -45,8 +50,9 @@ const EventBrochureForm = forwardRef<StepFormHandle, Props>(
             .filter((p) => p.url !== null)
             .map((p) => p.url as string),
         }),
+        getPendingDeletePaths: () => pendingDeletePaths,
       }),
-      [pages]
+      [pages, pendingDeletePaths]
     );
 
     return (
