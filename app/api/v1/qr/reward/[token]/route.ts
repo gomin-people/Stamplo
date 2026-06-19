@@ -156,10 +156,7 @@ export async function POST(request: Request, { params }: QrRewardRouteContext) {
     return serverError("리워드 수령 상태 업데이트 실패", updateError);
   }
 
-  await sendDashboardKpiInvalidate(
-    participant.events.id,
-    "reward_claimed"
-  ).catch(() => undefined);
+  await sendDashboardKpiInvalidate(participant.events.id, "reward_claimed");
 
   // 6. Supabase Realtime Broadcast 채널로 성공 이벤트 전송
   const channel = supabase.channel(`reward-claim:${eventUserId}`);

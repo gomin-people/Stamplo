@@ -181,7 +181,7 @@ export async function GET(
     await sendDashboardKpiInvalidate(
       missionCheckData.qrCode.events_id,
       "mission_completed"
-    ).catch(() => undefined);
+    );
   }
 
   return NextResponse.redirect(
@@ -252,7 +252,7 @@ export async function POST(
   await sendDashboardKpiInvalidate(
     missionCheckData.qrCode.events_id,
     "mission_completed"
-  ).catch(() => undefined);
+  );
 
   return created({
     mission: missionCheckData.mission,

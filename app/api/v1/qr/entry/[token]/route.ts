@@ -122,10 +122,7 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
     return serverError("참여자 생성 실패", participantError);
   }
 
-  await sendDashboardKpiInvalidate(
-    qrCode.events_id,
-    "participant_entered"
-  ).catch(() => undefined);
+  await sendDashboardKpiInvalidate(qrCode.events_id, "participant_entered");
 
   const response = NextResponse.redirect(
     new URL(getUserRoutes(event.id).root, request.url)
