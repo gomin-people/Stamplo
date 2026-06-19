@@ -1,17 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import {
-  CheckIcon,
-  PartyPopperIcon,
-  StampIcon,
-  UsersIcon,
-} from "lucide-animated";
+import { PartyPopperIcon, UsersIcon } from "lucide-animated";
 import DashboardKpiCard, {
   type KpiIconComponent,
 } from "@/components/admin/dashboard/DashboardKpiCard";
 import MissionCompletionStatus from "@/components/admin/dashboard/MissionCompletionStatus";
+import TodayFunnelSummary from "@/components/admin/dashboard/TodayFunnelSummary";
+import { adminDashboardQueries } from "@/features/admin/dashboard/adminDashboardQueries";
+import { useDashboardKpiBroadcast } from "@/hooks/useDashboardKpiBroadcast";
 import dynamic from "next/dynamic";
+import { useQuery } from "@tanstack/react-query";
 
 const ParticipantAnalysisChart = dynamic(
   () => import("@/components/admin/dashboard/ParticipantAnalysisChart")
@@ -19,9 +18,6 @@ const ParticipantAnalysisChart = dynamic(
 const ParticipantDemographicsChart = dynamic(
   () => import("@/components/admin/dashboard/ParticipantDemographicsChart")
 );
-import { useQuery } from "@tanstack/react-query";
-import { adminDashboardQueries } from "@/features/admin/dashboard/adminDashboardQueries";
-import { useDashboardKpiBroadcast } from "@/hooks/useDashboardKpiBroadcast";
 import type {
   AdminDashboardKpiKey,
   AdminDashboardKpisResponse,
@@ -35,63 +31,65 @@ const dashboardPanelClassName =
   "min-w-0 rounded-xl border border-gomin-neutral-100 bg-white";
 
 const emptyKpis: AdminDashboardKpisResponse = {
-  participants: { today: 0, total: 0 },
-  missionInProgress: { today: 0, total: 0 },
-  missionCompleted: { today: 0, total: 0 },
-  rewardClaimed: { today: 0, total: 0 },
+  totalParticipants: { value: 0 },
+  totalRewardClaimed: { value: 0 },
+  todayFunnel: {
+    participants: 0,
+    inProgress: { count: 0, percent: 0 },
+    unclaimed: { count: 0, percent: 0 },
+    claimed: { count: 0, percent: 0 },
+  },
 };
 
-const dashboardCardMeta: {
-  key: AdminDashboardKpiKey;
+const dashboardKpiSections: {
+  key: "overall" | "today";
   title: string;
-  info: string;
-  icon: KpiIconComponent;
-  colorClassNames: {
-    icon: string;
-    value: string;
-  };
+  subtitle?: string;
+  cardKeys?: AdminDashboardKpiKey[];
 }[] = [
   {
-    key: "participants",
-    title: "참여자 수",
-    info: "오늘 입장한 참여자 수 / 행사 전체 참여자 수",
+    key: "overall",
+    title: "참여 상태 분포",
+  },
+  {
+    key: "today",
+    title: "전체 정보",
+    subtitle: "행사 누적 기준",
+    cardKeys: ["totalParticipants", "totalRewardClaimed"],
+  },
+];
+
+const dashboardCardMeta: Record<
+  AdminDashboardKpiKey,
+  {
+    key: AdminDashboardKpiKey;
+    title: string;
+    icon: KpiIconComponent;
+    colorClassNames: {
+      icon: string;
+      value: string;
+    };
+  }
+> = {
+  totalParticipants: {
+    key: "totalParticipants",
+    title: "총 참여자수",
     icon: UsersIcon,
     colorClassNames: {
       icon: "bg-[#EEF4FF] text-[#4D7CFE]",
       value: "text-[#4D7CFE]",
     },
   },
-  {
-    key: "missionInProgress",
-    title: "미션 진행 중",
-    info: "오늘 미션 진행 중 참여자 수 / 오늘 참여자 수 (미션 전체 완료자 제외)",
-    icon: StampIcon,
-    colorClassNames: {
-      icon: "bg-[#FFF1D6] text-[#F59E0B]",
-      value: "text-[#F59E0B]",
-    },
-  },
-  {
-    key: "missionCompleted",
-    title: "미션 전체 완료",
-    info: "오늘 미션 전체 완료자 수 / 오늘 미션 진행 중 참여자 수",
-    icon: CheckIcon,
-    colorClassNames: {
-      icon: "bg-[#DDF7ED] text-[#20B486]",
-      value: "text-[#20B486]",
-    },
-  },
-  {
-    key: "rewardClaimed",
-    title: "굿즈 수령 완료",
-    info: "굿즈 수령 완료자 수 / 행사 전체 미션 전체 완료자 수",
+  totalRewardClaimed: {
+    key: "totalRewardClaimed",
+    title: "총 굿즈 수령수",
     icon: PartyPopperIcon,
     colorClassNames: {
       icon: "bg-[#F3F1FE] text-[#5435EB]",
       value: "text-[#5435EB]",
     },
   },
-];
+};
 
 const DashboardClient = ({ eventId }: Props) => {
   const kpisQuery = useQuery(adminDashboardQueries.kpis(eventId));
@@ -108,12 +106,6 @@ const DashboardClient = ({ eventId }: Props) => {
   const { data: achieverStatistics, refetch: refetchAchieverStatistics } =
     achieverStatisticsQuery;
   const { data: missions, refetch: refetchMissions } = missionsQuery;
-
-  const refetchKpis = useCallback(() => {
-    if (isValidEventId(eventId)) {
-      void refetchKpisQuery();
-    }
-  }, [eventId, refetchKpisQuery]);
 
   const refetchAllDashboardData = useCallback(() => {
     if (!isValidEventId(eventId)) {
@@ -137,7 +129,7 @@ const DashboardClient = ({ eventId }: Props) => {
   useDashboardKpiBroadcast({
     eventId,
     enabled: isEventIdValid,
-    onInvalidate: refetchKpis,
+    onInvalidate: refetchAllDashboardData,
   });
   useAlignedMinuteRefetch(refetchAllDashboardData, isEventIdValid);
   const kpisReady = kpisQuery.isSuccess && !!kpisData;
@@ -146,18 +138,64 @@ const DashboardClient = ({ eventId }: Props) => {
 
   return (
     <div className="px-8 pt-0">
-      <div className="mt-8 grid grid-cols-4 gap-4">
-        {dashboardCardMeta.map((card) => (
-          <DashboardKpiCard
-            key={`${eventId}-${card.key}`}
-            title={card.title}
-            countData={kpis[card.key]}
-            icon={card.icon}
-            colorClassNames={card.colorClassNames}
-            info={card.info}
-            ready={kpisReady}
-          />
-        ))}
+      <div className="mt-8 grid grid-cols-12 gap-4">
+        {dashboardKpiSections.map((section) => {
+          const isTodaySection = section.key === "overall";
+
+          return (
+            <section
+              key={section.key}
+              className={`rounded-xl border border-gomin-neutral-100 bg-white px-4 pt-3 pb-2 shadow-[0_8px_32px_rgba(15,23,42,0.06)] ${
+                section.key === "overall"
+                  ? "col-span-7 overflow-hidden"
+                  : "col-span-5"
+              }`}
+            >
+              {isTodaySection ? null : (
+                <div className="flex min-w-0 flex-wrap items-end gap-x-4 gap-y-1">
+                  <h2 className="text-lg font-semibold text-gomin-black">
+                    {section.title}
+                  </h2>
+                  <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-400">
+                    {section.subtitle}
+                  </p>
+                </div>
+              )}
+
+              {isTodaySection ? (
+                <TodayFunnelSummary
+                  funnel={kpis.todayFunnel}
+                  ready={kpisReady}
+                />
+              ) : (
+                <div className="grid grid-cols-2">
+                  {(section.cardKeys ?? []).map((cardKey, index) => {
+                    const card = dashboardCardMeta[cardKey];
+
+                    return (
+                      <div
+                        key={`${eventId}-${card.key}`}
+                        className={
+                          index === 0
+                            ? "relative pr-4 after:absolute after:top-1/2 after:right-0 after:h-12 after:-translate-y-1/2 after:border-r after:border-gomin-neutral-100 after:content-['']"
+                            : "pl-4"
+                        }
+                      >
+                        <DashboardKpiCard
+                          title={card.title}
+                          value={kpis[card.key].value}
+                          icon={card.icon}
+                          colorClassNames={card.colorClassNames}
+                          ready={kpisReady}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          );
+        })}
       </div>
 
       <div className="mt-4 grid grid-cols-12 gap-4">

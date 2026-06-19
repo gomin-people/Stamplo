@@ -1,21 +1,32 @@
 // 대시보드 KPI 카드 식별자
-export type AdminDashboardKpiKey =
-  | "participants"
-  | "missionInProgress"
-  | "missionCompleted"
-  | "rewardClaimed";
+export type AdminDashboardKpiKey = "totalParticipants" | "totalRewardClaimed";
 
 // 대시보드 KPI 카드 숫자 응답 타입
-export type AdminDashboardKpiCount = {
-  today: number;
-  total: number;
+export type AdminDashboardKpiMetric = {
+  value: number;
 };
 
-// 대시보드 KPI 4개 카드 응답 타입
+// 오늘 참여자 퍼널 단계 데이터
+export type AdminDashboardTodayFunnelStage = {
+  count: number;
+  percent: number;
+};
+
+// 오늘 참여자 퍼널 응답 타입
+export type AdminDashboardTodayFunnel = {
+  participants: number;
+  inProgress: AdminDashboardTodayFunnelStage;
+  unclaimed: AdminDashboardTodayFunnelStage;
+  claimed: AdminDashboardTodayFunnelStage;
+};
+
+// 대시보드 KPI 응답 타입
 export type AdminDashboardKpisResponse = Record<
   AdminDashboardKpiKey,
-  AdminDashboardKpiCount
->;
+  AdminDashboardKpiMetric
+> & {
+  todayFunnel: AdminDashboardTodayFunnel;
+};
 
 // 날짜별 참여자 수 데이터
 export type AdminDashboardDailyParticipant = {
