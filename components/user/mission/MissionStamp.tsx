@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import IconStamplo from "@/components/icons/IconStamplo";
 import MissionDetailModal from "@/components/user/mission/MissionDetailModal";
@@ -27,6 +27,18 @@ const MissionStamp = ({
 }: MissionStampProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [stampReady, setStampReady] = useState(!isNewStamped || !stampImageUrl);
+  const onStampReadyRef = useRef(onStampReady);
+
+  useEffect(() => {
+    onStampReadyRef.current = onStampReady;
+  }, [onStampReady]);
+
+  const handleImgRef = (el: HTMLImageElement | null) => {
+    if (el?.complete) {
+      setStampReady(true);
+      onStampReadyRef.current?.();
+    }
+  };
 
   return (
     <>
@@ -65,6 +77,7 @@ const MissionStamp = ({
             {stampImageUrl ? (
               <div className="relative w-[81%] h-[85%]">
                 <Image
+                  ref={handleImgRef}
                   src={stampImageUrl}
                   alt="Stamp"
                   fill

@@ -133,6 +133,12 @@ const MissionPageClient = ({
 
   const { showCelebration, handleStampReady } = useCelebration();
 
+  useEffect(() => {
+    if (storeNewlyStampedId != null && isAllCompleted) {
+      handleStampReady();
+    }
+  }, [storeNewlyStampedId, isAllCompleted, handleStampReady]);
+
   const hasError = isError && !isPreview;
   const isMissionsEmpty = missions.length === 0 && !isPreview;
   const isShowEmpty = hasError || isMissionsEmpty;
