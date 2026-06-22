@@ -182,7 +182,6 @@ const EventEditClient = ({ initialEvent }: Props) => {
               <EventInfoForm
                 key={formKey}
                 ref={step1Ref}
-                deferDelete
                 initialData={
                   initialEvent
                     ? {
@@ -208,7 +207,6 @@ const EventEditClient = ({ initialEvent }: Props) => {
               <EventBrochureForm
                 key={formKey}
                 ref={step2Ref}
-                deferDelete
                 disabled={mode === "view" || isAfter || isDuring}
                 initialData={
                   initialEvent.brochureImageUrl
@@ -221,7 +219,6 @@ const EventEditClient = ({ initialEvent }: Props) => {
               <EventThemeStampForm
                 key={formKey}
                 ref={step3Ref}
-                deferDelete
                 disabled={mode === "view" || isAfter || isDuring}
                 initialData={
                   initialEvent

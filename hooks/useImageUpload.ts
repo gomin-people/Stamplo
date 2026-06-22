@@ -6,6 +6,7 @@ import {
   useDeleteAdminImageMutation,
 } from "@/features/admin/upload/adminUploadMutations";
 import { extractStoragePath } from "@/utils/storage";
+import { useIsEditMode } from "@/stores/admin";
 
 const DEFAULT_ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "webp"];
 const DEFAULT_ALLOWED_MIME_TYPES = ["image/png", "image/jpeg", "image/webp"];
@@ -20,7 +21,6 @@ type UseImageUploadOptions = {
   resizeWidth?: number;
   onUrlChange?: (url: string) => void;
   uploadMode?: "storage" | "landing";
-  deferDelete?: boolean;
 };
 
 export default function useImageUpload({
@@ -32,8 +32,8 @@ export default function useImageUpload({
   resizeWidth,
   onUrlChange,
   uploadMode = "storage",
-  deferDelete = false,
 }: UseImageUploadOptions) {
+  const deferDelete = useIsEditMode();
   const [path, setPath] = useState<string | null>(
     initialPath ? (extractStoragePath(initialPath) ?? initialPath) : null
   );

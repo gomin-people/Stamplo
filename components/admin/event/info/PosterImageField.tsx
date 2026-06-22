@@ -25,14 +25,12 @@ type Props = {
   disabled?: boolean;
   onUploadingChange: (isUploading: boolean) => void;
   onPendingDeletePath?: (path: string | null) => void;
-  deferDelete?: boolean;
 };
 
 const PosterImageField = memo(function PosterImageField({
   disabled,
   onUploadingChange,
   onPendingDeletePath,
-  deferDelete = false,
 }: Props) {
   const { control } = useFormContext<FormState>();
   const { field, fieldState } = useController({
@@ -56,7 +54,6 @@ const PosterImageField = memo(function PosterImageField({
     allowedMimeTypes: POSTER_ALLOWED_MIME_TYPES,
     allowedExtensions: POSTER_ALLOWED_EXTENSIONS,
     resizeWidth: 600,
-    deferDelete,
     onUrlChange: (url) => {
       if (url) field.onChange(url);
     },

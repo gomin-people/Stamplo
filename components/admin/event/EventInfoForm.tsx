@@ -23,7 +23,6 @@ type DisabledField = keyof FormState;
 type Props = {
   initialData?: Partial<FormState>;
   disabledFields?: "all" | DisabledField[];
-  deferDelete?: boolean;
 };
 
 const defaultForm: FormState = {
@@ -51,7 +50,7 @@ const buildDefaultValues = (initialData?: Partial<FormState>): FormState => ({
 const handleSetValueAs = (v: string) => stripInvisibleChars(v).trim();
 
 const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
-  { initialData, disabledFields, deferDelete = false },
+  { initialData, disabledFields },
   ref
 ) {
   const isDisabled = (field: DisabledField) =>
@@ -113,7 +112,6 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
               onUploadingChange={setIsUploading}
               onPendingDeletePath={setPendingDeletePath}
               disabled={isDisabled("posterImageUrl")}
-              deferDelete={deferDelete}
             />
 
             <div className="flex flex-1 flex-col gap-4">

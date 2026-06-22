@@ -8,6 +8,7 @@ import {
 } from "@/features/admin/upload/adminUploadMutations";
 import { MAX_PAGES } from "@/constants";
 import { extractStoragePath } from "@/utils/storage";
+import { useIsEditMode } from "@/stores/admin";
 
 export type UploadPage = {
   id: string;
@@ -18,11 +19,8 @@ export type UploadPage = {
   isUploading: boolean;
 };
 
-const usePageUpload = (
-  initialUrls?: string[],
-  resizeWidth?: number,
-  deferDelete = false
-) => {
+const usePageUpload = (initialUrls?: string[], resizeWidth?: number) => {
+  const deferDelete = useIsEditMode();
   const [pages, setPages] = useState<UploadPage[]>(
     () =>
       initialUrls?.map((url) => ({

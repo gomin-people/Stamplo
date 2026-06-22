@@ -16,14 +16,10 @@ type InitialData = {
 type Props = {
   initialData?: InitialData;
   disabled?: boolean;
-  deferDelete?: boolean;
 };
 
 const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
-  function EventThemeStampForm(
-    { initialData, disabled = false, deferDelete = false },
-    ref
-  ) {
+  function EventThemeStampForm({ initialData, disabled = false }, ref) {
     const [stampFileUrl, setStampFileUrl] = useState<string>(
       initialData?.stampImageUrl ?? ""
     );
@@ -90,7 +86,6 @@ const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
             onRemove={handleStampRemove}
             onPendingDeletePath={setPendingDeletePath}
             disabled={disabled}
-            deferDelete={deferDelete}
           />
           <hr className="border-gomin-neutral-100" />
           <ThemeColorPicker

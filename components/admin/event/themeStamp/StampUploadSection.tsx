@@ -14,7 +14,6 @@ type Props = {
   onPendingDeletePath?: (path: string | null) => void;
   disabled?: boolean;
   uploadMode?: "storage" | "landing";
-  deferDelete?: boolean;
 };
 
 const StampUploadSection = ({
@@ -25,7 +24,6 @@ const StampUploadSection = ({
   onPendingDeletePath,
   disabled = false,
   uploadMode = "storage",
-  deferDelete = false,
 }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +39,6 @@ const StampUploadSection = ({
     initialPath: value,
     resizeWidth: 220,
     uploadMode,
-    deferDelete,
     onUrlChange: (url) => {
       onChange(url);
     },
