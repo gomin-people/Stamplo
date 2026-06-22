@@ -21,6 +21,7 @@ import {
   useUpdateEventMutation,
   useDeleteEventMutation,
 } from "@/features/admin/events/adminEventMutations";
+import { useDeleteAdminImageMutation } from "@/features/admin/upload/adminUploadMutations";
 import type { EventUpdatePayloadModel } from "@/types/models";
 import { getEventOperationStatus } from "@/utils/event-status";
 import {
@@ -59,6 +60,7 @@ const EventEditClient = ({ initialEvent }: Props) => {
 
   const { mutateAsync: updateEvent, isPending } = useUpdateEventMutation();
   const { mutateAsync: deleteEvent } = useDeleteEventMutation();
+  const { mutate: deleteImage } = useDeleteAdminImageMutation();
 
   const { isAfter, isDuring } = getEventOperationStatus(
     initialEvent.startDate,
@@ -132,6 +134,12 @@ const EventEditClient = ({ initialEvent }: Props) => {
 
     try {
       await updateEvent({ eventId: eventIdNum, payload });
+
+      const pendingPaths = stepRefs.flatMap(
+        (r) => r.current?.getPendingDeletePaths?.() ?? []
+      );
+      pendingPaths.forEach((path) => deleteImage(path));
+
       toast.success("변경사항이 저장되었습니다.", { id: "event-save-success" });
       setMode("view");
       router.refresh();

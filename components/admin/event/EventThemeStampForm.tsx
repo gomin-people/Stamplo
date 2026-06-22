@@ -24,6 +24,9 @@ const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
       initialData?.stampImageUrl ?? ""
     );
     const [isUploading, setIsUploading] = useState(false);
+    const [pendingDeletePath, setPendingDeletePath] = useState<string | null>(
+      null
+    );
 
     const [h, setH] = useState(() => {
       if (initialData?.primaryColor) {
@@ -66,8 +69,10 @@ const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
           stampImageUrl: stampFileUrl,
           primaryColor: keyColor,
         }),
+        getPendingDeletePaths: () =>
+          pendingDeletePath ? [pendingDeletePath] : [],
       }),
-      [stampFileUrl, isUploading, keyColor]
+      [stampFileUrl, isUploading, keyColor, pendingDeletePath]
     );
 
     return (
@@ -79,6 +84,7 @@ const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
             onUploadingChange={setIsUploading}
             onChange={setStampFileUrl}
             onRemove={handleStampRemove}
+            onPendingDeletePath={setPendingDeletePath}
             disabled={disabled}
           />
           <hr className="border-gomin-neutral-100" />

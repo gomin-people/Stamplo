@@ -19,6 +19,7 @@ const EventBrochureForm = forwardRef<StepFormHandle, Props>(
   function EventBrochureForm({ initialData, disabled = false }, ref) {
     const {
       pages,
+      pendingDeletePaths,
       addFiles,
       replaceInputRef,
       handleUploadChange,
@@ -45,8 +46,9 @@ const EventBrochureForm = forwardRef<StepFormHandle, Props>(
             .filter((p) => p.url !== null)
             .map((p) => p.url as string),
         }),
+        getPendingDeletePaths: () => pendingDeletePaths,
       }),
-      [pages]
+      [pages, pendingDeletePaths]
     );
 
     return (

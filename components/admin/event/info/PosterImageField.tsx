@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useRef, useEffect } from "react";
+import { memo, useRef, useEffect, useCallback } from "react";
 import { ImageIcon, X, Loader2 } from "lucide-react";
 import { useController, useFormContext } from "react-hook-form";
 import { z } from "zod";
@@ -24,11 +24,13 @@ const POSTER_ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"];
 type Props = {
   disabled?: boolean;
   onUploadingChange: (isUploading: boolean) => void;
+  onPendingDeletePath?: (path: string | null) => void;
 };
 
 const PosterImageField = memo(function PosterImageField({
   disabled,
   onUploadingChange,
+  onPendingDeletePath,
 }: Props) {
   const { control } = useFormContext<FormState>();
   const { field, fieldState } = useController({
@@ -42,6 +44,7 @@ const PosterImageField = memo(function PosterImageField({
   const {
     isUploading,
     validationError,
+    pendingDeletePath,
     handleFileChange,
     handleRemove: handleImageRemove,
     triggerFileInput,
@@ -59,6 +62,15 @@ const PosterImageField = memo(function PosterImageField({
   useEffect(() => {
     onUploadingChange(isUploading);
   }, [isUploading, onUploadingChange]);
+
+  const stablePendingDeletePath = useCallback(
+    (path: string | null) => onPendingDeletePath?.(path),
+    [onPendingDeletePath]
+  );
+
+  useEffect(() => {
+    stablePendingDeletePath(pendingDeletePath);
+  }, [pendingDeletePath, stablePendingDeletePath]);
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -8,4 +8,5 @@ export interface Mission {
 export interface StepFormHandle {
   validate: () => boolean;
   getData: () => Record<string, unknown>;
+  getPendingDeletePaths?: () => string[];
 }

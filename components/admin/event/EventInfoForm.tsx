@@ -58,6 +58,9 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
     (Array.isArray(disabledFields) && disabledFields.includes(field));
 
   const [isUploading, setIsUploading] = useState(false);
+  const [pendingDeletePath, setPendingDeletePath] = useState<string | null>(
+    null
+  );
 
   const methods = useForm<FormState>({
     defaultValues: buildDefaultValues(initialData),
@@ -91,8 +94,10 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
         return true;
       },
       getData: () => getValues(),
+      getPendingDeletePaths: () =>
+        pendingDeletePath ? [pendingDeletePath] : [],
     }),
-    [isUploading, getValues, trigger]
+    [isUploading, getValues, trigger, pendingDeletePath]
   );
 
   const operatingHoursError =
@@ -105,6 +110,7 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
           <div className="flex min-h-166 gap-8">
             <PosterImageField
               onUploadingChange={setIsUploading}
+              onPendingDeletePath={setPendingDeletePath}
               disabled={isDisabled("posterImageUrl")}
             />
 
