@@ -34,6 +34,7 @@ const BrochurePageList = ({
 
   return (
     <DndContext
+      id="brochure-page-list"
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={onDragEnd}

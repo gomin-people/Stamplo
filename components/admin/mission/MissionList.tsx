@@ -132,7 +132,7 @@ const MissionList = ({ missions, disabled = false, filter = "all" }: Props) => {
 
   return (
     <>
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <DndContext id="mission-list" sensors={sensors} onDragEnd={handleDragEnd}>
         <SortableContext
           items={sortedMissions.map((m) => m.id)}
           strategy={verticalListSortingStrategy}
