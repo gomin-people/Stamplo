@@ -19,6 +19,9 @@ export type AdminRouteDescriptionSegment =
       text: string;
     }
   | {
+      type: "eventStatusText";
+    }
+  | {
       type: "eventTitle";
     };
 
@@ -39,7 +42,8 @@ export const adminRoutes: AdminRouteConfig[] = [
     pattern: ADMIN_EVENT_DASHBOARD_PATH,
     title: "대시보드",
     description: [
-      { type: "text", text: "현재 운영 중인 행사 · " },
+      { type: "eventStatusText" },
+      { type: "text", text: " · " },
       { type: "eventTitle" },
       { type: "text", text: "의 실시간 현황입니다." },
     ],

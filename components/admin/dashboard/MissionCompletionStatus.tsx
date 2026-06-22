@@ -6,6 +6,7 @@ import { cn, formatNumber } from "@/utils";
 type MissionCompletionData = {
   id: number;
   title: string;
+  isActive: boolean;
   completedCount: number;
   completionRate: number;
 };
@@ -26,20 +27,20 @@ const MissionCompletionStatus = ({ missions }: Props) => {
   const missionItems = missions.slice(0, 10);
 
   return (
-    <div className="flex h-full min-h-168 min-w-0 flex-col px-4 pt-4">
+    <div className="flex h-full min-h-[41rem] min-w-0 flex-col px-4 pt-3">
       <div className="flex min-w-0 flex-wrap items-end gap-x-3 gap-y-1">
         <h2 className="text-lg font-semibold text-gomin-black">
           미션별 완료 현황
         </h2>
-        <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-400">
-          미션 참여 및 완료 데이터
+        <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-500">
+          미션 참여 및 완료 정보
         </p>
       </div>
 
       <div
         className={cn(
           missionCompletionGridClassName,
-          "mt-4 items-center gap-x-2 border-b border-gomin-neutral-100 pb-2 text-sm font-semibold text-gomin-neutral-400"
+          "mt-5.5 items-center gap-x-2 border-b border-gomin-neutral-100 pb-3 text-sm font-semibold text-gomin-neutral-500"
         )}
       >
         <span className="min-w-0 truncate">미션명</span>
@@ -55,23 +56,36 @@ const MissionCompletionStatus = ({ missions }: Props) => {
               Math.max(mission.completionRate, 0),
               100
             );
+            const isInactive = !mission.isActive;
 
             return (
               <li
                 key={mission.id}
                 className={cn(
                   missionCompletionGridClassName,
-                  "min-h-14.5 min-w-0 items-center gap-x-2 overflow-hidden border-b border-dashed border-gomin-neutral-100 last:border-b-0"
+                  "min-h-14 min-w-0 items-center gap-x-2 overflow-hidden border-b border-dashed border-gomin-neutral-100 transition-colors",
+                  missionItems.length === 10 &&
+                    index === missionItems.length - 1 &&
+                    "border-b-0",
+                  isInactive && "bg-gomin-neutral-100/40"
                 )}
               >
                 <span
-                  className="block min-w-0 truncate text-sm text-gomin-black"
+                  className={cn(
+                    "block min-w-0 truncate text-sm",
+                    isInactive ? "text-gomin-neutral-500" : "text-gomin-black"
+                  )}
                   title={mission.title}
                 >
                   {mission.title}
                 </span>
                 <span
-                  className="flex min-w-0 justify-end text-sm text-gomin-neutral-600"
+                  className={cn(
+                    "flex min-w-0 justify-end text-sm",
+                    isInactive
+                      ? "text-gomin-neutral-500"
+                      : "text-gomin-neutral-600"
+                  )}
                   aria-label={`${completedCountText}명`}
                   title={`${completedCountText}명`}
                 >
@@ -79,13 +93,20 @@ const MissionCompletionStatus = ({ missions }: Props) => {
                   <span className="shrink-0">명</span>
                 </span>
                 <div className="col-start-4 min-w-0">
-                  <div className="text-right text-sm font-semibold text-gomin-black">
+                  <div
+                    className={cn(
+                      "text-right text-sm font-semibold",
+                      isInactive ? "text-gomin-neutral-500" : "text-gomin-black"
+                    )}
+                  >
                     {mission.completionRate.toFixed(1)}%
                   </div>
                   <div
                     className={cn(
                       "mt-2 h-1.5 overflow-hidden rounded-full",
-                      progressBarClassNames.track
+                      isInactive
+                        ? "bg-gomin-neutral-100"
+                        : progressBarClassNames.track
                     )}
                     role="progressbar"
                     aria-label={`${mission.title} 완료율`}
@@ -96,7 +117,9 @@ const MissionCompletionStatus = ({ missions }: Props) => {
                     <motion.div
                       className={cn(
                         "h-full origin-left rounded-full",
-                        progressBarClassNames.fill
+                        isInactive
+                          ? "bg-gomin-neutral-300"
+                          : progressBarClassNames.fill
                       )}
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
@@ -116,7 +139,7 @@ const MissionCompletionStatus = ({ missions }: Props) => {
           })}
         </ul>
       ) : (
-        <div className="flex min-h-72 flex-1 items-center justify-center rounded-xl border border-dashed border-gomin-neutral-100 text-sm font-medium text-gomin-neutral-400">
+        <div className="flex min-h-72 flex-1 items-center justify-center rounded-xl border border-dashed border-gomin-neutral-100 text-sm font-medium text-gomin-neutral-500">
           등록된 미션 데이터가 없습니다.
         </div>
       )}

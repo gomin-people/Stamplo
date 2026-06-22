@@ -42,6 +42,38 @@ export function getAdminDashboardDateWindow(
 }
 
 /**
+ * 관리자 대시보드에서 "오늘" 카드 집계에 사용할 KST 하루 범위를 계산합니다.
+ *
+ * 오늘이 행사 기간 안에 포함될 때만 오늘 00:00~내일 00:00 직전 범위를 반환하고,
+ * 행사 시작 전이거나 종료 후이면 null을 반환합니다.
+ *
+ * @param startDate - 행사 시작일 YYYY-MM-DD
+ * @param endDate - 행사 종료일 YYYY-MM-DD
+ * @returns 오늘 집계용 시작 시각과 종료 exclusive 시각
+ */
+export function getAdminDashboardTodayWindow(
+  startDate: string,
+  endDate: string
+): AdminDashboardDateWindow | null {
+  const start = parseDateOnly(startDate);
+  const end = parseDateOnly(endDate);
+  const today = getToday();
+
+  if (!start || !end || !today) {
+    return null;
+  }
+
+  if (compareDateParts(today, start) < 0 || compareDateParts(today, end) > 0) {
+    return null;
+  }
+
+  return {
+    startsAt: formatKstDateStartAsUtcTimestamp(today),
+    endsBefore: formatKstDateStartAsUtcTimestamp(addDays(today, 1)),
+  };
+}
+
+/**
  * 관리자 대시보드 날짜 선택/차트에 표시할 날짜 label을 계산합니다.
  *
  * @param startDate - 행사 시작일 YYYY-MM-DD

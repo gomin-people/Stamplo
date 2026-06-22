@@ -7,10 +7,10 @@ import type {
 } from "@/types/admin-dashboard";
 
 /**
- * 어드민 대시보드 KPI 카드 데이터를 조회합니다.
+ * 어드민 대시보드 상단 KPI/퍼널 데이터를 조회합니다.
  *
  * @param eventId - 행사 ID
- * @returns KPI 카드 4개 데이터
+ * @returns 전체 정보 KPI 2개와 오늘 참여자 상태 분포 데이터
  */
 export async function fetchAdminDashboardKpis(
   eventId: number

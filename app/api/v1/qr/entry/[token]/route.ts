@@ -10,6 +10,7 @@ import {
 import { supabase } from "@/utils/supabase/server";
 import { getEventOperationStatus } from "@/utils/event-status";
 import { USER_ROUTES, getUserRoutes } from "@/constants/userRoutes";
+import { sendDashboardKpiInvalidate } from "@/utils/admin-dashboard-kpi-broadcast";
 
 // 입장 QR route parameter 타입
 type EntryRouteContext = {
@@ -120,6 +121,8 @@ export async function GET(request: NextRequest, { params }: EntryRouteContext) {
   if (participantError) {
     return serverError("참여자 생성 실패", participantError);
   }
+
+  await sendDashboardKpiInvalidate(qrCode.events_id, "participant_entered");
 
   const response = NextResponse.redirect(
     new URL(getUserRoutes(event.id).root, request.url)

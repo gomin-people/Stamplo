@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { EventModel } from "@/types/models";
 import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
+import { getDateKey, getEventOperationStatus } from "@/utils/event-status";
 
 type Props = {
   eventId: string;
@@ -41,29 +42,19 @@ const getStatusBadgeClassName = (status: AdminEventStatus, isActive = false) =>
         )
   );
 
-const getLocalDateKey = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const date = String(now.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${date}`;
-};
-
-const getEventDateKey = (value: string) => value.slice(0, 10);
-
 const getEventStatus = (
   event: Pick<EventModel, "startDate" | "endDate">
 ): AdminEventStatus => {
-  const today = getLocalDateKey();
-  const startDate = getEventDateKey(event.startDate);
-  const endDate = getEventDateKey(event.endDate);
+  const { isBefore, isDuring } = getEventOperationStatus(
+    event.startDate,
+    event.endDate
+  );
 
-  if (startDate <= today && today <= endDate) {
+  if (isDuring) {
     return "진행중";
   }
 
-  if (startDate > today) {
+  if (isBefore) {
     return "예정";
   }
 
@@ -71,10 +62,10 @@ const getEventStatus = (
 };
 
 const compareDateAsc = (firstDate: string, secondDate: string) =>
-  getEventDateKey(firstDate).localeCompare(getEventDateKey(secondDate));
+  getDateKey(firstDate).localeCompare(getDateKey(secondDate));
 
 const compareDateDesc = (firstDate: string, secondDate: string) =>
-  getEventDateKey(secondDate).localeCompare(getEventDateKey(firstDate));
+  getDateKey(secondDate).localeCompare(getDateKey(firstDate));
 
 const getEventSortPriority = (status: AdminEventStatus) => {
   if (status === "진행중") {

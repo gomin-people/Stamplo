@@ -20,7 +20,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { cn } from "@/utils";
-import { getRankedBarColors } from "@/components/admin/dashboard/rankedBarColors";
+import { getRankedBarColors } from "@/utils/ranked-bar-colors";
 
 type AnalysisView = "daily" | "hourly";
 
@@ -112,13 +112,13 @@ const ParticipantAnalysisChart = ({
   );
 
   return (
-    <div className="flex h-full min-h-88 min-w-0 flex-col px-4 py-4">
+    <div className="flex h-full min-h-84 min-w-0 flex-col pl-4 pr-3 pt-3 pb-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1 flex-wrap items-end gap-x-3 gap-y-1">
           <h2 className="text-lg font-semibold text-gomin-black">
             참여자 수 분석
           </h2>
-          <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-400">
+          <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-500">
             시간에 따른 참여 패턴 확인
           </p>
         </div>
@@ -150,7 +150,7 @@ const ParticipantAnalysisChart = ({
                   ))}
                 </select>
                 <ChevronDown
-                  className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-gomin-neutral-400"
+                  className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-gomin-neutral-500"
                   aria-hidden="true"
                 />
               </motion.div>
@@ -169,7 +169,7 @@ const ParticipantAnalysisChart = ({
                 role="tab"
                 aria-selected={activeView === tab.value}
                 className={cn(
-                  "relative cursor-pointer rounded-lg px-3 text-xs font-semibold text-gomin-neutral-400 transition",
+                  "relative cursor-pointer rounded-lg px-3 text-xs font-semibold text-gomin-neutral-500 transition",
                   "focus-visible:ring-2 focus-visible:ring-gomin-primary-300 focus-visible:outline-none",
                   activeView === tab.value && "text-gomin-black"
                 )}
