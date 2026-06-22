@@ -10,6 +10,7 @@ import {
   type AdminDashboardDateWindow,
   getAdminDashboardDateLabels,
   getAdminDashboardDateWindow,
+  getKstDateTimePartsFromStoredUtcTimestamp,
 } from "@/utils/admin-dashboard-date";
 import { supabase } from "@/utils/supabase/server";
 
@@ -95,7 +96,7 @@ export async function GET(
   );
 
   for (const createdAt of participantCreatedAts ?? []) {
-    const dateTimeParts = getTimestampDateTimeParts(createdAt);
+    const dateTimeParts = getKstDateTimePartsFromStoredUtcTimestamp(createdAt);
     if (!dateTimeParts) {
       continue;
     }
@@ -181,37 +182,4 @@ const fetchParticipantCreatedAts = async (
       return { data: createdAts, error: null };
     }
   }
-};
-
-const getTimestampDateTimeParts = (value: string) => {
-  const timestamp = parseStoredUtcTimestamp(value);
-  if (!timestamp) {
-    return null;
-  }
-
-  const month = timestamp.getMonth() + 1;
-  const day = timestamp.getDate();
-  const hour = timestamp.getHours();
-
-  if (!month || !day || !Number.isInteger(hour)) {
-    return null;
-  }
-
-  return {
-    month,
-    day,
-    hour: hour === 24 ? 0 : hour,
-  };
-};
-
-const parseStoredUtcTimestamp = (value: string) => {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  const hasTimeZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(trimmed);
-  const timestamp = new Date(hasTimeZone ? trimmed : `${trimmed}Z`);
-
-  return Number.isNaN(timestamp.getTime()) ? null : timestamp;
 };
