@@ -6,9 +6,14 @@ import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon";
 type HeaderProps = {
   showBackButton?: boolean;
   onBackClick?: () => void;
+  rightSlot?: React.ReactNode;
 };
 
-const Header = ({ showBackButton = true, onBackClick }: HeaderProps) => {
+const Header = ({
+  showBackButton = true,
+  onBackClick,
+  rightSlot,
+}: HeaderProps) => {
   const router = useRouter();
 
   const handleBack = () => {
@@ -20,7 +25,7 @@ const Header = ({ showBackButton = true, onBackClick }: HeaderProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full h-14 flex items-center justify-between px-4 bg-transparent pointer-events-none">
+    <header className="absolute top-0 z-50 w-full h-14 flex items-center justify-between px-4 bg-transparent pointer-events-none">
       {/* Left Area: Back Button */}
       <div className="flex items-center min-w-10">
         {showBackButton && (
@@ -33,6 +38,11 @@ const Header = ({ showBackButton = true, onBackClick }: HeaderProps) => {
           </button>
         )}
       </div>
+      {rightSlot && (
+        <div className="pointer-events-auto flex items-center mt-4">
+          {rightSlot}
+        </div>
+      )}
     </header>
   );
 };

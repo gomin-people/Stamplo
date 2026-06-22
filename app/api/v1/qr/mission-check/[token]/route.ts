@@ -12,8 +12,8 @@ import {
   serverError,
 } from "@/utils/api";
 import { supabase } from "@/utils/supabase/server";
-
-const MISSION_UNAVAILABLE_PATH = "/user-unavailable";
+import { USER_ROUTES, getUserRoutes } from "@/constants/userRoutes";
+import { sendDashboardKpiInvalidate } from "@/utils/admin-dashboard-kpi-broadcast";
 const INACTIVE_MISSION_MESSAGE = "비활성화된 미션입니다.";
 const MISSION_NOT_FOUND_MESSAGE = "존재하지 않는 미션입니다.";
 
@@ -23,7 +23,7 @@ const getMissionUnavailableUrl = (
   request: NextRequest,
   reason: MissionCheckFailureReason
 ) => {
-  const url = new URL(MISSION_UNAVAILABLE_PATH, request.url);
+  const url = new URL(USER_ROUTES.USER_UNAVAILABLE, request.url);
 
   if (reason === "missionNotFound") {
     url.searchParams.set("reason", "not-found");
@@ -140,7 +140,7 @@ export async function GET(
     }
 
     const response = NextResponse.redirect(
-      new URL("/qr-required", request.url)
+      new URL(USER_ROUTES.QR_REQUIRED, request.url)
     );
     clearParticipantCookie(response);
     return response;
@@ -177,8 +177,18 @@ export async function GET(
     return serverError("미션 완료 저장 실패", completionError);
   }
 
+  if (!completionError) {
+    await sendDashboardKpiInvalidate(
+      missionCheckData.qrCode.events_id,
+      "mission_completed"
+    );
+  }
+
   return NextResponse.redirect(
-    new URL(`/event/${missionCheckData.qrCode.events_id}/mission`, request.url)
+    new URL(
+      `${getUserRoutes(missionCheckData.qrCode.events_id).mission}?newMission=${missionCheckData.qrCode.missions_id}`,
+      request.url
+    )
   );
 }
 
@@ -238,6 +248,11 @@ export async function POST(
 
     return serverError("미션 완료 저장 실패", completionError);
   }
+
+  await sendDashboardKpiInvalidate(
+    missionCheckData.qrCode.events_id,
+    "mission_completed"
+  );
 
   return created({
     mission: missionCheckData.mission,

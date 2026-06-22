@@ -5,7 +5,8 @@ import BrochureDropzone from "./brochure/BrochureDropzone";
 import BrochurePageStatus from "./brochure/BrochurePageStatus";
 import BrochurePageList from "./brochure/BrochurePageList";
 import BrochureAddButton from "./brochure/BrochureAddButton";
-import usePageUpload, { MAX_PAGES } from "@/hooks/usePageUpload";
+import usePageUpload from "@/hooks/usePageUpload";
+import { MAX_PAGES } from "@/constants";
 import { type StepFormHandle } from "@/types";
 import { toast } from "sonner";
 
@@ -18,6 +19,7 @@ const EventBrochureForm = forwardRef<StepFormHandle, Props>(
   function EventBrochureForm({ initialData, disabled = false }, ref) {
     const {
       pages,
+      pendingDeletePaths,
       addFiles,
       replaceInputRef,
       handleUploadChange,
@@ -25,14 +27,16 @@ const EventBrochureForm = forwardRef<StepFormHandle, Props>(
       handleDelete,
       handleReplace,
       handleDragEnd,
-    } = usePageUpload(initialData?.brochureImageUrl);
+    } = usePageUpload(initialData?.brochureImageUrl, 624);
 
     useImperativeHandle(
       ref,
       () => ({
         validate: () => {
           if (pages.some((p) => p.isUploading)) {
-            toast.warning("이미지 업로드가 완료될 때까지 기다려주세요.");
+            toast.warning("이미지 업로드가 완료될 때까지 기다려주세요.", {
+              id: "uploading-warning",
+            });
             return false;
           }
           return true;
@@ -42,8 +46,9 @@ const EventBrochureForm = forwardRef<StepFormHandle, Props>(
             .filter((p) => p.url !== null)
             .map((p) => p.url as string),
         }),
+        getPendingDeletePaths: () => pendingDeletePaths,
       }),
-      [pages]
+      [pages, pendingDeletePaths]
     );
 
     return (

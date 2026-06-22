@@ -6,6 +6,7 @@ import { generatePalette, hslToHex, hexToHsl } from "@/utils";
 import StampUploadSection from "./themeStamp/StampUploadSection";
 import ThemeColorPicker from "./themeStamp/ThemeColorPicker";
 import ThemePreviewPanel from "./themeStamp/ThemePreviewPanel";
+import { toast } from "sonner";
 
 type InitialData = {
   stampImageUrl?: string | null;
@@ -19,13 +20,13 @@ type Props = {
 
 const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
   function EventThemeStampForm({ initialData, disabled = false }, ref) {
-    const [stampPreviewUrl, setStampPreviewUrl] = useState<string | null>(
-      initialData?.stampImageUrl ?? null
-    );
-    const [stampFileUrl, setStampFileUrl] = useState<string | null>(
-      initialData?.stampImageUrl ?? null
+    const [stampFileUrl, setStampFileUrl] = useState<string>(
+      initialData?.stampImageUrl ?? ""
     );
     const [isUploading, setIsUploading] = useState(false);
+    const [pendingDeletePath, setPendingDeletePath] = useState<string | null>(
+      null
+    );
 
     const [h, setH] = useState(() => {
       if (initialData?.primaryColor) {
@@ -48,32 +49,42 @@ const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
       }
     }, [keyColor]);
 
+    const handleStampRemove = () => setStampFileUrl("");
+
     // 부모 컴포넌트에 넘길 validate 및 getData 정의
-    useImperativeHandle(ref, () => ({
-      validate: () => {
-        if (isUploading) {
-          alert(
-            "스탬프 모양 이미지가 스토리지에 업로드 중입니다. 잠시만 기다려주세요."
-          );
-          return false;
-        }
-        return true;
-      },
-      getData: () => ({
-        stampImageUrl: stampFileUrl,
-        primaryColor: keyColor,
+    useImperativeHandle(
+      ref,
+      () => ({
+        validate: () => {
+          if (isUploading) {
+            toast.warning(
+              "스탬프 모양 이미지가 스토리지에 업로드 중입니다. 잠시만 기다려주세요.",
+              { id: "uploading" }
+            );
+            return false;
+          }
+          return true;
+        },
+        getData: () => ({
+          stampImageUrl: stampFileUrl,
+          primaryColor: keyColor,
+        }),
+        getPendingDeletePaths: () =>
+          pendingDeletePath ? [pendingDeletePath] : [],
       }),
-    }));
+      [stampFileUrl, isUploading, keyColor, pendingDeletePath]
+    );
 
     return (
       <div className="flex flex-row gap-10 text-gomin-black h-166">
         {/* 좌측 컨트롤 영역 */}
         <div className="flex-1 space-y-8">
           <StampUploadSection
-            stampPreviewUrl={stampPreviewUrl}
-            onPreviewChange={setStampPreviewUrl}
-            onFileUrlChange={setStampFileUrl}
+            value={stampFileUrl}
             onUploadingChange={setIsUploading}
+            onChange={setStampFileUrl}
+            onRemove={handleStampRemove}
+            onPendingDeletePath={setPendingDeletePath}
             disabled={disabled}
           />
           <hr className="border-gomin-neutral-100" />
@@ -87,8 +98,9 @@ const EventThemeStampForm = forwardRef<StepFormHandle, Props>(
 
         {/* 우측 실시간 미리보기 영역 */}
         <ThemePreviewPanel
-          stampImage={stampPreviewUrl} // 실시간 모바일 미리보기에는 로컬 Object URL(지연 0초)을 즉시 렌더링
+          stampImage={stampFileUrl} // 실시간 모바일 미리보기에는 로컬 Object URL(지연 0초)을 즉시 렌더링
           palette={palette}
+          className="w-full lg:w-[320px] h-162.5"
         />
       </div>
     );

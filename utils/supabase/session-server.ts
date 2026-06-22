@@ -11,9 +11,13 @@ export const createSessionClient = async () => {
       cookies: {
         getAll: () => cookieStore.getAll(),
         setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Server Component에서는 쿠키 쓰기가 불가능하므로 proxy에서 갱신한다.
+          }
         },
       },
     }

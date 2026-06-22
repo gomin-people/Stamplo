@@ -14,7 +14,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export default function MissionAddButton({ disabled }: Props) {
+const MissionAddButton = ({ disabled }: Props) => {
   const eventId = Number(useParams().eventId);
   const [isAdding, setIsAdding] = useState(false);
   const { mutateAsync: createAdminMissionAsync } =
@@ -43,11 +43,15 @@ export default function MissionAddButton({ disabled }: Props) {
       </Button>
 
       <Dialog open={isAdding} onOpenChange={setIsAdding}>
-        <MissionDialog
-          mission={{ title: "", description: "", isActive: false }}
-          onSave={handleSave}
-        />
+        {isAdding && (
+          <MissionDialog
+            mission={{ title: "", description: "", isActive: false }}
+            onSave={handleSave}
+          />
+        )}
       </Dialog>
     </>
   );
-}
+};
+
+export default MissionAddButton;

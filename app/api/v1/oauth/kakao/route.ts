@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ADMIN_EVENT_REGISTER_PATH } from "@/constants/adminRoutes";
+import { getPriorityAdminEventId } from "@/utils/admin-event-redirect";
 import { createSessionClient } from "@/utils/supabase/session-server";
 
 export async function GET(request: NextRequest) {
@@ -57,18 +58,11 @@ export async function GET(request: NextRequest) {
   //   2순위: 예정 행사 중 시작일이 가장 빠른 행사
   //   3순위: 종료 행사 중 종료일이 가장 최근인 행사
   // 조회 실패 시 로그인 페이지로 되돌리고, 행사가 있으면 대시보드로 없으면 등록 페이지로 이동합니다.
-  const { data: eventId, error: eventsError } = await supabase.rpc(
-    "get_priority_admin_event_id"
-  );
-
-  let redirectPath = ADMIN_EVENT_REGISTER_PATH;
-
-  if (eventsError) {
-    console.error("Error fetching events:", eventsError);
-    redirectPath = "/admin";
-  } else if (eventId != null) {
-    redirectPath = `/admin/events/${eventId}/dashboard`;
-  }
+  const eventId = await getPriorityAdminEventId(supabase);
+  const redirectPath =
+    eventId != null
+      ? `/admin/events/${eventId}/dashboard`
+      : ADMIN_EVENT_REGISTER_PATH;
 
   return NextResponse.redirect(`${origin}${redirectPath}`);
 }

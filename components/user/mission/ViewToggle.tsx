@@ -9,7 +9,7 @@ type ViewToggleProps = {
   onChange: (mode: ViewMode) => void;
 };
 
-export default function ViewToggle({ viewMode, onChange }: ViewToggleProps) {
+const ViewToggle = ({ viewMode, onChange }: ViewToggleProps) => {
   return (
     <div className="flex items-center gap-1">
       {/* 리스트 뷰 버튼 */}
@@ -39,4 +39,6 @@ export default function ViewToggle({ viewMode, onChange }: ViewToggleProps) {
       </button>
     </div>
   );
-}
+};
+
+export default ViewToggle;

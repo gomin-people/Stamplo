@@ -1,21 +1,32 @@
 // 대시보드 KPI 카드 식별자
-export type AdminDashboardKpiKey =
-  | "participants"
-  | "missionInProgress"
-  | "missionCompleted"
-  | "rewardClaimed";
+export type AdminDashboardKpiKey = "totalParticipants" | "totalRewardClaimed";
 
 // 대시보드 KPI 카드 숫자 응답 타입
-export type AdminDashboardKpiCount = {
-  today: number;
-  total: number;
+export type AdminDashboardKpiMetric = {
+  value: number;
 };
 
-// 대시보드 KPI 4개 카드 응답 타입
+// 오늘 참여자 퍼널 단계 데이터
+export type AdminDashboardTodayFunnelStage = {
+  count: number;
+  percent: number;
+};
+
+// 오늘 참여자 퍼널 응답 타입
+export type AdminDashboardTodayFunnel = {
+  participants: number;
+  inProgress: AdminDashboardTodayFunnelStage;
+  unclaimed: AdminDashboardTodayFunnelStage;
+  claimed: AdminDashboardTodayFunnelStage;
+};
+
+// 대시보드 KPI 응답 타입
 export type AdminDashboardKpisResponse = Record<
   AdminDashboardKpiKey,
-  AdminDashboardKpiCount
->;
+  AdminDashboardKpiMetric
+> & {
+  todayFunnel: AdminDashboardTodayFunnel;
+};
 
 // 날짜별 참여자 수 데이터
 export type AdminDashboardDailyParticipant = {
@@ -30,17 +41,17 @@ export type AdminDashboardHourlyParticipant = {
   count: number;
 };
 
-// 날짜별 시간대 차트 mock 보정 계수
-export type AdminDashboardHourlyDateFactor = {
+// 날짜별 시간대 참여자 수 데이터
+export type AdminDashboardHourlyParticipantsByDate = {
   label: string;
-  factor: number;
+  hourly: AdminDashboardHourlyParticipant[];
 };
 
 // 참여자 수 분석 차트 응답 타입
 export type AdminDashboardParticipantAnalysisResponse = {
   daily: AdminDashboardDailyParticipant[];
   hourlyTotal: AdminDashboardHourlyParticipant[];
-  hourlyDateFactors: AdminDashboardHourlyDateFactor[];
+  hourlyByDate: AdminDashboardHourlyParticipantsByDate[];
 };
 
 // 달성자 성별 통계 데이터
@@ -69,6 +80,7 @@ export type AdminDashboardAchieverStatisticsResponse = {
 export type AdminDashboardMissionStatus = {
   id: number;
   title: string;
+  isActive: boolean;
   completedCount: number;
   completionRate: number;
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, Plus } from "lucide-react";
 import { cn } from "@/utils";
@@ -15,16 +15,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAdminEventsQuery } from "@/features/admin/events/adminEventQueries";
 import type { EventModel } from "@/types/models";
-import {
-  useSetSelectedEventId,
-  useIsEditMode,
-  useSetPendingHref,
-} from "@/stores/admin";
+import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
+import { getDateKey, getEventOperationStatus } from "@/utils/event-status";
 
 type Props = {
   eventId: string;
+  events: EventModel[];
 };
 
 type AdminEventStatus = "진행중" | "예정" | "종료";
@@ -45,29 +42,19 @@ const getStatusBadgeClassName = (status: AdminEventStatus, isActive = false) =>
         )
   );
 
-const getLocalDateKey = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const date = String(now.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${date}`;
-};
-
-const getEventDateKey = (value: string) => value.slice(0, 10);
-
 const getEventStatus = (
   event: Pick<EventModel, "startDate" | "endDate">
 ): AdminEventStatus => {
-  const today = getLocalDateKey();
-  const startDate = getEventDateKey(event.startDate);
-  const endDate = getEventDateKey(event.endDate);
+  const { isBefore, isDuring } = getEventOperationStatus(
+    event.startDate,
+    event.endDate
+  );
 
-  if (startDate <= today && today <= endDate) {
+  if (isDuring) {
     return "진행중";
   }
 
-  if (startDate > today) {
+  if (isBefore) {
     return "예정";
   }
 
@@ -75,10 +62,10 @@ const getEventStatus = (
 };
 
 const compareDateAsc = (firstDate: string, secondDate: string) =>
-  getEventDateKey(firstDate).localeCompare(getEventDateKey(secondDate));
+  getDateKey(firstDate).localeCompare(getDateKey(secondDate));
 
 const compareDateDesc = (firstDate: string, secondDate: string) =>
-  getEventDateKey(secondDate).localeCompare(getEventDateKey(firstDate));
+  getDateKey(secondDate).localeCompare(getDateKey(firstDate));
 
 const getEventSortPriority = (status: AdminEventStatus) => {
   if (status === "진행중") {
@@ -114,35 +101,21 @@ export const compareEventsByDisplayPriority = (
 };
 
 // 현재 행사 선택 드롭다운과 행사 전환 동작을 담당하는 사이드바 컴포넌트
-const EventSelector = ({ eventId }: Props) => {
+const EventSelector = ({ eventId, events }: Props) => {
   const pathname = usePathname();
   const router = useRouter();
   const [isEventMenuOpen, setIsEventMenuOpen] = useState(false);
   const [activeScrollTarget, setActiveScrollTarget] = useState<string | null>(
     null
   );
-  const setSelectedEventId = useSetSelectedEventId();
   const isEditMode = useIsEditMode();
   const setPendingHref = useSetPendingHref();
-  const { data: events = [], isError, isLoading } = useAdminEventsQuery();
   const sortedEvents = useMemo(
     () => [...events].sort(compareEventsByDisplayPriority),
     [events]
   );
   const selectedEvent = events.find((event) => String(event.id) === eventId);
-  const selectedEventLabel = isLoading
-    ? "행사 불러오는 중"
-    : isError
-      ? "행사 목록 조회 실패"
-      : (selectedEvent?.title ?? `행사 ${eventId}`);
-
-  useEffect(() => {
-    if (!selectedEvent) {
-      return;
-    }
-
-    setSelectedEventId(String(selectedEvent.id));
-  }, [selectedEvent, setSelectedEventId]);
+  const selectedEventLabel = selectedEvent?.title ?? `행사 ${eventId}`;
 
   const selectEvent = (nextEventId: string) => {
     if (nextEventId === eventId) return;
@@ -155,7 +128,6 @@ const EventSelector = ({ eventId }: Props) => {
     if (isEditMode) {
       setPendingHref(href);
     } else {
-      setSelectedEventId(nextEventId);
       router.push(href);
     }
   };

@@ -1,0 +1,131 @@
+"use client";
+
+import { useState } from "react";
+import {
+  useUploadAdminImageMutation,
+  useDeleteAdminImageMutation,
+} from "@/features/admin/upload/adminUploadMutations";
+import { extractStoragePath } from "@/utils/storage";
+import { useIsEditMode } from "@/stores/admin";
+
+const DEFAULT_ALLOWED_EXTENSIONS = ["png", "jpg", "jpeg", "webp"];
+const DEFAULT_ALLOWED_MIME_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const DEFAULT_MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+
+type UseImageUploadOptions = {
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  initialPath?: string | null;
+  allowedExtensions?: string[];
+  allowedMimeTypes?: string[];
+  maxSizeBytes?: number;
+  resizeWidth?: number;
+  onUrlChange?: (url: string) => void;
+  uploadMode?: "storage" | "landing";
+};
+
+export default function useImageUpload({
+  fileInputRef,
+  initialPath = null,
+  allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS,
+  allowedMimeTypes = DEFAULT_ALLOWED_MIME_TYPES,
+  maxSizeBytes = DEFAULT_MAX_SIZE_BYTES,
+  resizeWidth,
+  onUrlChange,
+  uploadMode = "storage",
+}: UseImageUploadOptions) {
+  const deferDelete = useIsEditMode();
+  const [path, setPath] = useState<string | null>(
+    initialPath ? (extractStoragePath(initialPath) ?? initialPath) : null
+  );
+  const [pendingDeletePath, setPendingDeletePath] = useState<string | null>(
+    null
+  );
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const {
+    mutate: uploadImage,
+    isPending: isUploading,
+    isSuccess,
+    isError,
+  } = useUploadAdminImageMutation({ width: resizeWidth });
+  const { mutate: deleteImage } = useDeleteAdminImageMutation();
+
+  const validate = (file: File): string | null => {
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (
+      !allowedMimeTypes.includes(file.type) ||
+      !ext ||
+      !allowedExtensions.includes(ext)
+    ) {
+      return `지원하지 않는 파일 형식입니다. (${allowedExtensions.join(", ")} 이미지만 업로드 가능)`;
+    }
+    if (file.size > maxSizeBytes) {
+      return `파일 크기는 ${Math.floor(maxSizeBytes / 1024 / 1024)}MB 이하여야 합니다.`;
+    }
+    return null;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const error = validate(file);
+    if (error) {
+      setValidationError(error);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    setValidationError(null);
+
+    if (uploadMode === "landing") {
+      const localUrl = URL.createObjectURL(file);
+      setPath(localUrl);
+      onUrlChange?.(localUrl);
+    } else {
+      uploadImage(file, {
+        onSuccess: ({ url, path: uploadedPath }) => {
+          setPath(uploadedPath);
+          onUrlChange?.(url);
+        },
+        onError: (err) => {
+          console.error("이미지 업로드 에러:", err);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        },
+      });
+    }
+  };
+
+  const handleRemove = () => {
+    if (path) {
+      if (uploadMode === "landing") {
+        if (path.startsWith("blob:")) {
+          URL.revokeObjectURL(path);
+        }
+      } else if (deferDelete) {
+        setPendingDeletePath(path);
+      } else {
+        deleteImage(path, {
+          onError: (err) => console.error("이미지 삭제 에러:", err),
+        });
+      }
+    }
+    setPath(null);
+    setValidationError(null);
+    onUrlChange?.("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const triggerFileInput = () => fileInputRef.current?.click();
+
+  return {
+    isUploading,
+    isSuccess,
+    isError,
+    validationError,
+    pendingDeletePath,
+    handleFileChange,
+    handleRemove,
+    triggerFileInput,
+  };
+}

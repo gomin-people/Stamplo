@@ -1,20 +1,29 @@
 "use client";
 
-import { useState, memo } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import BrochureButton from "@/components/user/mission/BrochureButton";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ViewToggle from "@/components/user/mission/ViewToggle";
 import MissionStamp from "@/components/user/mission/MissionStamp";
 import MissionItem from "@/components/user/mission/MissionItem";
 import FloatingActionButton from "@/components/user/mission/FloatingActionButton";
 import SurveyModal from "@/components/user/mission/SurveyModal";
+import QrCheckModal from "@/components/user/mission/QrCheckModal";
 import {
-  useParticipantMissionsQuery,
+  participantMissionQueries,
   type ParticipantMission,
   type ParticipantMissions,
 } from "@/features/participant/missions/participantMissionQueries";
 import { cn } from "@/utils";
 import { buildInitialData } from "@/utils/participant-mission";
+import { type ParticipantModel } from "@/types/models";
+import { useCelebration } from "@/hooks/useCelebration";
+import {
+  useNewlyStampedMissionId,
+  useSetNewlyStampedMissionId,
+  useClearNewlyStampedMissionId,
+} from "@/stores/user";
+import { getUserRoutes } from "@/constants/userRoutes";
 
 // Supabase의 event 테이블 타입 인터페이스 정의
 type EventData = {
@@ -23,6 +32,7 @@ type EventData = {
   name?: string;
   description?: string;
   stampImageUrl?: string | null;
+  brochureImageUrl?: string[] | null;
 };
 
 type InitialMission = {
@@ -36,7 +46,9 @@ type MissionPageClientProps = {
   event: EventData;
   eventId: string;
   initialMissions: InitialMission[];
+  initialParticipant?: ParticipantModel;
   isPreview?: boolean;
+  newlyStampedId?: number | null;
 };
 
 type ViewMode = "list" | "grid";
@@ -52,19 +64,28 @@ const MissionPageClient = ({
   event,
   eventId,
   initialMissions,
+  initialParticipant,
   isPreview = false,
+  newlyStampedId,
 }: MissionPageClientProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isSurveyOpen, setIsSurveyOpen] = useState(false);
+  const [isQrCheckOpen, setIsQrCheckOpen] = useState(false);
+  const storeNewlyStampedId = useNewlyStampedMissionId();
+  const setNewlyStampedMissionId = useSetNewlyStampedMissionId();
+  const clearNewlyStampedMissionId = useClearNewlyStampedMissionId();
 
   const initialData: ParticipantMissions | undefined =
     !isPreview && initialMissions.length > 0
-      ? buildInitialData(initialMissions)
+      ? buildInitialData(initialMissions, initialParticipant)
       : undefined;
 
   // React Query를 통해 DB에서 참여자의 실시간 완료 스탬프 현황 데이터를 가져옴
-  const { data, isError } = useParticipantMissionsQuery({
+  // 어드민 미리보기 환경에서는 세션 없이 쿼리가 실행되어 401 오류가 발생하므로 enabled로 차단한다.
+  const { data, isError, isFetching } = useQuery({
+    ...participantMissionQueries.list(),
     enabled: !isPreview,
     initialData,
   });
@@ -96,36 +117,71 @@ const MissionPageClient = ({
       ? !!data.participant.gender && !!data.participant.ageRange
       : false;
 
+  // 설문 제출 완료 감지 시 자동으로 완료 페이지 이동
+  useEffect(() => {
+    if (isSurveyCompleted && isSurveyOpen) {
+      const timer = setTimeout(() => {
+        router.push(getUserRoutes(eventId).complete);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isSurveyCompleted, isSurveyOpen, eventId, router]);
+
   // 리워드 수령 완료 여부
   const isRewardClaimed =
     data && !isPreview ? data.participant.isRewardClaimed : false;
 
+  const { showCelebration, handleStampReady } = useCelebration();
+
+  useEffect(() => {
+    if (storeNewlyStampedId != null && isAllCompleted) {
+      handleStampReady();
+    }
+  }, [storeNewlyStampedId, isAllCompleted, handleStampReady]);
+
   const hasError = isError && !isPreview;
   const isMissionsEmpty = missions.length === 0 && !isPreview;
   const isShowEmpty = hasError || isMissionsEmpty;
-  const showBrochureButton = isPreview || !hasError;
-  const showMissionUI = isPreview || (showBrochureButton && !isMissionsEmpty);
+  const showMissionUI = isPreview || (!hasError && !isMissionsEmpty);
 
   // QR 체크 안내 또는 완료 페이지 이동
   const handleAction = () => {
     if (isAllCompleted) {
       if (isSurveyCompleted) {
-        router.push(`/event/${eventId}/complete`);
+        router.push(getUserRoutes(eventId).complete);
       } else {
         setIsSurveyOpen(true);
       }
     } else {
-      window.location.assign(`/event/${eventId}/qr-check`);
+      setIsQrCheckOpen(true);
     }
   };
 
   const handleSurveySubmitSuccess = () => {
-    router.push(`/event/${eventId}/complete`);
+    setTimeout(() => {
+      router.push(getUserRoutes(eventId).complete);
+    }, 100);
   };
+
+  const handleMissionComplete = (missionId: number) => {
+    queryClient.invalidateQueries({
+      queryKey: participantMissionQueries.all(),
+    });
+    setNewlyStampedMissionId(missionId);
+  };
+
+  // 네이티브 카메라로 QR 스캔 시 서버 리다이렉트(newMission)로 전달된 값을 스토어에 동기화
+  useEffect(() => {
+    if (newlyStampedId != null) setNewlyStampedMissionId(newlyStampedId);
+  }, [newlyStampedId, setNewlyStampedMissionId]);
+
+  // 컴포넌트가 언마운트되면 새 스탬프 애니메이션 표시 상태를 정리
+  useEffect(() => {
+    return () => clearNewlyStampedMissionId();
+  }, [clearNewlyStampedMissionId]);
 
   // DB에서 불러온 title (또는 name)을 1순위로 사용하며 예외 처리 제공
   const eventName = event?.title || event?.name || `이벤트 #${eventId}`;
-
   return (
     <div
       className={cn(
@@ -133,20 +189,21 @@ const MissionPageClient = ({
         isPreview
           ? "h-full pb-20"
           : isShowEmpty
-            ? "h-full overflow-hidden"
-            : viewMode === "list"
-              ? "min-h-screen pb-20"
-              : "pb-21.5"
+            ? "h-full overflow-hidden pt-14"
+            : "pb-21.5 pt-14"
       )}
     >
       <main className="flex-1 max-w-md w-full mx-auto px-6 pt-4 pb-1.5 overflow-x-hidden">
-        {/* 2. 타이틀 & 브로슈어 안내장 버튼 레이아웃 */}
-        <div className="flex items-center justify-between gap-4 mb-5">
-          <h1 className="text-4xl font-nanum font-extrabold leading-11.25 text-gomin-primary-700 tracking-tight select-none">
+        {/* 2. 타이틀 레이아웃 */}
+        <div className="mb-5">
+          <h1
+            className={cn(
+              "text-4xl font-nanum font-extrabold leading-11.25 text-gomin-primary-700 tracking-tight select-none max-h-22.5 overflow-hidden",
+              eventName.includes(" ") ? "break-keep" : "wrap-break-word"
+            )}
+          >
             {eventName}
           </h1>
-          {/* 우측 별도 컴포넌트로 보여지는 브로슈어 버튼 */}
-          {showBrochureButton && <BrochureButton eventId={eventId} />}
         </div>
 
         {/* 3. 진행 상황 안내 문구 */}
@@ -162,7 +219,12 @@ const MissionPageClient = ({
                 리워드를 받으세요
               </h2>
             ) : (
-              <h2 className="text-2xl font-nanum font-extrabold text-gomin-black leading-tight tracking-tight flex items-center gap-1.5 select-none">
+              <h2
+                className={cn(
+                  "text-2xl font-nanum font-extrabold text-gomin-black leading-tight tracking-tight select-none",
+                  showCelebration && "animate-shake-in"
+                )}
+              >
                 🎉 축하합니다!
                 <br />
                 모든 스탬프를 수집했어요!
@@ -197,6 +259,12 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
+                  isNewStamped={mission.id === storeNewlyStampedId}
+                  onStampReady={
+                    mission.id === storeNewlyStampedId && isAllCompleted
+                      ? handleStampReady
+                      : undefined
+                  }
                 />
               ))}
             </div>
@@ -208,6 +276,12 @@ const MissionPageClient = ({
                   key={mission.id}
                   mission={mission}
                   stampImageUrl={event.stampImageUrl}
+                  isNewStamped={mission.id === storeNewlyStampedId}
+                  onStampReady={
+                    mission.id === storeNewlyStampedId && isAllCompleted
+                      ? handleStampReady
+                      : undefined
+                  }
                 />
               ))}
             </div>
@@ -222,8 +296,18 @@ const MissionPageClient = ({
           onClick={handleAction}
           isPreview={isPreview}
           isRewardClaimed={isRewardClaimed}
+          isLoading={isFetching && !isPreview}
+          className={isPreview ? "" : "animate-fade-up"}
         />
       )}
+
+      {/* QR 체크 모달 */}
+      <QrCheckModal
+        isOpen={isQrCheckOpen}
+        onClose={() => setIsQrCheckOpen(false)}
+        eventId={eventId}
+        onMissionComplete={handleMissionComplete}
+      />
 
       {/* 설문조사 모달 */}
       <SurveyModal
@@ -235,4 +319,4 @@ const MissionPageClient = ({
   );
 };
 
-export default memo(MissionPageClient);
+export default MissionPageClient;

@@ -1,14 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
+import { resolveRequest, requestJson } from "@/features/shared/api/http";
+import type { AdminUserModel } from "@/types/models";
 
-export function useAdminUserQuery() {
-  return useQuery({
-    queryKey: ["adminUser"],
-    queryFn: async () => {
-      const res = await fetch("/api/v1/admin/user");
-      if (!res.ok) {
-        throw new Error(`${res.status} ${res.statusText}`);
-      }
-      return res.json();
-    },
-  });
+export async function fetchAdminUser(): Promise<AdminUserModel> {
+  const { url, init } = await resolveRequest("/api/v1/admin/user");
+  return requestJson<AdminUserModel>(url, init);
 }
+
+export const adminUserQueries = {
+  all: () => ["adminUser"] as const,
+  me: () =>
+    queryOptions({
+      queryKey: adminUserQueries.all(),
+      queryFn: fetchAdminUser,
+    }),
+};

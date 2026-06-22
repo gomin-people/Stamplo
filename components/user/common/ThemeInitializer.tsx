@@ -7,7 +7,7 @@ type ThemeInitializerProps = {
   primaryColor: string;
 };
 
-export function ThemeInitializer({ primaryColor }: ThemeInitializerProps) {
+export const ThemeInitializer = ({ primaryColor }: ThemeInitializerProps) => {
   const activeColor = primaryColor || "#5435EB";
 
   // props로 받은 색상으로 즉시 7단계 테마 팔레트 생성 (클라이언트/서버 공통)
@@ -51,4 +51,4 @@ export function ThemeInitializer({ primaryColor }: ThemeInitializerProps) {
       }}
     />
   );
-}
+};

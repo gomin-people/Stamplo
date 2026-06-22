@@ -5,9 +5,13 @@ import { ApiError } from "@/features/shared/api/http";
 
 type UploadResult = { url: string; path: string };
 
-export async function uploadAdminImage(file: File): Promise<UploadResult> {
+export async function uploadAdminImage(
+  file: File,
+  options?: { width?: number }
+): Promise<UploadResult> {
   const formData = new FormData();
   formData.append("file", file);
+  if (options?.width) formData.append("width", String(options.width));
 
   const response = await fetch("/api/v1/admin/upload", {
     method: "POST",
@@ -28,8 +32,10 @@ export async function uploadAdminImage(file: File): Promise<UploadResult> {
   return body as UploadResult;
 }
 
-export function useUploadAdminImageMutation() {
-  return useMutation({ mutationFn: uploadAdminImage });
+export function useUploadAdminImageMutation(options?: { width?: number }) {
+  return useMutation({
+    mutationFn: (file: File) => uploadAdminImage(file, options),
+  });
 }
 
 export function useDeleteAdminImageMutation() {

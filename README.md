@@ -50,8 +50,7 @@ app/
 │       ├── brochure/   # 브로슈어
 │       ├── mission/    # 미션 목록
 │       ├── qr-check/   # QR 스캔
-│       ├── complete/   # 완료 + 설문
-│       └── detail/     # 행사 상세
+│       └── complete/   # 완료 + 설문
 ├── (admin)/            # 어드민 사이드 (PC)
 │   └── admin/events/[eventId]/
 │       ├── dashboard/  # 현황 대시보드

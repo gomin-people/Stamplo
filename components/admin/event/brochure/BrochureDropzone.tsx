@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { cn } from "@/utils";
 
 type DropzoneProps = {
@@ -29,7 +29,7 @@ const BrochureDropzone = ({
   const [shake, setShake] = useState(0);
 
   const triggerShake = (message: string) => {
-    toast.warning(message);
+    toast.warning(message, { id: "brochure-warning" });
     setShake((s) => s + 1);
   };
 
@@ -107,7 +107,8 @@ const BrochureDropzone = ({
                 disabled ? "text-gomin-neutral-300" : "text-gomin-primary-700"
               )}
             >
-              JPG · PNG 파일을 드래그하거나 클릭해 업로드하세요
+              JPG · PNG 파일을 드래그하거나 클릭해 업로드하세요 ( 8 : 17 비율
+              권장)
             </span>
           </div>
           <div className="ml-auto shrink-0">

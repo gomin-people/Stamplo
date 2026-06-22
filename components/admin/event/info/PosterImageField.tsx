@@ -1,14 +1,14 @@
 "use client";
-import { memo, useRef, useState } from "react";
-import { ImageIcon, X } from "lucide-react";
-import {
-  useUploadAdminImageMutation,
-  useDeleteAdminImageMutation,
-} from "@/features/admin/upload/adminUploadMutations";
 
+import { memo, useRef, useEffect, useCallback } from "react";
+import { ImageIcon, X, Loader2 } from "lucide-react";
+import { useController, useFormContext } from "react-hook-form";
+import { z } from "zod";
+import { EventInfoSchema } from "@/types/schemas/adminEventInfoSchemas";
+import useImageUpload from "@/hooks/useImageUpload";
 import { cn } from "@/utils/index";
-import { imageSchema } from "@/utils/schemas";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import {
   Field,
   FieldDescription,
@@ -16,76 +16,92 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 
+type FormState = z.infer<typeof EventInfoSchema>;
+
+const POSTER_ALLOWED_MIME_TYPES = ["image/jpeg", "image/png"];
+const POSTER_ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"];
+
 type Props = {
-  error?: string;
-  initialImageUrl?: string;
   disabled?: boolean;
-  onUploadStart: () => void;
-  onUploadSuccess: (url: string) => void;
-  onRemove: () => void;
+  onUploadingChange: (isUploading: boolean) => void;
+  onPendingDeletePath?: (path: string | null) => void;
 };
 
 const PosterImageField = memo(function PosterImageField({
-  error,
-  initialImageUrl,
   disabled,
-  onUploadStart,
-  onUploadSuccess,
-  onRemove,
+  onUploadingChange,
+  onPendingDeletePath,
 }: Props) {
-  const [posterPreview, setPosterPreview] = useState<string | null>(
-    initialImageUrl ?? null
-  );
-  const [posterPath, setPosterPath] = useState<string | null>(null);
-  const [fileError, setFileError] = useState<string | undefined>();
+  const { control } = useFormContext<FormState>();
+  const { field, fieldState } = useController({
+    control,
+    name: "posterImageUrl",
+  });
+  const value = field.value;
+  const error = fieldState.error?.message;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { mutate: uploadImage, isPending: isUploading } =
-    useUploadAdminImageMutation();
-  const { mutate: deleteImage } = useDeleteAdminImageMutation();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const {
+    isUploading,
+    validationError,
+    pendingDeletePath,
+    handleFileChange,
+    handleRemove: handleImageRemove,
+    triggerFileInput,
+  } = useImageUpload({
+    fileInputRef,
+    initialPath: value,
+    allowedMimeTypes: POSTER_ALLOWED_MIME_TYPES,
+    allowedExtensions: POSTER_ALLOWED_EXTENSIONS,
+    resizeWidth: 600,
+    onUrlChange: (url) => {
+      if (url) field.onChange(url);
+    },
+  });
 
-    const result = imageSchema.safeParse(file);
-    if (!result.success) {
-      setFileError(result.error.issues[0]?.message);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      return;
-    }
+  useEffect(() => {
+    onUploadingChange(isUploading);
+  }, [isUploading, onUploadingChange]);
 
-    setFileError(undefined);
-    setPosterPreview(URL.createObjectURL(file));
-    onUploadStart();
-    uploadImage(file, {
-      onSuccess: ({ url, path }) => {
-        setPosterPath(path);
-        onUploadSuccess(url);
-      },
-    });
-  };
+  const stablePendingDeletePath = useCallback(
+    (path: string | null) => onPendingDeletePath?.(path),
+    [onPendingDeletePath]
+  );
+
+  useEffect(() => {
+    stablePendingDeletePath(pendingDeletePath);
+  }, [pendingDeletePath, stablePendingDeletePath]);
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (posterPath) deleteImage(posterPath);
-    setPosterPreview(null);
-    setPosterPath(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    onRemove();
+    handleImageRemove();
+    field.onChange("");
   };
 
   return (
-    <Field className="w-64 shrink-0" data-invalid={!!error}>
+    <Field
+      className="w-64 shrink-0"
+      data-invalid={!!(error || validationError)}
+    >
       <FieldTitle className="gap-1">
         포스터 이미지
         <span className="text-destructive">*</span>
       </FieldTitle>
       <div className="relative aspect-2/3 w-full">
-        {posterPreview ? (
+        {isUploading ? (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-input bg-muted/30 text-muted-foreground">
+            <Loader2 className="size-8 animate-spin text-primary/60" />
+            <span className="text-xs">업로드 중...</span>
+          </div>
+        ) : value ? (
           <div className="relative h-full w-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={posterPreview}
+            <Image
+              width={400}
+              height={600}
+              src={value}
+              sizes="600px"
+              fetchPriority={"high"}
+              loading="eager"
               alt="포스터 미리보기"
               className="h-full w-full rounded-lg object-cover"
             />
@@ -103,18 +119,18 @@ const PosterImageField = memo(function PosterImageField({
             )}
           </div>
         ) : (
-          <button
+          <Button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={triggerFileInput}
             disabled={isUploading || disabled}
             className={cn(
-              "flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 text-muted-foreground transition-colors hover:bg-muted/50 disabled:opacity-50",
+              "flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 text-muted-foreground transition-colors hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-50",
               error ? "border-destructive" : "border-input"
             )}
           >
             <ImageIcon className="size-8 text-primary/40" />
             <span className="text-xs">클릭해서 업로드해주세요.</span>
-          </button>
+          </Button>
         )}
       </div>
       <input
@@ -129,7 +145,7 @@ const PosterImageField = memo(function PosterImageField({
         2 : 3 비율 · 1080 × 1620 권장
       </FieldDescription>
       <div className="h-3">
-        <FieldError>{fileError ?? error}</FieldError>
+        <FieldError>{validationError ?? error}</FieldError>
       </div>
     </Field>
   );

@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import {
   badRequest,
   notFound,
@@ -9,8 +10,12 @@ import {
   toInteger,
   unauthorized,
 } from "@/utils/api";
+import { getPriorityAdminEventId } from "@/utils/admin-event-redirect";
 import { supabase } from "@/utils/supabase/server";
 import { createSessionClient } from "@/utils/supabase/session-server";
+import { extractStoragePath } from "@/utils/storage";
+
+const BUCKET = "Stamply";
 
 // 어드민 행사 상세 route parameter 타입
 type AdminEventRouteContext = {
@@ -199,6 +204,8 @@ export async function PATCH(
     return notFound("행사를 찾을 수 없습니다.");
   }
 
+  revalidateTag(`event-theme-${eventId}`, "default");
+
   return ok(data);
 }
 
@@ -207,7 +214,7 @@ export async function PATCH(
  *
  * @param request - Route Handler 요청 객체
  * @param context - 행사 ID route parameter
- * @returns 삭제된 행사 ID
+ * @returns 삭제된 행사 ID와 다음 우선순위 행사 ID
  */
 export async function DELETE(
   request: Request,
@@ -234,7 +241,7 @@ export async function DELETE(
   // 하위 데이터 삭제 전에 RLS로 현재 운영자가 소유한 event인지 확인합니다.
   const { data: event, error: eventError } = await sessionSupabase
     .from("events")
-    .select("id")
+    .select("id, poster_image_url, brochure_image_url, stamp_image_url")
     .eq("id", eventId)
     .maybeSingle();
 
@@ -245,6 +252,17 @@ export async function DELETE(
   if (!event) {
     return notFound("행사를 찾을 수 없습니다.");
   }
+
+  // Storage에서 삭제할 행사 이미지 경로 수집
+  const singleImageUrls = [event.poster_image_url, event.stamp_image_url];
+  const brochureImageUrls = Array.isArray(event.brochure_image_url)
+    ? event.brochure_image_url
+    : [];
+
+  const allImagePaths = [...singleImageUrls, ...brochureImageUrls]
+    .filter(Boolean)
+    .map((url) => extractStoragePath(url!))
+    .filter((path): path is string => path !== null);
 
   // FK 제약을 고려해 하위 데이터부터 삭제
   const cleanupSteps = [
@@ -266,6 +284,11 @@ export async function DELETE(
     }
   }
 
+  // Storage 파일 정리 — 응답을 블로킹하지 않음
+  if (allImagePaths.length > 0) {
+    void supabase.storage.from(BUCKET).remove(allImagePaths);
+  }
+
   // events 테이블은 RLS로 현재 운영자 소유 row만 삭제됩니다.
   const { error: deleteEventError } = await sessionSupabase
     .from("events")
@@ -276,5 +299,7 @@ export async function DELETE(
     return serverError("행사 삭제 실패", deleteEventError);
   }
 
-  return ok({ id: eventId });
+  const nextEventId = await getPriorityAdminEventId(sessionSupabase);
+
+  return ok({ id: eventId, next_event_id: nextEventId });
 }

@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import LayoutHeader from "@/components/user/header/LayoutHeader";
 
 export default function UserLayout({
@@ -9,6 +10,7 @@ export default function UserLayout({
     <div className="flex flex-col h-svh overflow-hidden">
       <LayoutHeader />
       <main className="flex-1 overflow-y-auto">{children}</main>
+      <Toaster />
     </div>
   );
 }

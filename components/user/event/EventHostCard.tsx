@@ -14,7 +14,7 @@ const EventHostCard = ({
   return (
     <InfoCard label="주최측 정보">
       <div className="flex justify-between items-start">
-        <span className="text-[15px] font-bold text-gomin-neutral-700">
+        <span className="text-[15px] font-bold text-gomin-neutral-700 break-keep">
           {production}
         </span>
         <div className="flex flex-col items-end text-right gap-2">

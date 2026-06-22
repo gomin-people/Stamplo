@@ -6,8 +6,9 @@ import {
   uploadAdminImage,
   useDeleteAdminImageMutation,
 } from "@/features/admin/upload/adminUploadMutations";
-
-const MAX_PAGES = 10;
+import { MAX_PAGES } from "@/constants";
+import { extractStoragePath } from "@/utils/storage";
+import { useIsEditMode } from "@/stores/admin";
 
 export type UploadPage = {
   id: string;
@@ -18,25 +19,29 @@ export type UploadPage = {
   isUploading: boolean;
 };
 
-const usePageUpload = (initialUrls?: string[]) => {
+const usePageUpload = (initialUrls?: string[], resizeWidth?: number) => {
+  const deferDelete = useIsEditMode();
   const [pages, setPages] = useState<UploadPage[]>(
     () =>
       initialUrls?.map((url) => ({
         id: crypto.randomUUID(),
         previewUrl: url,
         url,
-        path: null,
+        path: extractStoragePath(url),
         isUploading: false,
       })) ?? []
   );
+  const [pendingDeletePaths, setPendingDeletePaths] = useState<string[]>([]);
   const replaceInputRef = useRef<HTMLInputElement>(null);
-  const replacingId = useRef<string | null>(null); // 교체 중인 페이지 id
+  const replacingId = useRef<string | null>(null);
 
   const { mutate: deleteImage } = useDeleteAdminImageMutation();
 
   const uploadAndSet = async (id: string, file: File) => {
     try {
-      const { url, path } = await uploadAdminImage(file);
+      const { url, path } = await uploadAdminImage(file, {
+        width: resizeWidth,
+      });
       setPages((prev) =>
         prev.map((p) =>
           p.id === id ? { ...p, url, path, isUploading: false } : p
@@ -87,7 +92,13 @@ const usePageUpload = (initialUrls?: string[]) => {
     setPages((prev) =>
       prev.map((p) => {
         if (p.id !== id) return p;
-        if (p.path) deleteImage(p.path);
+        if (p.path) {
+          if (deferDelete) {
+            setPendingDeletePaths((paths) => [...paths, p.path!]);
+          } else {
+            deleteImage(p.path);
+          }
+        }
         return {
           ...p,
           file,
@@ -108,7 +119,13 @@ const usePageUpload = (initialUrls?: string[]) => {
   const handleDelete = (id: string) => {
     setPages((prev) => {
       const page = prev.find((p) => p.id === id);
-      if (page?.path) deleteImage(page.path);
+      if (page?.path) {
+        if (deferDelete) {
+          setPendingDeletePaths((paths) => [...paths, page.path!]);
+        } else {
+          deleteImage(page.path);
+        }
+      }
       return prev.filter((p) => p.id !== id);
     });
   };
@@ -132,6 +149,7 @@ const usePageUpload = (initialUrls?: string[]) => {
 
   return {
     pages,
+    pendingDeletePaths,
     addFiles,
     replaceInputRef,
     handleUploadChange,
@@ -142,5 +160,4 @@ const usePageUpload = (initialUrls?: string[]) => {
   };
 };
 
-export { MAX_PAGES };
 export default usePageUpload;

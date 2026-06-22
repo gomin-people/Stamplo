@@ -1,23 +1,26 @@
-import { getEntryEvent } from "@/features/qr/entry/api/entry";
+import { cookies } from "next/headers";
+import { fetchParticipantEventBrochure } from "@/features/participant/events/participantEventApi";
 import BrochureClient from "@/components/user/brochure/BrochureClient";
 import { redirect } from "next/navigation";
+import { getUserRoutes } from "@/constants/userRoutes";
 
 type Props = {
   params: Promise<{ eventId: string }>;
-  searchParams: Promise<{ from?: string }>;
 };
 
-const BrochurePage = async ({ params, searchParams }: Props) => {
+export default async function BrochurePage({ params }: Props) {
   const { eventId } = await params;
-  const { from } = await searchParams;
 
-  const event = await getEntryEvent(eventId);
+  const event = await fetchParticipantEventBrochure(Number(eventId));
 
   if (!event.brochureImageUrl?.length) {
-    redirect(`/event/${eventId}/${from === "mission" ? "detail" : "mission"}`);
+    redirect(getUserRoutes(eventId).mission);
   }
 
-  return <BrochureClient images={event.brochureImageUrl} />;
-};
+  const cookieStore = await cookies();
+  const showGuide = !cookieStore.has(`brochure-guide-seen-${eventId}`);
 
-export default BrochurePage;
+  return (
+    <BrochureClient images={event.brochureImageUrl} showGuide={showGuide} />
+  );
+}

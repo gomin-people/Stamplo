@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { adminMissionQueryOptions } from "@/features/admin/missions/adminMissionQueries";
-import { useAdminEventQuery } from "@/features/admin/events/adminEventQueries";
 import MissionFilter from "@/components/admin/mission/MissionFilter";
 import MissionAddButton from "@/components/admin/mission/MissionAddButton";
+import { Info } from "lucide-react";
 import MissionList from "@/components/admin/mission/MissionList";
 import { Button } from "@/components/ui/button";
 import type { AdminMissionDetail } from "@/types/models";
@@ -19,21 +19,18 @@ const QRDownloadButton = dynamic(
 
 type Props = {
   eventId: number;
+  eventStartDate: string | null;
+  eventEndDate: string | null;
 };
 
-export default function MissionClient({ eventId }: Props) {
+const MissionClient = ({ eventId, eventStartDate, eventEndDate }: Props) => {
   const [filter, setFilter] = useState("all");
-  const [isReordering, setIsReordering] = useState(false);
 
   const {
     data: missions,
     isError,
     refetch,
-    isFetching,
   } = useQuery(adminMissionQueryOptions.list(eventId));
-  const isDisabled = isReordering || isFetching;
-
-  const { data: event } = useAdminEventQuery(eventId);
 
   const filteredMissions = useMemo(() => {
     if (!missions) return [];
@@ -47,7 +44,9 @@ export default function MissionClient({ eventId }: Props) {
 
   const isMissionCountOver = (missions?.length ?? 0) >= 10;
   const isAfter =
-    !!event && getEventOperationStatus(event.startDate, event.endDate).isAfter;
+    typeof eventStartDate === "string" &&
+    typeof eventEndDate === "string" &&
+    getEventOperationStatus(eventStartDate, eventEndDate).isAfter;
 
   const handleToggle = (value: string) => {
     setFilter(value);
@@ -57,7 +56,15 @@ export default function MissionClient({ eventId }: Props) {
     <div className="p-8">
       <div className="bg-white border rounded-xl border-gomin-neutral-100">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gomin-neutral-100">
-          <MissionFilter toggleValue={handleToggle} disabled={isDisabled} />
+          <div className="flex items-center gap-3">
+            <MissionFilter toggleValue={handleToggle} />
+            {filter !== "all" && (
+              <span className="flex items-center gap-1 text-xs text-gomin-neutral-400">
+                <Info className="w-3.5 h-3.5 shrink-0" />
+                필터 적용 중에는 순서 변경이 불가합니다.
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <MissionAddButton disabled={isMissionCountOver || isAfter} />
             <QRDownloadButton missions={filteredMissions} disabled={isAfter} />
@@ -69,7 +76,7 @@ export default function MissionClient({ eventId }: Props) {
           style={{ gridTemplateColumns: "40px 60px 1fr 2fr 110px 72px 90px" }}
         >
           <div />
-          <div>#</div>
+          <div>순서</div>
           <div>미션명</div>
           <div>설명</div>
           <div className="text-center">활성화</div>
@@ -87,12 +94,13 @@ export default function MissionClient({ eventId }: Props) {
         ) : (
           <MissionList
             missions={filteredMissions ?? []}
-            isFetching={isDisabled}
-            isAfter={isAfter}
-            onReorderingChange={setIsReordering}
+            disabled={isAfter}
+            filter={filter}
           />
         )}
       </div>
     </div>
   );
-}
+};
+
+export default MissionClient;

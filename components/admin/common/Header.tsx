@@ -2,20 +2,25 @@
 
 import { useParams, usePathname } from "next/navigation";
 import { getAdminRouteConfig } from "@/constants/adminRoutes";
-import { useAdminEventsQuery } from "@/features/admin/events/adminEventQueries";
+import type { EventModel } from "@/types/models";
+import { getAdminEventStatusLabel } from "@/utils/event-status";
 
-const Header = () => {
+type Props = {
+  events: EventModel[];
+};
+
+const Header = ({ events }: Props) => {
   const pathname = usePathname();
   const { eventId } = useParams<{ eventId?: string }>();
   const route = getAdminRouteConfig(pathname);
-  const shouldFetchEvents = Boolean(
-    eventId &&
-    route?.description?.some((segment) => segment.type === "eventTitle")
-  );
-  const { data: events } = useAdminEventsQuery({ enabled: shouldFetchEvents });
+  const selectedEvent = eventId
+    ? events?.find((event) => String(event.id) === eventId)
+    : undefined;
   const eventTitle = eventId
-    ? (events?.find((event) => String(event.id) === eventId)?.title ??
-      `행사 ${eventId}`)
+    ? (selectedEvent?.title ?? `행사 ${eventId}`)
+    : undefined;
+  const eventStatusText = selectedEvent
+    ? getAdminEventStatusLabel(selectedEvent.startDate, selectedEvent.endDate)
     : undefined;
 
   if (!route || !route.title) {
@@ -26,8 +31,19 @@ const Header = () => {
     <header className="flex flex-col pt-6 pr-4 pl-8">
       <h1 className="text-xl font-semibold text-gomin-black">{route.title}</h1>
       {route.description && (
-        <p className="mt-2 text-sm text-gomin-neutral-500">
+        <p className="mt-2 text-sm text-gomin-neutral-600">
           {route.description.map((segment, index) => {
+            if (segment.type === "eventStatusText") {
+              return (
+                <span
+                  key={`${segment.type}-${index}`}
+                  className="text-gomin-neutral-600"
+                >
+                  {eventStatusText}
+                </span>
+              );
+            }
+
             if (segment.type === "eventTitle") {
               return (
                 <strong
@@ -39,7 +55,14 @@ const Header = () => {
               );
             }
 
-            return <span key={`${segment.type}-${index}`}>{segment.text}</span>;
+            return (
+              <span
+                key={`${segment.type}-${index}`}
+                className="text-gomin-neutral-600"
+              >
+                {segment.text}
+              </span>
+            );
           })}
         </p>
       )}

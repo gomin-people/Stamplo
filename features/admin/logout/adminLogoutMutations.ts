@@ -1,15 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
+import { requestJson, createJsonRequest } from "@/features/shared/api/http";
+
+function postAdminLogout() {
+  return requestJson("/api/v1/admin/logout", createJsonRequest("POST"));
+}
 
 export function useAdminLogoutMutation() {
   return useMutation({
-    mutationFn: async () => {
-      const res = await fetch("/api/v1/admin/logout", {
-        method: "POST",
-      });
-      if (!res.ok) {
-        throw new Error(`${res.status} ${res.statusText}`);
-      }
-      return res.json();
-    },
+    mutationFn: postAdminLogout,
   });
 }

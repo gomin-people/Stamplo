@@ -1,109 +1,146 @@
-import { Info } from "lucide-react";
+"use client";
+
+import { useCallback, useEffect, useRef } from "react";
+import AnimatedNumber from "@/components/admin/common/AnimatedNumber";
+import type {
+  AnimatedIconComponent,
+  AnimatedIconHandle,
+} from "@/types/animated-icon";
 import { cn, formatNumber } from "@/utils";
+
+const KPI_ICON_ANIMATION_DURATION_MS = 900;
+
+export type KpiIconComponent = AnimatedIconComponent;
 
 type Props = {
   title: string;
-  icon: React.ReactNode;
-  countData: {
-    today: number;
-    total: number;
-  };
+  icon: KpiIconComponent;
+  value: number;
   colorClassNames: {
     icon: string;
     value: string;
   };
-  info: string;
+  ready?: boolean;
 };
 
 const DashboardKpiCard = ({
   title,
   icon,
-  countData,
+  value,
   colorClassNames,
-  info,
+  ready = true,
 }: Props) => {
-  const todayCount = formatNumber(countData.today);
-  const totalCount = formatNumber(countData.total);
-  const shouldStackTotalCount = `${todayCount} / ${totalCount}`.length > 22;
-  const tooltipParenthesisIndex = info.indexOf("(");
-  const hasTooltipParenthesis = tooltipParenthesisIndex !== -1;
+  const Icon = icon;
+  const iconRef = useRef<AnimatedIconHandle>(null);
+  const previousValueRef = useRef(value);
+  const hasSeenReadyValueRef = useRef(false);
+  const resetIconAnimationTimeoutRef = useRef<number | null>(null);
+
+  const animateIcon = useCallback(() => {
+    if (resetIconAnimationTimeoutRef.current !== null) {
+      window.clearTimeout(resetIconAnimationTimeoutRef.current);
+    }
+
+    iconRef.current?.stopAnimation();
+    window.requestAnimationFrame(() => {
+      iconRef.current?.startAnimation();
+    });
+
+    resetIconAnimationTimeoutRef.current = window.setTimeout(() => {
+      iconRef.current?.stopAnimation();
+      resetIconAnimationTimeoutRef.current = null;
+    }, KPI_ICON_ANIMATION_DURATION_MS);
+  }, []);
+
+  const startHoverAnimation = useCallback(() => {
+    if (resetIconAnimationTimeoutRef.current !== null) {
+      window.clearTimeout(resetIconAnimationTimeoutRef.current);
+      resetIconAnimationTimeoutRef.current = null;
+    }
+
+    iconRef.current?.startAnimation();
+  }, []);
+
+  const stopHoverAnimation = useCallback(() => {
+    if (resetIconAnimationTimeoutRef.current !== null) {
+      window.clearTimeout(resetIconAnimationTimeoutRef.current);
+      resetIconAnimationTimeoutRef.current = null;
+    }
+
+    iconRef.current?.stopAnimation();
+  }, []);
+
+  useEffect(() => {
+    if (!ready) {
+      return;
+    }
+
+    const previousValue = previousValueRef.current;
+
+    if (!hasSeenReadyValueRef.current) {
+      previousValueRef.current = value;
+      hasSeenReadyValueRef.current = true;
+      return;
+    }
+
+    if (value > previousValue) {
+      animateIcon();
+    }
+
+    previousValueRef.current = value;
+  }, [animateIcon, ready, value]);
+
+  useEffect(() => {
+    return () => {
+      if (resetIconAnimationTimeoutRef.current !== null) {
+        window.clearTimeout(resetIconAnimationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <section
       aria-label={title}
-      className="relative flex min-h-30 min-w-0 items-center gap-4 rounded-xl border border-gomin-neutral-100 bg-white p-4 pr-11"
+      className="flex min-h-[5.5rem] min-w-0 translate-y-[0.5rem] items-center gap-3"
     >
-      <div className="group/info absolute top-2 right-2">
-        <button
-          type="button"
-          aria-label={`${title} 기준: ${info}`}
-          className="grid size-6 cursor-pointer place-items-center rounded-full bg-white text-gomin-neutral-400 transition hover:text-gomin-primary-700 focus-visible:ring-2 focus-visible:ring-gomin-primary-300 focus-visible:outline-none"
-        >
-          <Info className="size-3.5" aria-hidden="true" />
-        </button>
-        <div className="pointer-events-none absolute right-0 bottom-6 z-10 w-max max-w-[min(28rem,calc(100vw-2rem))] rounded-lg border border-gomin-neutral-100 bg-white/90 px-3 py-2 text-right text-xs leading-5 font-medium text-gomin-neutral-600 opacity-0 shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition group-hover/info:opacity-100 group-focus-within/info:opacity-100">
-          {hasTooltipParenthesis ? (
-            <>
-              <span className="block">
-                {info.slice(0, tooltipParenthesisIndex).trim()}
-              </span>
-              <span className="block">
-                {info.slice(tooltipParenthesisIndex).trim()}
-              </span>
-            </>
-          ) : (
-            info
-          )}
-        </div>
-      </div>
       <div
         className={cn(
           "mx-1 flex size-12 shrink-0 items-center justify-center rounded-xl",
           colorClassNames.icon
         )}
+        onMouseEnter={startHoverAnimation}
+        onMouseLeave={stopHoverAnimation}
       >
-        {icon}
+        <Icon
+          ref={iconRef}
+          size={24}
+          animateOnHover={false}
+          aria-hidden="true"
+          className="flex size-6 shrink-0 items-center justify-center text-current [&_svg]:!h-6 [&_svg]:!w-6"
+        />
       </div>
-      <div className="flex h-16 min-w-0 flex-1 translate-y-0.5 flex-col gap-2">
+      <div className="flex min-w-0 flex-1 translate-y-0.5 flex-col gap-0.5">
         <div
-          className="-translate-y-1 truncate text-sm font-medium text-gomin-neutral-500"
+          className="-translate-y-0.5 truncate text-sm leading-none font-medium text-gomin-neutral-500"
           title={title}
         >
           {title}
         </div>
-        <div className="min-w-0">
+        <div className="flex min-w-0 translate-y-1 items-baseline gap-1.5">
           <div
             className={cn(
-              "flex min-w-0 items-baseline gap-x-1 whitespace-nowrap",
-              shouldStackTotalCount ? "-translate-y-1" : "translate-y-1"
+              "min-w-0 whitespace-nowrap text-3xl leading-none font-semibold",
+              colorClassNames.value
             )}
+            title={`${formatNumber(value)}명`}
           >
-            <div
-              className={cn(
-                "min-w-0 truncate text-3xl leading-none font-semibold",
-                colorClassNames.value
-              )}
-              title={`${todayCount}명`}
-            >
-              {todayCount}
-            </div>
-            {!shouldStackTotalCount && (
-              <div
-                className="min-w-0 truncate leading-none tracking-[0.03em] text-gomin-neutral-400"
-                title={`${totalCount}명`}
-              >
-                / {totalCount}명
-              </div>
-            )}
+            <span className="inline-block translate-y-0.5">
+              <AnimatedNumber value={value} ready={ready} />
+            </span>
           </div>
-          {shouldStackTotalCount && (
-            <div
-              className="mt-2 -translate-y-[3px] truncate text-right leading-none tracking-[0.03em] text-gomin-neutral-400"
-              title={`${totalCount}명`}
-            >
-              / {totalCount}명
-            </div>
-          )}
+          <span className="text-base leading-none font-medium text-gomin-neutral-500">
+            명
+          </span>
         </div>
       </div>
     </section>

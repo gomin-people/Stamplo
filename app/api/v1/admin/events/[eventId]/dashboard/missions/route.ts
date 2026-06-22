@@ -91,7 +91,7 @@ export async function GET(
   ] = await Promise.all([
     supabase
       .from("missions")
-      .select("id,title,sort_order")
+      .select("id,title,sort_order,is_active")
       .eq("events_id", eventId)
       .order("sort_order", { ascending: true })
       .order("id", { ascending: true }),
@@ -130,6 +130,7 @@ export async function GET(
         return {
           id: mission.id,
           title: mission.title,
+          is_active: mission.is_active,
           completed_count: completedCount,
           completion_rate:
             denominator === 0 ? 0 : (completedCount / denominator) * 100,

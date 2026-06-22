@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
 import {
   Area,
@@ -20,7 +20,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { cn } from "@/utils";
-import { getRankedBarColors } from "@/components/admin/dashboard/rankedBarColors";
+import { getRankedBarColors } from "@/utils/ranked-bar-colors";
 
 type AnalysisView = "daily" | "hourly";
 
@@ -39,15 +39,15 @@ type HourlyParticipantBarData = HourlyParticipantData & {
   fill: string;
 };
 
-type HourlyDateFactor = {
+type HourlyParticipantsByDate = {
   label: string;
-  factor: number;
+  hourly: HourlyParticipantData[];
 };
 
 type Props = {
   daily: DailyParticipantData[];
   hourlyTotal: HourlyParticipantData[];
-  hourlyDateFactors: HourlyDateFactor[];
+  hourlyByDate: HourlyParticipantsByDate[];
 };
 
 const analysisTabs: {
@@ -59,7 +59,6 @@ const analysisTabs: {
 ];
 
 const HOURLY_TOTAL_OPTION_VALUE = "total";
-const ADMIN_DASHBOARD_TIME_ZONE = "Asia/Seoul";
 
 const chartColor = "#5435EB";
 const chartSoftColor = "#C8BEFA";
@@ -82,7 +81,7 @@ const hourlyChartConfig = {
 const ParticipantAnalysisChart = ({
   daily,
   hourlyTotal,
-  hourlyDateFactors,
+  hourlyByDate,
 }: Props) => {
   const [activeView, setActiveView] = useState<AnalysisView>("daily");
   const eventDateOptions = useMemo(
@@ -104,22 +103,22 @@ const ParticipantAnalysisChart = ({
     () =>
       selectedHourlyFilterValue === HOURLY_TOTAL_OPTION_VALUE
         ? hourlyTotalData
-        : getHourlyDataByDate(
-            selectedHourlyFilterValue,
-            hourlyTotal,
-            hourlyDateFactors
+        : withHourlyFill(
+            hourlyByDate.find(
+              (item) => item.label === selectedHourlyFilterValue
+            )?.hourly ?? []
           ),
-    [selectedHourlyFilterValue, hourlyTotalData, hourlyTotal, hourlyDateFactors]
+    [selectedHourlyFilterValue, hourlyTotalData, hourlyByDate]
   );
 
   return (
-    <div className="flex h-full min-h-88 min-w-0 flex-col px-4 py-4">
+    <div className="flex h-full min-h-84 min-w-0 flex-col pl-4 pr-3 pt-3 pb-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1 flex-wrap items-end gap-x-3 gap-y-1">
           <h2 className="text-lg font-semibold text-gomin-black">
             참여자 수 분석
           </h2>
-          <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-400">
+          <p className="min-w-0 truncate text-sm font-medium text-gomin-neutral-500">
             시간에 따른 참여 패턴 확인
           </p>
         </div>
@@ -151,7 +150,7 @@ const ParticipantAnalysisChart = ({
                   ))}
                 </select>
                 <ChevronDown
-                  className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-gomin-neutral-400"
+                  className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-gomin-neutral-500"
                   aria-hidden="true"
                 />
               </motion.div>
@@ -170,7 +169,7 @@ const ParticipantAnalysisChart = ({
                 role="tab"
                 aria-selected={activeView === tab.value}
                 className={cn(
-                  "relative cursor-pointer rounded-lg px-3 text-xs font-semibold text-gomin-neutral-400 transition",
+                  "relative cursor-pointer rounded-lg px-3 text-xs font-semibold text-gomin-neutral-500 transition",
                   "focus-visible:ring-2 focus-visible:ring-gomin-primary-300 focus-visible:outline-none",
                   activeView === tab.value && "text-gomin-black"
                 )}
@@ -402,30 +401,10 @@ function formatChartTick(value: number) {
     : `${compactValue.toFixed(1)}k`;
 }
 
-function getHourlyDataByDate(
-  date: string,
-  hourlyTotal: HourlyParticipantData[],
-  hourlyDateFactors: HourlyDateFactor[]
-): HourlyParticipantBarData[] {
-  const factor =
-    hourlyDateFactors.find((item) => item.label === date)?.factor ?? 1;
-
-  return withHourlyFill(
-    hourlyTotal.map((item) => ({
-      ...item,
-      count: Math.round(item.count * factor),
-    }))
-  );
-}
-
 function getTodayDateOption() {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: ADMIN_DASHBOARD_TIME_ZONE,
-    month: "numeric",
-    day: "numeric",
-  }).formatToParts(new Date());
-  const month = parts.find((part) => part.type === "month")?.value;
-  const day = parts.find((part) => part.type === "day")?.value;
+  const now = new Date();
+  const month = `${now.getMonth() + 1}`;
+  const day = `${now.getDate()}`;
 
   return month && day ? `${month}/${day}` : HOURLY_TOTAL_OPTION_VALUE;
 }

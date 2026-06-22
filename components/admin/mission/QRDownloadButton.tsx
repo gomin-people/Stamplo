@@ -21,10 +21,7 @@ type Props = {
 const QR_SIZE = 256;
 const QR_PADDING = 16;
 
-export default function QRDownloadButton({
-  missions,
-  disabled = false,
-}: Props) {
+const QRDownloadButton = ({ missions, disabled = false }: Props) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -99,4 +96,6 @@ export default function QRDownloadButton({
       </Tooltip>
     </>
   );
-}
+};
+
+export default QRDownloadButton;

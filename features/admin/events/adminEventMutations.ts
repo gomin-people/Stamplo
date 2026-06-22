@@ -35,8 +35,13 @@ function updateAdminEvent(eventId: number, payload: EventUpdatePayloadModel) {
   );
 }
 
+type DeletedEvent = {
+  id: number;
+  nextEventId: number | null;
+};
+
 function deleteAdminEvent(eventId: number) {
-  return requestJson<{ id: number }>(
+  return requestJson<DeletedEvent>(
     `/api/v1/admin/events/${eventId}`,
     createJsonRequest("DELETE")
   );

@@ -1,7 +1,24 @@
-export default function StamploLogo() {
+import Image from "next/image";
+
+type Props = {
+  width?: number;
+  height?: number;
+  className?: string;
+  style?: React.CSSProperties;
+};
+
+const StamploLogo = ({ width = 144, height = 41, className, style }: Props) => {
   return (
-    <h1 className="text-4xl text-gomin-primary-700 tracking-tight [font-family:var(--font-monomaniac-one)]">
-      Stamplo
-    </h1>
+    <Image
+      src="/images/textLogo.svg"
+      alt="Stamplo"
+      width={width}
+      height={height}
+      className={className}
+      style={style}
+      priority
+    />
   );
-}
+};
+
+export default StamploLogo;

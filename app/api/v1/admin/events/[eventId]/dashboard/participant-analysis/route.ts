@@ -10,6 +10,7 @@ import {
   type AdminDashboardDateWindow,
   getAdminDashboardDateLabels,
   getAdminDashboardDateWindow,
+  getKstDateTimePartsFromStoredUtcTimestamp,
 } from "@/utils/admin-dashboard-date";
 import { supabase } from "@/utils/supabase/server";
 
@@ -87,20 +88,31 @@ export async function GET(
   const hourlyCounts = new Map(
     Array.from({ length: 24 }, (_, hour) => [hour, 0])
   );
-  let includedParticipantCount = 0;
+  const hourlyCountsByDate = new Map(
+    dateLabels.map((label) => [
+      label,
+      new Map(Array.from({ length: 24 }, (_, hour) => [hour, 0])),
+    ])
+  );
 
   for (const createdAt of participantCreatedAts ?? []) {
-    const dateLabel = getTimestampDateLabel(createdAt);
+    const dateTimeParts = getKstDateTimePartsFromStoredUtcTimestamp(createdAt);
+    if (!dateTimeParts) {
+      continue;
+    }
+
+    const dateLabel = `${dateTimeParts.month}/${dateTimeParts.day}`;
 
     if (!dailyCounts.has(dateLabel)) {
       continue;
     }
 
-    const hour = getTimestampHour(createdAt);
+    const hour = dateTimeParts.hour;
+    const hourlyCountsForDate = hourlyCountsByDate.get(dateLabel);
 
     dailyCounts.set(dateLabel, (dailyCounts.get(dateLabel) ?? 0) + 1);
     hourlyCounts.set(hour, (hourlyCounts.get(hour) ?? 0) + 1);
-    includedParticipantCount += 1;
+    hourlyCountsForDate?.set(hour, (hourlyCountsForDate.get(hour) ?? 0) + 1);
   }
 
   const daily = Array.from(dailyCounts.entries()).map(([label, count]) => ({
@@ -114,18 +126,23 @@ export async function GET(
       label: `${hour}시`,
       count,
     }));
-  const hourlyDateFactors = daily.map((item) => ({
-    label: item.label,
-    factor:
-      includedParticipantCount === 0
-        ? 0
-        : item.count / includedParticipantCount,
-  }));
+  const hourlyByDate = Array.from(hourlyCountsByDate.entries()).map(
+    ([label, counts]) => ({
+      label,
+      hourly: Array.from(counts.entries())
+        .sort(([hourA], [hourB]) => hourA - hourB)
+        .map(([hour, count]) => ({
+          hour,
+          label: `${hour}시`,
+          count,
+        })),
+    })
+  );
 
   return ok({
     daily,
     hourly_total: hourlyTotal,
-    hourly_date_factors: hourlyDateFactors,
+    hourly_by_date: hourlyByDate,
   });
 }
 
@@ -165,22 +182,4 @@ const fetchParticipantCreatedAts = async (
       return { data: createdAts, error: null };
     }
   }
-};
-
-const getTimestampDateLabel = (value: string) => {
-  const [datePart] = value.split("T");
-  const [, month, day] = datePart.split("-").map(Number);
-
-  if (!month || !day) {
-    return datePart;
-  }
-
-  return `${month}/${day}`;
-};
-
-const getTimestampHour = (value: string) => {
-  const timePart = value.split("T")[1] ?? "";
-  const hour = Number(timePart.slice(0, 2));
-
-  return Number.isInteger(hour) && hour >= 0 && hour <= 23 ? hour : 0;
 };

@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import {
   badRequest,
   created,
@@ -151,6 +152,8 @@ export async function POST(request: Request) {
     await sessionSupabase.from("events").delete().eq("id", event.id);
     return serverError("행사 QR 생성 실패", qrCodeError);
   }
+
+  revalidateTag(`event-theme-${event.id}`, "default");
 
   return created({
     ...event,
