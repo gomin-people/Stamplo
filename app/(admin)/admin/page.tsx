@@ -8,6 +8,7 @@ import { createSessionClient } from "@/utils/supabase/session-server";
 
 export default async function AdminHomePage() {
   const supabase = await createSessionClient();
+  const isTestLoginEnabled = process.env.STAMPLY_TEST_LOGIN_ENABLED === "true";
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -42,7 +43,7 @@ export default async function AdminHomePage() {
             <div className="h-px flex-1 bg-gomin-neutral-100" />
           </div>
           <KakaoLogin />
-          <TestLoginButton />
+          {isTestLoginEnabled ? <TestLoginButton /> : null}
         </div>
       </div>
     </main>
