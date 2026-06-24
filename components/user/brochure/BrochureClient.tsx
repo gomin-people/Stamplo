@@ -59,7 +59,7 @@ const BrochureClient = ({ images, showGuide }: Props) => {
         onNext={handleNext}
       />
 
-      {!guideVisible && (
+      {!guideVisible && isLastPage && (
         <FloatingActionButton
           label="스탬프 투어 시작하기"
           onClick={() => router.push(getUserRoutes(eventId).mission)}
