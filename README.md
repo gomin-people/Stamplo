@@ -9,22 +9,28 @@
 
 ## 🤦‍♂️ 고민하는 사람들
 
-| 이름                                        | 역할                              |
-| ------------------------------------------- | --------------------------------- |
-| [권우진](https://github.com/sy3ra)          | Frontend, UI/UX Designer          |
-| [김예림](https://github.com/skylarkim22)    | Frontend, 기획자                  |
-| [김현미](https://github.com/DevONew)        | Frontend, Project Manager         |
-| [이현성](https://github.com/hyeonseong2023) | Frontend, Backend, Infra          |
+| 이름                                   | 역할                          |
+| -------------------------------------- | ----------------------------- |
+| [권우진](https://github.com/sy3ra)     | Frontend, UI/UX Designer      |
+| [김예림](https://github.com/DevONew)     | Frontend, 기획자            |
+| [김현미](https://github.com/skylarkim22) | Frontend, Project Manager     |
+| [이현성](https://velog.io/@528528abcd) | Frontend, Backend, Infra      |
 
 ## 🧰 기술 스택
 
 | 구분          | 사용 기술                                 |
 | ------------- | ----------------------------------------- |
-| Core          | Next.js 16 (App Router), TypeScript       |
+| Core          | Next.js 16 (App Router), TypeScript, pnpm |
 | 데이터 & 상태 | TanStack Query v5, Zustand                |
 | 스타일 & UI   | Tailwind CSS v4, shadcn/ui, Framer Motion |
 | 폼 & 차트     | Zod, Recharts, dnd-kit                    |
 | BaaS & 인증   | Supabase (DB, Storage, Auth), Kakao OAuth |
+
+## 📄 기술 문서
+
+ERD, 폴더 구조 및 설계 의도, 기술 스택 선택 이유 등 상세 문서는 아래에서 확인할 수 있습니다.
+
+[기술 문서 보러가기 →](https://app.notion.com/p/Stamplo-0ecd989c6a144f009f837acda2392ef0?source=copy_link)
 
 ## ✨ 주요 기능
 
@@ -50,17 +56,6 @@
 
 [프로젝트 회고 보러가기 →](https://github.com/gomin-people/Stamplo/issues/270)
 
-## 🎪 실제 사용 사례
-
-### Codeit × Stamplo — 코드잇 위워크 들러보기
-
-> 코드잇 프론트엔드 단기심화 14기 수강생 전용 공간에서 진행한 스탬프 투어 행사
-
-- **일시**: 2025.06.23 (화) 09:00 ~ 19:00
-- **장소**: 위워크 역삼2호점 3층 코드잇
-
-<!-- 행사 결과 -->
-<!-- TODO: 행사 종료 후 참여자 수, 미션 완료율 등 결과 추가 -->
 
 ## 🚀 시작하기
 
@@ -82,9 +77,9 @@ pnpm test
 
 ## 📚 API Reference
 
-로컬 서버 실행 후 아래 주소에서 OpenAPI 3.1 문서를 확인할 수 있다.
+아래 주소에서 API 문서를 확인할 수 있습니다.
 
 | 항목         | 주소                               |
 | ------------ | ---------------------------------- |
-| Scalar UI    | http://localhost:3000/reference    |
-| OpenAPI JSON | http://localhost:3000/openapi.json |
+| Scalar UI    | https://go-stamplo.vercel.app/reference    |
+| OpenAPI JSON | https://go-stamplo.vercel.app/openapi.json |
