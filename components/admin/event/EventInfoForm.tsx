@@ -30,6 +30,8 @@ const defaultForm: FormState = {
   title: "",
   startDate: "",
   endDate: "",
+  roadAddress: "",
+  addressDetail: "",
   location: "",
   locationUrl: "",
   production: "",
@@ -46,6 +48,7 @@ const buildDefaultValues = (initialData?: Partial<FormState>): FormState => ({
   ...Object.fromEntries(
     Object.entries(initialData ?? {}).filter(([, v]) => v !== undefined)
   ),
+  roadAddress: initialData?.location ?? "",
 });
 
 const handleSetValueAs = (v: string) => stripInvisibleChars(v).trim();
