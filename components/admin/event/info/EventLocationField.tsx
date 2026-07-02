@@ -1,6 +1,6 @@
 "use client";
 import { memo, useCallback } from "react";
-import { MapPin, Search, Link } from "lucide-react";
+import { MapPin, Link } from "lucide-react";
 import { useController, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { useKakaoPostcodePopup, type Address } from "react-daum-postcode";
@@ -8,7 +8,6 @@ import { EventInfoSchema } from "@/types/schemas/adminEventInfoSchemas";
 import { stripInvisibleChars } from "@/utils";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 type FormState = z.infer<typeof EventInfoSchema>;
 
@@ -48,7 +47,13 @@ const EventLocationField = memo(function EventLocationField({
   );
 
   const handleSearch = useCallback(() => {
+    const width = 450;
+    const height = 520;
     void openPostcode({
+      width,
+      height,
+      left: window.screenX + (window.outerWidth - width) / 2,
+      top: window.screenY + (window.outerHeight - height) / 2,
       onComplete: (data: Address) => {
         const roadAddress = data.roadAddress || data.jibunAddress;
         roadField.onChange(roadAddress);
@@ -69,49 +74,35 @@ const EventLocationField = memo(function EventLocationField({
         <FieldLabel htmlFor="roadAddress">
           주소 <span className="text-destructive">*</span>
         </FieldLabel>
-        <div className="flex gap-2">
-          <div className="relative flex-1">
+        <div className="flex flex-col gap-2">
+          <div className="relative">
             <MapPin className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="roadAddress"
               name="roadAddress"
               value={roadField.value}
               readOnly
-              placeholder="주소 검색 버튼을 눌러 주소를 입력해주세요."
+              placeholder="입력칸을 클릭해 주소를 검색해주세요."
               className="cursor-pointer pl-8"
               aria-invalid={!!roadError}
               disabled={disabled}
               onClick={disabled ? undefined : handleSearch}
             />
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleSearch}
+          <Input
+            id="addressDetail"
+            name="addressDetail"
+            value={detailField.value}
+            onChange={handleDetailChange}
+            onBlur={() => detailField.onChange(detailField.value.trim())}
+            placeholder="건물명, 동/호수 등 상세주소를 입력해주세요. "
+            maxLength={80}
             disabled={disabled}
-          >
-            <Search />
-            주소 검색
-          </Button>
+          />
         </div>
         <div className="h-3">
           <FieldError>{roadError?.message}</FieldError>
         </div>
-      </Field>
-
-      <Field>
-        <FieldLabel htmlFor="addressDetail">상세주소</FieldLabel>
-        <Input
-          id="addressDetail"
-          name="addressDetail"
-          value={detailField.value}
-          onChange={handleDetailChange}
-          onBlur={() => detailField.onChange(detailField.value.trim())}
-          placeholder="건물명, 동/호수 등 상세주소를 입력해주세요. (최대 80자)"
-          maxLength={80}
-          disabled={disabled}
-        />
-        <div className="h-3" />
       </Field>
 
       <Field data-invalid={!!urlError}>
