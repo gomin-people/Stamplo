@@ -91,11 +91,17 @@ const RewardQrModal = ({
             </div>
 
             {qrUrl && (
-              <div className="rounded-2xl border border-gomin-neutral-100 bg-white p-5 shadow-sm">
+              <div
+                className="rounded-2xl border border-gomin-neutral-100 bg-white p-5 shadow-sm"
+                style={{ colorScheme: "light" }}
+              >
                 <QRCode
                   value={qrUrl}
                   size={200}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
                   aria-label={`리워드 수령 QR (행사 ${eventId})`}
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                 />
               </div>
             )}
