@@ -168,7 +168,10 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
                 </Field>
               </div>
 
-              <EventLocationField disabled={isDisabled("location")} />
+              <EventLocationField
+                disabled={isDisabled("location")}
+                locationUrlDisabled={isDisabled("locationUrl")}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <Field>

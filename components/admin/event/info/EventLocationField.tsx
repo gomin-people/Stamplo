@@ -1,6 +1,6 @@
 "use client";
 import { memo, useCallback } from "react";
-import { MapPin, Search } from "lucide-react";
+import { MapPin, Search, Link } from "lucide-react";
 import { useController, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { useKakaoPostcodePopup, type Address } from "react-daum-postcode";
@@ -14,16 +14,22 @@ type FormState = z.infer<typeof EventInfoSchema>;
 
 type Props = {
   disabled?: boolean;
+  locationUrlDisabled?: boolean;
 };
 
 const EventLocationField = memo(function EventLocationField({
   disabled,
+  locationUrlDisabled,
 }: Props) {
   const { control } = useFormContext<FormState>();
   const {
     field,
     fieldState: { error },
   } = useController({ control, name: "location" });
+  const {
+    field: urlField,
+    fieldState: { error: urlError },
+  } = useController({ control, name: "locationUrl" });
   const openPostcode = useKakaoPostcodePopup();
 
   const handleSearch = useCallback(() => {
@@ -41,42 +47,68 @@ const EventLocationField = memo(function EventLocationField({
   }, [openPostcode, field]);
 
   return (
-    <Field data-invalid={!!error}>
-      <FieldLabel htmlFor="location">
-        주소 <span className="text-destructive">*</span>
-      </FieldLabel>
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <MapPin className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+    <>
+      <Field data-invalid={!!error}>
+        <FieldLabel htmlFor="location">
+          주소 <span className="text-destructive">*</span>
+        </FieldLabel>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <MapPin className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="location"
+              name="location"
+              value={field.value}
+              onChange={(e) =>
+                field.onChange(stripInvisibleChars(e.target.value))
+              }
+              onBlur={() => field.onChange(field.value.trim())}
+              placeholder="주소 검색 후 상세주소를 입력해주세요. (최대 100자)"
+              className="pl-8"
+              maxLength={100}
+              aria-invalid={!!error}
+              disabled={disabled}
+            />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleSearch}
+            disabled={disabled}
+          >
+            <Search />
+            주소 검색
+          </Button>
+        </div>
+        <div className="h-3">
+          <FieldError>{error?.message}</FieldError>
+        </div>
+      </Field>
+
+      <Field data-invalid={!!urlError}>
+        <FieldLabel htmlFor="locationUrl">지도 링크</FieldLabel>
+        <div className="relative">
+          <Link className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            id="location"
-            name="location"
-            value={field.value}
+            id="locationUrl"
+            name="locationUrl"
+            value={urlField.value}
             onChange={(e) =>
-              field.onChange(stripInvisibleChars(e.target.value))
+              urlField.onChange(stripInvisibleChars(e.target.value))
             }
-            onBlur={() => field.onChange(field.value.trim())}
-            placeholder="주소 검색 후 상세주소를 입력해주세요. (최대 100자)"
+            onBlur={() => urlField.onChange(urlField.value.trim())}
+            placeholder="https:// 로 시작하는 지도 링크를 입력해주세요. (최대 100자)"
             className="pl-8"
             maxLength={100}
-            aria-invalid={!!error}
-            disabled={disabled}
+            aria-invalid={!!urlError}
+            disabled={locationUrlDisabled}
           />
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleSearch}
-          disabled={disabled}
-        >
-          <Search />
-          주소 검색
-        </Button>
-      </div>
-      <div className="h-3">
-        <FieldError>{error?.message}</FieldError>
-      </div>
-    </Field>
+        <div className="h-3">
+          <FieldError>{urlError?.message}</FieldError>
+        </div>
+      </Field>
+    </>
   );
 });
 
