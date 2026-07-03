@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import {
   getAdminRouteConfig,
   getAdminSidebarItems,
 } from "@/constants/adminRoutes";
-import EventSelector, { compareEventsByDisplayPriority } from "./EventSelector";
+import EventSelector from "./EventSelector";
 import SidebarNav from "./SidebarNav";
 import AdminUserInfo from "@/components/admin/common/AdminUserInfo";
 import StamploLogo from "@/components/admin/common/StamploLogo";
@@ -20,10 +20,17 @@ import type { AdminUserModel, EventModel } from "@/types/models";
 type Props = {
   events: EventModel[];
   user: AdminUserModel;
+  currentEvent?: EventModel;
+  cancelTargetEventId?: string | null;
 };
 
 // 관리자 이벤트 화면의 사이드바와 행사 등록 취소 이동 버튼 렌더링
-const Sidebar = ({ events, user }: Props) => {
+const Sidebar = ({
+  events,
+  user,
+  currentEvent,
+  cancelTargetEventId = null,
+}: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const { eventId } = useParams<{ eventId?: string }>();
@@ -32,12 +39,6 @@ const Sidebar = ({ events, user }: Props) => {
   const setPendingHref = useSetPendingHref();
   const [isRewardQrOpen, setIsRewardQrOpen] = useState(false);
   const rewardQrIconRef = useRef<ScanTextIconHandle>(null);
-  const firstEvent = useMemo(
-    () => [...events].sort(compareEventsByDisplayPriority)[0],
-    [events]
-  );
-
-  const cancelTargetEventId = firstEvent ? String(firstEvent.id) : null;
 
   if (!route) {
     return null;
@@ -73,7 +74,12 @@ const Sidebar = ({ events, user }: Props) => {
 
       {eventId ? (
         <>
-          <EventSelector key={eventId} eventId={eventId} events={events} />
+          <EventSelector
+            key={eventId}
+            eventId={eventId}
+            events={events}
+            currentEvent={currentEvent}
+          />
           <SidebarNav items={items} pathname={pathname} />
         </>
       ) : cancelTargetEventId ? (

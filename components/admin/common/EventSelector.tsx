@@ -22,6 +22,7 @@ import { getDateKey, getEventOperationStatus } from "@/utils/event-status";
 type Props = {
   eventId: string;
   events: EventModel[];
+  currentEvent?: EventModel;
 };
 
 type AdminEventStatus = "진행중" | "예정" | "종료";
@@ -101,7 +102,7 @@ export const compareEventsByDisplayPriority = (
 };
 
 // 현재 행사 선택 드롭다운과 행사 전환 동작을 담당하는 사이드바 컴포넌트
-const EventSelector = ({ eventId, events }: Props) => {
+const EventSelector = ({ eventId, events, currentEvent }: Props) => {
   const pathname = usePathname();
   const router = useRouter();
   const [isEventMenuOpen, setIsEventMenuOpen] = useState(false);
@@ -114,7 +115,10 @@ const EventSelector = ({ eventId, events }: Props) => {
     () => [...events].sort(compareEventsByDisplayPriority),
     [events]
   );
-  const selectedEvent = events.find((event) => String(event.id) === eventId);
+  const selectedEvent =
+    currentEvent && String(currentEvent.id) === eventId
+      ? currentEvent
+      : events.find((event) => String(event.id) === eventId);
   const selectedEventLabel = selectedEvent?.title ?? `행사 ${eventId}`;
 
   const selectEvent = (nextEventId: string) => {

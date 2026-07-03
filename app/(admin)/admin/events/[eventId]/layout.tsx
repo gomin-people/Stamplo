@@ -1,4 +1,9 @@
 import { notFound, redirect } from "next/navigation";
+import Footer from "@/components/admin/common/Footer";
+import Header from "@/components/admin/common/Header";
+import Sidebar from "@/components/admin/common/Sidebar";
+import type { AdminUserModel, EventModel } from "@/types/models";
+import { toCamelKeys } from "@/utils/case";
 import { createSessionClient } from "@/utils/supabase/session-server";
 
 type AdminEventLayoutProps = {
@@ -35,21 +40,43 @@ export default async function AdminEventLayout({
     redirect("/admin");
   }
 
-  // events 테이블 RLS로 현재 운영자가 접근 가능한 행사만 조회됩니다.
-  const { data: event, error } = await supabase
+  const { data: events, error: eventsError } = await supabase
     .from("events")
-    .select("id")
-    .eq("id", eventId)
-    .maybeSingle();
+    .select("id,title,start_date,end_date")
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false });
 
-  if (error) {
-    console.error("Error checking admin event access:", error);
-    throw new Error("관리자 행사 접근 권한 확인에 실패했습니다.");
+  if (eventsError) {
+    console.error("Error loading admin event layout data:", eventsError);
+    throw new Error("관리자 행사 목록 조회에 실패했습니다.");
   }
 
-  if (!event) {
+  const eventList = toCamelKeys(events ?? []) as EventModel[];
+  const currentEvent = eventList.find((event) => event.id === eventId);
+
+  if (!currentEvent) {
     notFound();
   }
+  const adminUser: AdminUserModel = {
+    id: user.id,
+    name:
+      typeof user.user_metadata?.name === "string"
+        ? user.user_metadata.name
+        : (user.email ?? "관리자"),
+  };
 
-  return children;
+  return (
+    <div className="flex h-screen overflow-hidden bg-gomin-neutral-100">
+      <Sidebar
+        events={eventList}
+        user={adminUser}
+        currentEvent={currentEvent}
+      />
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto bg-gomin-admin-surface">
+        <Header events={eventList} currentEvent={currentEvent} />
+        <main>{children}</main>
+        <Footer />
+      </div>
+    </div>
+  );
 }
