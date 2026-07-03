@@ -52,8 +52,12 @@ const EventLocationField = memo(function EventLocationField({
     void openPostcode({
       width,
       height,
-      left: window.screenX + (window.outerWidth - width) / 2,
-      top: window.screenY + (window.outerHeight - height) / 2,
+      left: Math.round(
+        Math.max(0, window.screenX + (window.outerWidth - width) / 2)
+      ),
+      top: Math.round(
+        Math.max(0, window.screenY + (window.outerHeight - height) / 2)
+      ),
       onComplete: (data: Address) => {
         const roadAddress = data.roadAddress || data.jibunAddress;
         roadField.onChange(roadAddress);
@@ -95,7 +99,7 @@ const EventLocationField = memo(function EventLocationField({
             value={detailField.value}
             onChange={handleDetailChange}
             onBlur={() => detailField.onChange(detailField.value.trim())}
-            placeholder="건물명, 동/호수 등 상세주소를 입력해주세요. "
+            placeholder="건물명, 동/호수 등 상세주소를 입력해주세요."
             maxLength={80}
             disabled={disabled}
           />
