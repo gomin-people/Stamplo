@@ -65,11 +65,21 @@ const QRDownloadButton = ({ missions, disabled = false }: Props) => {
 
   return (
     <>
-      <div ref={containerRef} className="hidden" aria-hidden>
+      <div
+        ref={containerRef}
+        className="hidden"
+        aria-hidden
+        style={{ colorScheme: "light" }}
+      >
         {missions.flatMap((mission) =>
           (mission.qrCodes ?? []).map((qr) => (
             <div key={qr.id} data-token={qr.token}>
-              <QRCode value={getMissionCheckUrl(qr.token)} size={QR_SIZE} />
+              <QRCode
+                value={getMissionCheckUrl(qr.token)}
+                size={QR_SIZE}
+                bgColor="#ffffff"
+                fgColor="#000000"
+              />
             </div>
           ))
         )}

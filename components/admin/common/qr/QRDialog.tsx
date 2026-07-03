@@ -95,8 +95,15 @@ const QRDialog = ({ title, url, filename, description }: Props) => {
         <div
           ref={svgRef}
           className="rounded-2xl border border-gomin-neutral-100 bg-white p-5 shadow-sm"
+          style={{ colorScheme: "light" }}
         >
-          <QRCode value={url} size={QR_SIZE} />
+          <QRCode
+            value={url}
+            size={QR_SIZE}
+            bgColor="#ffffff"
+            fgColor="#000000"
+            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+          />
         </div>
       </div>
 
