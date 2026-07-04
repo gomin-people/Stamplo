@@ -4,7 +4,7 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { z } from "zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { MapPin, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { type StepFormHandle } from "@/types";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import CharCount from "@/components/admin/common/CharCount";
 import PosterImageField from "@/components/admin/event/info/PosterImageField";
 import EventContactPhoneField from "@/components/admin/event/info/EventContactPhoneField";
+import EventLocationField from "@/components/admin/event/info/EventLocationField";
 import { stripInvisibleChars } from "@/utils";
 import { EventInfoSchema } from "@/types/schemas/adminEventInfoSchemas";
 import { toast } from "sonner";
@@ -29,6 +30,8 @@ const defaultForm: FormState = {
   title: "",
   startDate: "",
   endDate: "",
+  roadAddress: "",
+  addressDetail: "",
   location: "",
   locationUrl: "",
   production: "",
@@ -45,6 +48,7 @@ const buildDefaultValues = (initialData?: Partial<FormState>): FormState => ({
   ...Object.fromEntries(
     Object.entries(initialData ?? {}).filter(([, v]) => v !== undefined)
   ),
+  roadAddress: initialData?.location ?? "",
 });
 
 const handleSetValueAs = (v: string) => stripInvisibleChars(v).trim();
@@ -167,26 +171,10 @@ const EventInfoForm = forwardRef<StepFormHandle, Props>(function EventInfoForm(
                 </Field>
               </div>
 
-              <Field data-invalid={!!errors.location}>
-                <FieldLabel htmlFor="location">
-                  주소 <span className="text-destructive">*</span>
-                </FieldLabel>
-                <div className="relative">
-                  <MapPin className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="location"
-                    {...register("location", { setValueAs: handleSetValueAs })}
-                    placeholder="행사 주소를 입력해주세요. (최대 100자)"
-                    className="pl-8"
-                    maxLength={100}
-                    aria-invalid={!!errors.location}
-                    disabled={isDisabled("location")}
-                  />
-                </div>
-                <div className="h-3">
-                  <FieldError>{errors.location?.message}</FieldError>
-                </div>
-              </Field>
+              <EventLocationField
+                disabled={isDisabled("location")}
+                locationUrlDisabled={isDisabled("locationUrl")}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <Field>

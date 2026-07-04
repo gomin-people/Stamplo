@@ -22,6 +22,11 @@ export const EventInfoSchema = z
       .max(20, "행사명은 최대 20자까지 입력 가능합니다."),
     startDate: z.string().min(1, "시작일을 입력해주세요."),
     endDate: z.string().min(1, "종료일을 입력해주세요."),
+    roadAddress: z.string().trim().min(1, "주소를 입력해주세요."),
+    addressDetail: z
+      .string()
+      .trim()
+      .max(80, "상세주소는 최대 80자까지 입력 가능합니다."),
     location: z
       .string()
       .trim()
