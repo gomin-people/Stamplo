@@ -15,14 +15,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { EventModel } from "@/types/models";
+import type { AdminEventListItem, EventModel } from "@/types/models";
 import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
 import { getDateKey, getEventOperationStatus } from "@/utils/event-status";
 
 type Props = {
   eventId: string;
-  events: EventModel[];
-  currentEvent?: EventModel;
+  events: AdminEventListItem[];
+  currentEvent?: AdminEventListItem;
 };
 
 type AdminEventStatus = "진행중" | "예정" | "종료";
@@ -82,8 +82,8 @@ const getEventSortPriority = (status: AdminEventStatus) => {
 
 // 현재 행사 선택 목록과 생성 취소 이동 대상에서 동일하게 사용하는 행사 노출 우선순위
 export const compareEventsByDisplayPriority = (
-  firstEvent: EventModel,
-  secondEvent: EventModel
+  firstEvent: AdminEventListItem,
+  secondEvent: AdminEventListItem
 ) => {
   const firstStatus = getEventStatus(firstEvent);
   const secondStatus = getEventStatus(secondEvent);

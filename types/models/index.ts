@@ -29,6 +29,11 @@ export type EventModel = {
   updatedAt: string;
 };
 
+export type AdminEventListItem = Pick<
+  EventModel,
+  "id" | "title" | "startDate" | "endDate"
+>;
+
 // 미션 API 응답 타입
 export type MissionModel = {
   id: number;

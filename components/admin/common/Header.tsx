@@ -2,12 +2,12 @@
 
 import { useParams, usePathname } from "next/navigation";
 import { getAdminRouteConfig } from "@/constants/adminRoutes";
-import type { EventModel } from "@/types/models";
+import type { AdminEventListItem } from "@/types/models";
 import { getAdminEventStatusLabel } from "@/utils/event-status";
 
 type Props = {
-  events: EventModel[];
-  currentEvent?: EventModel;
+  events: AdminEventListItem[];
+  currentEvent?: AdminEventListItem;
 };
 
 const Header = ({ events, currentEvent }: Props) => {

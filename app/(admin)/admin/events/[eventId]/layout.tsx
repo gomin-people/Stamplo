@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Footer from "@/components/admin/common/Footer";
 import Header from "@/components/admin/common/Header";
 import Sidebar from "@/components/admin/common/Sidebar";
-import type { AdminUserModel, EventModel } from "@/types/models";
+import type { AdminEventListItem, AdminUserModel } from "@/types/models";
 import { toCamelKeys } from "@/utils/case";
 import { createSessionClient } from "@/utils/supabase/session-server";
 
@@ -51,7 +51,7 @@ export default async function AdminEventLayout({
     throw new Error("관리자 행사 목록 조회에 실패했습니다.");
   }
 
-  const eventList = toCamelKeys(events ?? []) as EventModel[];
+  const eventList = toCamelKeys(events ?? []) as AdminEventListItem[];
   const currentEvent = eventList.find((event) => event.id === eventId);
 
   if (!currentEvent) {

@@ -15,12 +15,12 @@ import { Button } from "@/components/ui/button";
 import { ScanTextIcon, type ScanTextIconHandle } from "lucide-animated";
 import { X } from "lucide-react";
 import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
-import type { AdminUserModel, EventModel } from "@/types/models";
+import type { AdminEventListItem, AdminUserModel } from "@/types/models";
 
 type Props = {
-  events: EventModel[];
+  events: AdminEventListItem[];
   user: AdminUserModel;
-  currentEvent?: EventModel;
+  currentEvent?: AdminEventListItem;
   cancelTargetEventId?: string | null;
 };
 
