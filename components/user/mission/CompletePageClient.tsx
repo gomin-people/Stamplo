@@ -8,7 +8,7 @@ import {
   type RewardQrData,
 } from "@/features/participant/reward/participantRewardMutations";
 import { createBrowserSupabaseClient } from "@/utils/supabase/browser";
-import RewardQrModal from "./RewardQrModal";
+import RewardQrModal from "@/components/user/mission/RewardQrModal";
 import { toast } from "sonner";
 import { ApiError } from "@/features/shared/api/http";
 import { getRewardQrUrl } from "@/utils/qr";

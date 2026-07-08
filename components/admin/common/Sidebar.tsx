@@ -6,8 +6,8 @@ import {
   getAdminRouteConfig,
   getAdminSidebarItems,
 } from "@/constants/adminRoutes";
-import EventSelector from "./EventSelector";
-import SidebarNav from "./SidebarNav";
+import EventSelector from "@/components/admin/common/EventSelector";
+import SidebarNav from "@/components/admin/common/SidebarNav";
 import AdminUserInfo from "@/components/admin/common/AdminUserInfo";
 import StamploLogo from "@/components/admin/common/StamploLogo";
 import RewardQrScannerClient from "@/components/admin/reward/RewardQrScannerClient";
