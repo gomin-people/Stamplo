@@ -15,13 +15,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { EventModel } from "@/types/models";
+import type { AdminEventListItem, EventModel } from "@/types/models";
 import { useIsEditMode, useSetPendingHref } from "@/stores/admin";
 import { getDateKey, getEventOperationStatus } from "@/utils/event-status";
 
 type Props = {
   eventId: string;
-  events: EventModel[];
+  events: AdminEventListItem[];
+  currentEvent?: AdminEventListItem;
 };
 
 type AdminEventStatus = "진행중" | "예정" | "종료";
@@ -81,8 +82,8 @@ const getEventSortPriority = (status: AdminEventStatus) => {
 
 // 현재 행사 선택 목록과 생성 취소 이동 대상에서 동일하게 사용하는 행사 노출 우선순위
 export const compareEventsByDisplayPriority = (
-  firstEvent: EventModel,
-  secondEvent: EventModel
+  firstEvent: AdminEventListItem,
+  secondEvent: AdminEventListItem
 ) => {
   const firstStatus = getEventStatus(firstEvent);
   const secondStatus = getEventStatus(secondEvent);
@@ -101,7 +102,7 @@ export const compareEventsByDisplayPriority = (
 };
 
 // 현재 행사 선택 드롭다운과 행사 전환 동작을 담당하는 사이드바 컴포넌트
-const EventSelector = ({ eventId, events }: Props) => {
+const EventSelector = ({ eventId, events, currentEvent }: Props) => {
   const pathname = usePathname();
   const router = useRouter();
   const [isEventMenuOpen, setIsEventMenuOpen] = useState(false);
@@ -114,7 +115,10 @@ const EventSelector = ({ eventId, events }: Props) => {
     () => [...events].sort(compareEventsByDisplayPriority),
     [events]
   );
-  const selectedEvent = events.find((event) => String(event.id) === eventId);
+  const selectedEvent =
+    currentEvent && String(currentEvent.id) === eventId
+      ? currentEvent
+      : events.find((event) => String(event.id) === eventId);
   const selectedEventLabel = selectedEvent?.title ?? `행사 ${eventId}`;
 
   const selectEvent = (nextEventId: string) => {

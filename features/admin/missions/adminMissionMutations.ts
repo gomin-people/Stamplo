@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createJsonRequest, requestJson } from "@/features/shared/api/http";
-import { adminMissionQueryOptions } from "./adminMissionQueries";
+import { adminMissionQueryOptions } from "@/features/admin/missions/adminMissionQueries";
 import type { AdminMissionDetail } from "@/types/models";
 import {
   type MissionModel,

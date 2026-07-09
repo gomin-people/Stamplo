@@ -2,20 +2,24 @@
 
 import { useParams, usePathname } from "next/navigation";
 import { getAdminRouteConfig } from "@/constants/adminRoutes";
-import type { EventModel } from "@/types/models";
+import type { AdminEventListItem } from "@/types/models";
 import { getAdminEventStatusLabel } from "@/utils/event-status";
 
 type Props = {
-  events: EventModel[];
+  events: AdminEventListItem[];
+  currentEvent?: AdminEventListItem;
 };
 
-const Header = ({ events }: Props) => {
+const Header = ({ events, currentEvent }: Props) => {
   const pathname = usePathname();
   const { eventId } = useParams<{ eventId?: string }>();
   const route = getAdminRouteConfig(pathname);
-  const selectedEvent = eventId
-    ? events?.find((event) => String(event.id) === eventId)
-    : undefined;
+  const selectedEvent =
+    eventId && currentEvent && String(currentEvent.id) === eventId
+      ? currentEvent
+      : eventId
+        ? events.find((event) => String(event.id) === eventId)
+        : undefined;
   const eventTitle = eventId
     ? (selectedEvent?.title ?? `행사 ${eventId}`)
     : undefined;
