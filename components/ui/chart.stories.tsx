@@ -25,6 +25,10 @@ const meta = {
   component: ChartContainer,
   parameters: { layout: "centered" },
   tags: ["autodocs"],
+  args: {
+    config: chartConfig,
+    children: <BarChart />,
+  },
 } satisfies Meta<typeof ChartContainer>;
 
 export default meta;
