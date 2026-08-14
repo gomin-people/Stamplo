@@ -11,7 +11,9 @@
     "lint": "eslint",
     "test": "jest",
     "prepare": "husky",
-    "knip": "knip"
+    "knip": "knip",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,css}": [
@@ -54,8 +56,13 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^5.2.1",
     "@fontsource/nanum-gothic": "^5.2.7",
     "@fontsource/noto-sans-kr": "^5.2.9",
+    "@storybook/addon-a11y": "^10.5.0",
+    "@storybook/addon-docs": "^10.5.0",
+    "@storybook/addon-mcp": "^0.7.0",
+    "@storybook/nextjs": "^10.5.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -68,12 +75,14 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-storybook": "^10.5.0",
     "husky": "^9.1.7",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "knip": "^6.17.0",
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
+    "storybook": "^10.5.0",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.9",
     "typescript": "^5"
