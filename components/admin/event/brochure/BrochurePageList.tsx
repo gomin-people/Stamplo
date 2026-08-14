@@ -11,7 +11,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import BrochurePageItem from "./BrochurePageItem";
+import BrochurePageItem from "@/components/admin/event/brochure/BrochurePageItem";
 import type { UploadPage } from "@/hooks/usePageUpload";
 import type { DragEndEvent } from "@dnd-kit/core";
 

@@ -2,7 +2,7 @@ import {
   getResponseMessage,
   parseJsonResponse,
 } from "@/features/shared/api/http";
-import { getUserUnavailablePath } from "./qrCheckUtils";
+import { getUserUnavailablePath } from "@/components/user/qr-check/qrCheckUtils";
 
 export const ALREADY_COMPLETED_MISSION_MESSAGE = "이미 완료된 미션입니다";
 export const MISSION_CHECK_FAILED_MESSAGE = "미션 확인에 실패했습니다";

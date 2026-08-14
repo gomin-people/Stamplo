@@ -49,3 +49,5 @@ AGENTS.local.md
 
 #ide
 .idea
+*storybook.log
+storybook-static

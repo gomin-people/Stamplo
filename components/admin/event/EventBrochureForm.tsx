@@ -1,10 +1,10 @@
 "use client";
 
 import { forwardRef, useImperativeHandle } from "react";
-import BrochureDropzone from "./brochure/BrochureDropzone";
-import BrochurePageStatus from "./brochure/BrochurePageStatus";
-import BrochurePageList from "./brochure/BrochurePageList";
-import BrochureAddButton from "./brochure/BrochureAddButton";
+import BrochureDropzone from "@/components/admin/event/brochure/BrochureDropzone";
+import BrochurePageStatus from "@/components/admin/event/brochure/BrochurePageStatus";
+import BrochurePageList from "@/components/admin/event/brochure/BrochurePageList";
+import BrochureAddButton from "@/components/admin/event/brochure/BrochureAddButton";
 import usePageUpload from "@/hooks/usePageUpload";
 import { MAX_PAGES } from "@/constants";
 import { type StepFormHandle } from "@/types";

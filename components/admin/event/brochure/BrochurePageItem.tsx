@@ -3,7 +3,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, RefreshCw, Trash2 } from "lucide-react";
-import BrochureThumbnail from "./BrochureThumbnail";
+import BrochureThumbnail from "@/components/admin/event/brochure/BrochureThumbnail";
 import type { UploadPage } from "@/hooks/usePageUpload";
 import { cn } from "@/utils";
 import { Button } from "@/components/ui/button";

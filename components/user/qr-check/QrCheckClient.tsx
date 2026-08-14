@@ -8,7 +8,7 @@ import { useQrGuideMessage } from "@/hooks/useQrGuideMessage";
 import { useQrScanner } from "@/hooks/useQrScanner";
 import { type CameraStatus, type QrGuideMessageState } from "@/types/qr-check";
 import { getQrScanTarget } from "@/utils/qr";
-import { completeMissionFromQr } from "./completeMissionFromQr";
+import { completeMissionFromQr } from "@/components/user/qr-check/completeMissionFromQr";
 
 type QrCheckClientProps = {
   eventId: string;

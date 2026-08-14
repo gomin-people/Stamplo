@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { createJsonRequest, requestJson } from "@/features/shared/api/http";
 import { toSnakeKeys } from "@/utils/case";
 import {
@@ -53,36 +53,8 @@ function deleteAdminEvent(eventId: number) {
  * @returns React Query 행사 생성 mutation
  */
 export function useCreateEventMutation() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: createAdminEvent,
-    onSuccess: async (createdEvent) => {
-      await queryClient.cancelQueries({
-        queryKey: ["admin", "events", "list"],
-      });
-
-      queryClient.setQueryData<EventModel[]>(
-        ["admin", "events", "list"],
-        (events = []) => {
-          const hasCreatedEvent = events.some(
-            (event) => event.id === createdEvent.id
-          );
-
-          if (hasCreatedEvent) {
-            return events.map((event) =>
-              event.id === createdEvent.id ? createdEvent : event
-            );
-          }
-
-          return [createdEvent, ...events];
-        }
-      );
-
-      void queryClient.invalidateQueries({
-        queryKey: ["admin", "events", "list"],
-      });
-    },
   });
 }
 
@@ -92,15 +64,9 @@ export function useCreateEventMutation() {
  * @returns React Query 행사 수정 mutation
  */
 export function useUpdateEventMutation() {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ eventId, payload }: UpdateEventVariables) =>
       updateAdminEvent(eventId, payload),
-    onSuccess: (_, { eventId }) => {
-      queryClient.invalidateQueries({
-        queryKey: ["admin", "events", "detail", eventId],
-      });
-    },
   });
 }
 

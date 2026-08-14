@@ -3,9 +3,9 @@
 import { forwardRef, useImperativeHandle, useState, useMemo } from "react";
 import { type StepFormHandle } from "@/types";
 import { generatePalette, hslToHex, hexToHsl } from "@/utils";
-import StampUploadSection from "./themeStamp/StampUploadSection";
-import ThemeColorPicker from "./themeStamp/ThemeColorPicker";
-import ThemePreviewPanel from "./themeStamp/ThemePreviewPanel";
+import StampUploadSection from "@/components/admin/event/themeStamp/StampUploadSection";
+import ThemeColorPicker from "@/components/admin/event/themeStamp/ThemeColorPicker";
+import ThemePreviewPanel from "@/components/admin/event/themeStamp/ThemePreviewPanel";
 import { toast } from "sonner";
 
 type InitialData = {
